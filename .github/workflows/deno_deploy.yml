@@ -1,0 +1,34 @@
+name: deno_deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: read # Needed to clone the repository
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v3
+
+      - run: corepack enable
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+      - run: yarn install
+      - run: yarn build
+        env:
+          NITRO_PRESET: deno_deploy
+      - name: Deploy to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: wechat-article-exporter
+          entrypoint: server/index.ts
+          root: .output
