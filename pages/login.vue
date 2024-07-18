@@ -245,6 +245,10 @@ onMounted(() => {
   getQrcode()
 })
 
+onUnmounted(() => {
+  stopCheckQrcode()
+})
+
 </script>
 
 <style scoped>
