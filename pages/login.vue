@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center relative login__type__container login__type__container__scan">
     <h2 class="text-center text-2xl mb-5">登录微信公众平台</h2>
-    <img :src="qrcodeSrc" alt="" class="block w-2/3 login__type__container__scan__qrcode">
+    <img :src="qrcodeSrc || 'https://res.wx.qq.com/mpres/zh_CN/htmledition/pages/login/loginpage/images/default_qrcode_2x6f3177.png'" alt="" class="block w-2/3 login__type__container__scan__qrcode">
 
     <div class="login__type__container__scan__info">
       <!-- 等待扫码 -->
@@ -235,6 +235,7 @@ async function bizLogin() {
   if (token) {
     console.log('登录成功')
     window.localStorage.setItem('token', token)
+    navigateTo('/home')
   } else {
     console.log('系统繁忙，请稍后再试')
   }

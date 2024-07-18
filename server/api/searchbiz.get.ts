@@ -1,24 +1,21 @@
-import {parseCookies, H3Event} from 'h3'
+import {proxyMpRequest} from "~/server/utils";
 
 interface SearchBizQuery {
-    page?: string
-    size?: string
+    page?: number
+    size?: number
     keyword: string
     token: string
 }
 
-export default defineEventHandler(async (event: H3Event) => {
-    const cookies = parseCookies(event)
-    const cookie = Object.keys(cookies).map(key => `${key}=${cookies[key]}`).join(';')
-
+export default defineEventHandler(async (event) => {
     const query = getQuery<SearchBizQuery>(event)
     const keyword = query.keyword
     const token = query.token
-    const page: string = query.page || '1'
-    const size: string = query.size || '5'
-    const begin = (parseInt(page) - 1) * parseInt(size)
+    const page: number = query.page || 1
+    const size: number = query.size || 5
+    const begin = (page - 1) * size
 
-    const params: Record<string, string> = {
+    const params: Record<string, string | number> = {
         action: 'search_biz',
         begin: begin.toString(),
         count: size,
@@ -29,11 +26,11 @@ export default defineEventHandler(async (event: H3Event) => {
         ajax: '1',
     }
 
-    return fetch(`https://mp.weixin.qq.com/cgi-bin/searchbiz?${new URLSearchParams(params).toString()}`, {
+    return proxyMpRequest({
+        event: event,
         method: 'GET',
-        headers: {
-            Referer: 'https://mp.weixin.qq.com/',
-            Cookie: cookie,
-        },
-    }).then(resp => resp.json())
+        endpoint: 'https://mp.weixin.qq.com/cgi-bin/searchbiz',
+        query: params,
+        parseJson: true,
+    })
 })

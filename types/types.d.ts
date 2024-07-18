@@ -1,22 +1,3 @@
-interface BaseResp {
-    err_msg: string
-    ret: number
-}
-
-export interface StartLoginResult {
-    base_resp: BaseResp
-}
-export interface ScanLoginResult {
-    base_resp: BaseResp
-    status: number
-    acct_size: number
-    binduin: string
-}
-export interface BizLoginResult {
-    base_resp: BaseResp
-    redirect_url: string
-}
-
 const SCAN_LOGIN_TYPE = {
     0: '等待扫码',
     1: '扫码成功，可登录账号=1',
@@ -26,6 +7,28 @@ const SCAN_LOGIN_TYPE = {
     5: '二维码已过期',
     6: '二维码加载失败',
     7: 'qq号需要绑定邮箱',
+}
+
+
+export interface BaseResp {
+    err_msg: string
+    ret: number
+}
+
+export interface StartLoginResult {
+    base_resp: BaseResp
+}
+
+export interface ScanLoginResult {
+    base_resp: BaseResp
+    status: number
+    acct_size: number
+    binduin: string
+}
+
+export interface BizLoginResult {
+    base_resp: BaseResp
+    redirect_url: string
 }
 
 export interface AccountInfo {
@@ -52,6 +55,7 @@ export interface PublishListItem {
     publish_type: number
     publish_info: string
 }
+
 export interface PublishPage {
     featured_count: number
     masssend_count: number
@@ -59,6 +63,7 @@ export interface PublishPage {
     publish_list: PublishListItem[]
     total_count: number
 }
+
 export interface PublishInfo {
     type: number
     new_publish: number
@@ -71,18 +76,21 @@ export interface PublishInfo {
     appmsg_info: AppMsgInfo[]
     appmsgex: AppMsgEx[]
 }
+
 export interface ArticleSentInfo {
     func_flag: number
     is_published: number
     is_send_all: boolean
     time: number
 }
+
 export interface ArticleSentResult {
     msg_status: number
     refuse_reason: string
     update_time: number
     reject_index_list: any[]
 }
+
 export interface ArticleSentStatus {
     fail: number
     progress: number
@@ -90,6 +98,7 @@ export interface ArticleSentStatus {
     total: number
     userprotect: number
 }
+
 export interface AppMsgInfo {
     appmsg_like_type: number
     appmsgid: number
@@ -100,6 +109,7 @@ export interface AppMsgInfo {
     share_type: number
     smart_product: number
 }
+
 export interface AppMsgEx {
     aid: string
     album_id: string

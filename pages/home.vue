@@ -25,6 +25,7 @@
         </li>
       </ul>
       <button @click="nextAccountPage" v-if="accountList.length > 0">下一页</button>
+      <a :href="'/api/logout?token='+token">退出</a>
     </div>
     <div class="right">
       <form class="search" id="article-search" @submit.prevent="searchArticle">
@@ -42,7 +43,7 @@
             <p class="digest">{{article.digest}}</p>
             <div class="actions">
               <a :href="article.link" class="link" target="_blank">查看全文</a>
-              <a href="javascript:void 0" class="download">下载</a>
+              <a href="javascript:void 0" class="download" @click="download(article.link)">下载</a>
             </div>
           </div>
         </li>
@@ -71,6 +72,7 @@ const AccountTypeMap: Record<number, string> = {
   1: '订阅号',
   2: '服务号'
 }
+const token = window.localStorage.getItem('token')
 
 function proxyImage(url: string) {
   return `https://service.champ.design/api/proxy?url=${encodeURIComponent(url)}`
@@ -88,12 +90,14 @@ async function getAccountList() {
     query: {
       keyword: accountQuery.value,
       page: accountPageNo,
-      token: window.localStorage.getItem('token')
+      token: token,
     }
   })
 
   if (resp.base_resp.ret === 0) {
     accountList.push(...resp.list)
+  } else if (resp.base_resp.ret === 200003) {
+    navigateTo('/login')
   } else {
     console.log(resp.base_resp.err_msg)
   }
@@ -109,7 +113,7 @@ async function getArticleList() {
       id: activeAccountFakeID.value,
       keyword: articleQuery.value,
       page: articlePageNo,
-      token: window.localStorage.getItem('token')
+      token: token,
     }
   })
 
@@ -120,6 +124,8 @@ async function getArticleList() {
       const publish_info: PublishInfo = JSON.parse(item.publish_info)
       articleList.push(...publish_info.appmsgex)
     })
+  } else if (resp.base_resp.ret === 200003) {
+    navigateTo('/login')
   } else {
     console.log(resp.base_resp.err_msg)
   }
@@ -159,6 +165,13 @@ function nextAccountPage() {
 function nextArticlePage() {
   articlePageNo++
   getArticleList()
+}
+
+function download(link: string) {
+  // const iframe = document.createElement('iframe')
+  // iframe.src = link
+  // iframe.style.display = 'none'
+  // document.body.appendChild(iframe)
 }
 </script>
 

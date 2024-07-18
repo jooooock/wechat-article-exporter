@@ -1,29 +1,26 @@
-import {parseCookies} from "h3";
+import {proxyMpRequest} from "~/server/utils";
 
 export default defineEventHandler(async (event) => {
     const {sessionid} = event.context.params!
-    const cookies = parseCookies(event)
-    const cookie = Object.keys(cookies).map(key => `${key}=${cookies[key]}`).join(';')
 
-    const body: Record<string, string> = {
+    const body: Record<string, string | number> = {
         userlang: 'zh_CN',
         redirect_url: '',
-        login_type: '3',
+        login_type: 3,
         sessionid: sessionid,
         token: '',
         lang: 'zh_CN',
         f: 'json',
-        ajax: '1',
+        ajax: 1,
     }
 
-    return fetch('https://mp.weixin.qq.com/cgi-bin/bizlogin?action=startlogin', {
+    return proxyMpRequest({
+        event: event,
         method: 'POST',
-        body: new URLSearchParams(body).toString(),
-        headers: {
-            Referer: 'https://mp.weixin.qq.com/',
-            Cookie: cookie,
-        }
-    }).catch(e => {
-        console.log(e)
+        endpoint: 'https://mp.weixin.qq.com/cgi-bin/bizlogin',
+        query: {
+            action: 'startlogin',
+        },
+        body: body,
     })
 })
