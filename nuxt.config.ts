@@ -7,4 +7,11 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
   ssr: false,
+  nitro: {
+    vercel: {
+      functions: {
+        maxDuration: 60,
+      }
+    }
+  }
 })
