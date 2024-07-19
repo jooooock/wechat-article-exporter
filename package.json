@@ -19,6 +19,7 @@
     "lucide-vue-next": "^0.408.0",
     "nuxt": "^3.12.3",
     "pinia": "^2.1.7",
+    "puppeteer": "^22.13.1",
     "vue": "latest"
   },
   "devDependencies": {

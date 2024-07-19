@@ -12,7 +12,8 @@
       <p class="digest">{{ digest }}</p>
       <div class="actions">
         <a :href="link" class="link underline text-blue-500" target="_blank">查看原文</a>
-        <a href="javascript:void 0" class="download" @click="download(link)">下载</a>
+        <button class="hover:text-blue-800" @click="copyLink(link)" :disabled="copyBtnDisabled">{{copyBtnText}}</button>
+        <button class="hover:text-blue-800" @click="download(link)">下载</button>
       </div>
     </div>
   </li>
@@ -46,6 +47,19 @@ function download(link: string) {
   // iframe.src = link
   // iframe.style.display = 'none'
   // document.body.appendChild(iframe)
+}
+
+const copyBtnText = ref('复制链接')
+const copyBtnDisabled = ref(false)
+function copyLink(link: string) {
+  window.navigator.clipboard.writeText(link)
+
+  copyBtnText.value = '已复制'
+  copyBtnDisabled.value = true
+  setTimeout(() => {
+    copyBtnText.value = '复制链接'
+    copyBtnDisabled.value = false
+  }, 1000)
 }
 </script>
 
@@ -87,10 +101,6 @@ li {
         font-size: 18px;
         font-weight: bold;
         color: darkblue;
-      }
-
-      .highlight {
-        color: red;
       }
 
       & > .time {
