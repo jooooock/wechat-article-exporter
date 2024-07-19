@@ -20,7 +20,7 @@
             class="hover:cursor-pointer"
             @click="handleError"
           >
-            first lesson.
+            login
           </a>
         </p>
       </div>
@@ -33,7 +33,7 @@ const error = useError();
 const handleError = () => {
   clearError({
     redirect:
-      '/course/1-chapter-1/1-introduction-to-typescript-with-vue-js-3',
+      '/login',
   });
 };
 </script>
