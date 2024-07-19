@@ -1,8 +1,23 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from "@sparticuz/chromium-min";
+
+
+chromium.setHeadlessMode = true;
+
+// 远程执行包
+const remoteExecutablePath =
+    "https://github.com/Sparticuz/chromium/releases/download/v126.0.0/chromium-v126.0.0-pack.tar";
 
 export default defineEventHandler(async (event) => {
+    console.log(await chromium.executablePath())
+
     // Launch the browser and open a new blank page
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(remoteExecutablePath),
+        headless: chromium.headless,
+    });
     const page = await browser.newPage();
 
     // Navigate the page to a URL.

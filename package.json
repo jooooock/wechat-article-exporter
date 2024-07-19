@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@pinia/nuxt": "^0.5.1",
+    "@sparticuz/chromium-min": "126",
     "@tailwindcss/typography": "^0.5.13",
     "@vueuse/core": "^10.11.0",
     "@vueuse/nuxt": "^10.11.0",
@@ -19,7 +20,7 @@
     "lucide-vue-next": "^0.408.0",
     "nuxt": "^3.12.3",
     "pinia": "^2.1.7",
-    "puppeteer": "^22.13.1",
+    "puppeteer-core": "^22.13.1",
     "vue": "latest"
   },
   "devDependencies": {
