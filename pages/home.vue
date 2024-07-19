@@ -15,6 +15,10 @@ definePageMeta({
   layout: false
 })
 
+useHead({
+  title: '微信公众号文章导出'
+})
+
 const token = useToken()
 const logoutHref = `/api/logout?token=${token.value}`
 

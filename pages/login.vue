@@ -128,6 +128,10 @@ const SCAN_LOGIN_TYPE = {
   7: 'qq号需要绑定邮箱',
 }
 
+useHead({
+  title: '登录 | 微信公众号文章导出'
+});
+
 // 创建新的登录会话
 async function newLoginSession(sid: string) {
   const {data, status, error} = await useFetch<StartLoginResult>(`/api/login/session/${sid}`, {

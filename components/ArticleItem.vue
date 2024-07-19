@@ -47,12 +47,12 @@ li {
   padding: 10px 20px;
   align-items: center;
 
-  &.isDeleted::after {
-    content: '已删';
-    color: red;
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
+  &.isDeleted {
+    background-image: url("~/assets/deleted.png");
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: 100px 100px;
+    background-blend-mode: lighten;
   }
 
   & > .cover {
