@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="pb-24">
     <mp-search v-model="accountQuery" @search="searchAccount" placeholder="搜索公众号" />
     <ul>
       <AccountItem
@@ -10,7 +10,7 @@
           @click="selectAccount(account)"
       />
     </ul>
-    <p v-if="loading" class="text-center">loading...</p>
+    <p v-if="loading" class="text-center mt-2 py-2">loading...</p>
     <button v-else class="block mx-auto border-2 w-1/4 hover:border-amber-700 rounded py-1 px-3 mt-2" @click="nextAccountPage" v-if="accountList.length > 0">下一页</button>
   </div>
 </template>

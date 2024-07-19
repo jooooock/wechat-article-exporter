@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="pb-24">
     <mp-search v-model="articleQuery" @search="searchArticle" placeholder="选择公众号，搜索文章"/>
     <ul id="articles">
       <ArticleItem v-for="article in articleList" :key="article.appmsgid" v-bind="article"/>
     </ul>
-    <p v-if="loading" class="text-center">loading...</p>
+    <p v-if="loading" class="text-center mt-2 py-2">loading...</p>
     <button v-else class="block mx-auto border-2 w-1/4 hover:border-amber-700 rounded py-1 px-3 mt-2" @click="nextArticlePage" v-if="articleList.length > 0">下一页</button>
   </div>
 </template>
