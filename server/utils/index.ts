@@ -11,7 +11,7 @@ interface RequestOptions {
     parseJson?: boolean
 }
 
-export function proxyMpRequest(options: RequestOptions) {
+export async function proxyMpRequest(options: RequestOptions) {
     const cookies = parseCookies(options.event)
     const cookie = Object.keys(cookies).map(key => `${key}=${cookies[key]}`).join(';')
 

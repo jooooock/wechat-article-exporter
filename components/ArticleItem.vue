@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import dayjs from "dayjs";
+import {saveAs} from 'file-saver'
 
 interface Props {
   index: number
@@ -45,18 +46,16 @@ function articleUpdateTime(update_time: number) {
 const downloading = ref(false)
 async function download(link: string, title: string) {
   downloading.value = true
-  const base64 = await $fetch('/api/download?url=' + encodeURIComponent(link)).finally(() => {
+  const html = await $fetch<string>('/api/download?url=' + encodeURIComponent(link)).finally(() => {
     downloading.value = false
   })
 
-  const url = `data:image/png;base64,${base64}`;
-  const element = document.createElement('a')
-  element.setAttribute('href', url)
-  element.setAttribute('download', title)
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click()
-  document.body.removeChild(element);
+  // const buffer = Uint8Array.from(atob(html), (c) => c.charCodeAt(0))
+
+  const blob = new Blob([html], {
+    type: "text/html;charset=utf-8",
+  });
+  saveAs(blob, title)
 }
 
 const copyBtnText = ref('复制链接')
