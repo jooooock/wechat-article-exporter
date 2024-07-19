@@ -13,7 +13,7 @@
       <div class="actions">
         <a :href="link" class="link underline text-blue-500" target="_blank">查看原文</a>
         <button class="hover:text-blue-800" @click="copyLink(link)" :disabled="copyBtnDisabled">{{copyBtnText}}</button>
-        <button class="hover:text-blue-800" @click="download(link)">下载</button>
+        <button class="hover:text-blue-800" @click="download(link, title)" :disabled="downloading">{{downloading ? '下载中' : '下载'}}</button>
       </div>
     </div>
   </li>
@@ -42,11 +42,21 @@ function articleUpdateTime(update_time: number) {
   return dayjs.unix(update_time).format('YYYY-MM-DD HH:mm')
 }
 
-function download(link: string) {
-  // const iframe = document.createElement('iframe')
-  // iframe.src = link
-  // iframe.style.display = 'none'
-  // document.body.appendChild(iframe)
+const downloading = ref(false)
+async function download(link: string, title: string) {
+  downloading.value = true
+  const base64 = await $fetch('/api/download?url=' + encodeURIComponent(link)).finally(() => {
+    downloading.value = false
+  })
+
+  const url = `data:image/png;base64,${base64}`;
+  const element = document.createElement('a')
+  element.setAttribute('href', url)
+  element.setAttribute('download', title)
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click()
+  document.body.removeChild(element);
 }
 
 const copyBtnText = ref('复制链接')
