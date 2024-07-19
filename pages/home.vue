@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import type {AccountInfo} from "~/types/types";
-import {activeAccountFakeID} from "~/composables/useActiveAccount";
+import {activeAccount} from "~/composables/useActiveAccount";
 import type ArticleList from "~/components/ArticleList.vue";
 
 
@@ -25,7 +25,7 @@ const logoutHref = `/api/logout?token=${token.value}`
 const articleListRef = ref<typeof ArticleList | null>(null)
 
 function selectAccount(account: AccountInfo) {
-  activeAccountFakeID.value = account.fakeid
+  activeAccount.value = account
   articleListRef.value?.init()
 }
 </script>

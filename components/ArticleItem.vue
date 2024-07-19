@@ -1,14 +1,17 @@
 <template>
-  <li :class="{isDeleted: is_deleted}">
-    <img :src="proxyImage(cover_img || cover)" alt="" class="cover">
+  <li :class="{isDeleted: isDeleted}">
+    <img :src="proxyImage(cover)" alt="" class="cover">
     <div class="content">
       <div class="head">
-        <p class="title" v-html="title"></p>
-        <p class="time">{{ articleUpdateTime(update_time) }}</p>
+        <p class="title">
+          <span class="text-rose-600">#{{index}}. </span>
+          <span v-html="title"></span>
+        </p>
+        <p class="time">{{ articleUpdateTime(updatedAt) }}</p>
       </div>
       <p class="digest">{{ digest }}</p>
       <div class="actions">
-        <a :href="link" class="link" target="_blank">查看全文</a>
+        <a :href="link" class="link underline text-blue-500" target="_blank">查看原文</a>
         <a href="javascript:void 0" class="download" @click="download(link)">下载</a>
       </div>
     </div>
@@ -16,10 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import type {AppMsgEx} from "~/types/types";
 import dayjs from "dayjs";
 
-defineProps<AppMsgEx>()
+interface Props {
+  index: number
+  cover: string
+  title: string
+  updatedAt: number
+  digest: string
+  link: string
+  isDeleted: boolean
+}
+
+defineProps<Props>()
 
 function proxyImage(url: string) {
   return `https://service.champ.design/api/proxy?url=${encodeURIComponent(url)}`

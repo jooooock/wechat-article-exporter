@@ -5,7 +5,7 @@
       <AccountItem
           v-for="account in accountList"
           :key="account.fakeid"
-          :class="{active: account.fakeid === activeAccountFakeID}"
+          :class="{active: account.fakeid === activeAccount?.fakeid}"
           v-bind="account"
           @click="selectAccount(account)"
       />
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import type {AccountInfo, SearchBizResponse} from "~/types/types";
-import {activeAccountFakeID} from "~/composables/useActiveAccount";
+import {activeAccount} from "~/composables/useActiveAccount";
 
 const accountQuery = ref('')
 const accountList = reactive<AccountInfo[]>([])

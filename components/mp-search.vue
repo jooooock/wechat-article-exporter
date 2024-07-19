@@ -1,7 +1,7 @@
 <template>
-  <form class="search" @submit.prevent="search">
-    <input type="text" v-model="query" autocomplete="off" :placeholder="placeholder">
-    <button type="submit">搜索</button>
+  <form class="search flex flex-1 py-2 px-4" @submit.prevent="search">
+    <input class="flex-1 rounded border py-1 px-2" type="text" v-model="query" autocomplete="off" :placeholder="placeholder">
+    <button type="submit" class="ml-1">搜索</button>
   </form>
 </template>
 
@@ -18,25 +18,3 @@ function search() {
   emit('search', query.value)
 }
 </script>
-<style scoped>
-.search {
-  display: flex;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: .5em 1em;
-  background: white;
-  border-bottom: 1px solid lightgray;
-
-  & input {
-    flex: 1;
-    border: 1px solid lightgray;
-    border-radius: 3px;
-    padding: .25em .5em;
-  }
-
-  & button {
-    margin-left: 10px;
-  }
-}
-</style>
