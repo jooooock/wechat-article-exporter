@@ -1,13 +1,13 @@
 <template>
   <li :class="{isDeleted: isDeleted}">
-    <img :src="proxyImage(cover)" alt="" class="cover">
+    <img v-if="cover" :src="proxyImage(cover)" alt="" class="cover">
     <div class="content">
       <div class="head">
         <p class="title">
           <span class="text-rose-600">#{{index}}. </span>
           <span v-html="title"></span>
         </p>
-        <p class="time">{{ articleUpdateTime(updatedAt) }}</p>
+        <p class="time whitespace-nowrap">{{ articleUpdateTime(updatedAt) }}</p>
       </div>
       <p class="digest">{{ digest }}</p>
       <div class="actions">
