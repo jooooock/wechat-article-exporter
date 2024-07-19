@@ -1,16 +1,13 @@
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
+import {launchBrowserLocal} from '~/server/utils/local-puppeteer'
+import {launchBrowserRemote} from '~/server/utils/remote-puppeteer'
 
+
+// 运行环境
+const isDev = process.env.NODE_ENV === "development";
 
 export default defineEventHandler(async (event) => {
-
     // Launch the browser and open a new blank page
-    const browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-    });
+    let browser = isDev ? await launchBrowserLocal() : await launchBrowserRemote();
     const page = await browser.newPage();
 
     // Navigate the page to a URL.
