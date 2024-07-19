@@ -34,13 +34,16 @@ async function autoScroll(page: any){
             var totalHeight = 0;
             var distance = 100;
             var timer = setInterval(() => {
+                // @ts-ignore
                 var scrollHeight = document.body.scrollHeight;
+                // @ts-ignore
                 window.scrollBy(0, distance);
                 totalHeight += distance;
 
+                // @ts-ignore
                 if(totalHeight >= scrollHeight - window.innerHeight){
                     clearInterval(timer);
-                    resolve();
+                    resolve(true);
                 }
             }, 100);
         });
