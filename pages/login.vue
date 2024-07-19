@@ -116,6 +116,17 @@ const qrcodeTimer = ref<number | null>(null)
 const sessionid = new Date().getTime().toString() + Math.floor(Math.random() * 100);
 const hasStartLogin = ref(false)
 
+const token = useToken()
+const SCAN_LOGIN_TYPE = {
+  0: '等待扫码',
+  1: '扫码成功，可登录账号=1',
+  2: '扫码成功，可登录账号>1',
+  3: '没有可登录账号',
+  4: '登录失败',
+  5: '二维码已过期',
+  6: '二维码加载失败',
+  7: 'qq号需要绑定邮箱',
+}
 
 // 创建新的登录会话
 async function newLoginSession(sid: string) {
@@ -231,10 +242,10 @@ async function bizLogin() {
     method: 'POST'
   })
   // /cgi-bin/home?t=home/index&lang=zh_CN&token=1416430543
-  const token = new URL(`http://localhost${result.redirect_url}`).searchParams.get('token')
-  if (token) {
+  const _token = new URL(`http://localhost${result.redirect_url}`).searchParams.get('token')
+  if (_token) {
     console.log('登录成功')
-    window.localStorage.setItem('token', token)
+    token.value = _token
     navigateTo('/home')
   } else {
     console.log('系统繁忙，请稍后再试')
@@ -248,7 +259,6 @@ onMounted(() => {
 onUnmounted(() => {
   stopCheckQrcode()
 })
-
 </script>
 
 <style scoped>

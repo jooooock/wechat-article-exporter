@@ -11,10 +11,17 @@
   },
   "dependencies": {
     "@nuxtjs/tailwindcss": "^6.12.0",
+    "@pinia/nuxt": "^0.5.1",
     "@tailwindcss/typography": "^0.5.13",
     "@vueuse/core": "^10.11.0",
     "@vueuse/nuxt": "^10.11.0",
+    "dayjs": "^1.11.12",
+    "lucide-vue-next": "^0.408.0",
     "nuxt": "^3.12.3",
+    "pinia": "^2.1.7",
     "vue": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
   }
 }

@@ -1,15 +1,3 @@
-const SCAN_LOGIN_TYPE = {
-    0: '等待扫码',
-    1: '扫码成功，可登录账号=1',
-    2: '扫码成功，可登录账号>1',
-    3: '没有可登录账号',
-    4: '登录失败',
-    5: '二维码已过期',
-    6: '二维码加载失败',
-    7: 'qq号需要绑定邮箱',
-}
-
-
 export interface BaseResp {
     err_msg: string
     ret: number
@@ -114,13 +102,13 @@ export interface AppMsgEx {
     aid: string
     album_id: string
     appmsgid: number
-    author_name: number
+    author_name: string
     ban_flag: number
     checking: number
     copyright_stat: number
     copyright_type: number
     cover: string
-    cover_img: string
+    cover_img?: string
     create_time: number
     digest: string
     has_red_packet_cover: number

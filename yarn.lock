@@ -909,7 +909,7 @@
     which "^3.0.1"
     ws "^8.17.1"
 
-"@nuxt/kit@3.12.3", "@nuxt/kit@^3.11.2", "@nuxt/kit@^3.12.1", "@nuxt/kit@^3.12.2":
+"@nuxt/kit@3.12.3", "@nuxt/kit@^3.11.2", "@nuxt/kit@^3.12.1", "@nuxt/kit@^3.12.2", "@nuxt/kit@^3.5.0":
   version "3.12.3"
   resolved "https://registry.npmjs.org/@nuxt/kit/-/kit-3.12.3.tgz#71a8ea30feb54e0c6fb3b7df33b71aa08ba05f8f"
   integrity sha512-5R8FZLDxBKlkDWYsqwU1tctGJ5vwMA96WBrNkpQ0LznB2/p+3MWWTO6vz+0P0F9xvZZfkk/KKyZ3uUhnG9VJOA==
@@ -1124,6 +1124,14 @@
     "@parcel/watcher-win32-arm64" "2.4.1"
     "@parcel/watcher-win32-ia32" "2.4.1"
     "@parcel/watcher-win32-x64" "2.4.1"
+
+"@pinia/nuxt@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.npmjs.org/@pinia/nuxt/-/nuxt-0.5.1.tgz#ee7c979d365a5dfda882430ddfae405fbd78d8d5"
+  integrity sha512-6wT6TqY81n+7/x3Yhf0yfaJVKkZU42AGqOR0T3+UvChcaOJhSma7OWPN64v+ptYlznat+fS1VTwNAcbi2lzHnw==
+  dependencies:
+    "@nuxt/kit" "^3.5.0"
+    pinia ">=2.1.7"
 
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
@@ -1505,7 +1513,7 @@
     "@vue/compiler-dom" "3.4.31"
     "@vue/shared" "3.4.31"
 
-"@vue/devtools-api@^6.5.1":
+"@vue/devtools-api@^6.5.0", "@vue/devtools-api@^6.5.1":
   version "6.6.3"
   resolved "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.6.3.tgz#b23a588154cba8986bba82b6e1d0248bde3fd1a0"
   integrity sha512-0MiMsFma/HqA6g3KLKn+AGpL1kgKhFWszC9U29NfpWK5LE7bjeXxySWJrOJ77hBz+TBrBQ7o4QJqbPbqbs8rJw==
@@ -2354,6 +2362,11 @@ csstype@^3.1.3:
   version "3.1.3"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz#d80ff294d114fb0e6ac500fbf85b60137d7eff81"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
+
+dayjs@^1.11.12:
+  version "1.11.12"
+  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.12.tgz#5245226cc7f40a15bf52e0b99fd2a04669ccac1d"
+  integrity sha512-Rt2g+nTbLlDWZTwwrIXjy9MeiZmSDI375FvZs72ngxx8PDC6YXOeR3q5LAuPzjZQxhiWdRKac7RKV+YyQYfYIg==
 
 db0@^0.1.4:
   version "0.1.4"
@@ -3603,6 +3616,11 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
+lucide-vue-next@^0.408.0:
+  version "0.408.0"
+  resolved "https://registry.npmjs.org/lucide-vue-next/-/lucide-vue-next-0.408.0.tgz#79f3d42dd05a5821f20b189fb4dd6f3d07af5003"
+  integrity sha512-X2w4IDKs6O/R+vPdyMl5VvXS0mhuTqXtw6/NQOOIfCHvMz6vWa1Q2XvYT3oQGzyU94uVZw16jcdC1LwI5XbOdg==
+
 magic-string-ast@^0.6.0:
   version "0.6.2"
   resolved "https://registry.npmjs.org/magic-string-ast/-/magic-string-ast-0.6.2.tgz#180679c584bdea9de1dbb6c755fd3e4bf1b0b509"
@@ -4253,6 +4271,14 @@ pify@^2.3.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
   integrity sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==
+
+pinia@>=2.1.7, pinia@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.npmjs.org/pinia/-/pinia-2.1.7.tgz#4cf5420d9324ca00b7b4984d3fbf693222115bbc"
+  integrity sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==
+  dependencies:
+    "@vue/devtools-api" "^6.5.0"
+    vue-demi ">=0.14.5"
 
 pirates@^4.0.1:
   version "4.0.6"
@@ -5274,6 +5300,11 @@ type-is@^1.6.16:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
+typescript@^5.5.3:
+  version "5.5.3"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-5.5.3.tgz#e1b0a3c394190838a0b168e771b0ad56a0af0faa"
+  integrity sha512-/hreyEujaB0w76zKo6717l3L0o/qEUtRgdvUBvlkhoWeOVMjMuHNHk0BRBzikzuGDqNmPQbg5ifMEqsHLiIUcQ==
+
 ufo@^1.1.2, ufo@^1.4.0, ufo@^1.5.3:
   version "1.5.3"
   resolved "https://registry.npmjs.org/ufo/-/ufo-1.5.3.tgz#3325bd3c977b6c6cd3160bf4ff52989adc9d3344"
@@ -5596,7 +5627,7 @@ vue-bundle-renderer@^2.1.0:
   dependencies:
     ufo "^1.5.3"
 
-vue-demi@>=0.14.8:
+vue-demi@>=0.14.5, vue-demi@>=0.14.8:
   version "0.14.8"
   resolved "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.8.tgz#00335e9317b45e4a68d3528aaf58e0cec3d5640a"
   integrity sha512-Uuqnk9YE9SsWeReYqK2alDI5YzciATE0r2SkA6iMAtuXvNTMNACJLJEXNXaEy94ECuBe4Sk6RzRU80kjdbIo1Q==
