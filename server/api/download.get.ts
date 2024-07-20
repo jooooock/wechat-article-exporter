@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         return `${p1}src="${proxyImage(p2)}"`
     });
     // 处理 background url
-    html = html.replaceAll(/(background: url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, p2, p3) => {
+    html = html.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, p2, p3) => {
         return `${p1}${proxyImage(p2)}${p3}`
     })
 

@@ -52,7 +52,33 @@ async function download(link: string, title: string) {
 
   // const buffer = Uint8Array.from(atob(html), (c) => c.charCodeAt(0))
 
-  const blob = new Blob([html], {
+  const parser = new DOMParser()
+  const document = parser.parseFromString(html, 'text/html')
+  const $jsContent = document.querySelector('#js_content')
+  if (!$jsContent) {
+    alert('下载失败，请重试')
+    return
+  }
+
+  $jsContent.removeAttribute('style')
+  const pageContent = document.querySelector('#page-content')!.outerHTML
+
+  const result = `<!DOCTYPE html>
+<html class="">
+<head>
+    <meta name="wechat-enable-text-zoom-em" content="true">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
+</head>
+<body>
+${pageContent}
+</body>
+</html>`
+
+  const blob = new Blob([result], {
     type: "text/html;charset=utf-8",
   });
   saveAs(blob, title)
