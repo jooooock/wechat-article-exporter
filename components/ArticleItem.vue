@@ -121,11 +121,16 @@ async function download(link: string, title: string) {
     const indexHTML = `<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport"
           content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
+    <link rel="stylesheet" href="//res.wx.qq.com/mmbizappmsg/zh_CN/htmledition/js/assets/index.lyzn48mo196f5b68.css">
+    <link rel="stylesheet" href="//res.wx.qq.com/mmbizappmsg/zh_CN/htmledition/js/assets/cover_next.lyzn48mo6e86e161.css">
+    <link rel="stylesheet" href="//res.wx.qq.com/mmbizappmsg/zh_CN/htmledition/js/assets/interaction.lyzn48mo9570c58b.css">
+    <link rel="stylesheet" href="//res.wx.qq.com/mmbizappmsg/zh_CN/htmledition/js/assets/qqmail_tpl_vite_entry.lyzn48moe171b81c.css">
+    <link rel="stylesheet" href="//res.wx.qq.com/mmbizappmsg/zh_CN/htmledition/js/assets/tencent_portfolio_light.lyzn48mo0cd74df8.css">
     <style>
 #page-content {
 max-width: 667px;
