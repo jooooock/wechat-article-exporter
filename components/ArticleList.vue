@@ -1,10 +1,8 @@
 <template>
   <div class="pb-24">
     <div class="sticky top-0 z-10 px-5 bg-white rounded border border-b flex items-center">
-      <div>当前选择公众号: <span class="text-sky-400">{{ activeAccount?.nickname }}</span> (共有 {{ totalCount }} 条)
-      </div>
-      <PageSizer v-model="pageSize" />
-      <mp-search v-model="articleQuery" @search="searchArticle" placeholder="选择公众号，搜索文章"/>
+      <div> (共有 {{ totalCount }} 条)</div>
+      <mp-search v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>
     </div>
     <ul id="articles">
       <ArticleItem
@@ -30,7 +28,6 @@
 <script setup lang="ts">
 import type {AppMsgEx, AppMsgPublishResponse, PublishInfo, PublishPage} from "~/types/types";
 import {activeAccount} from "~/composables/useActiveAccount";
-import PageSizer from "~/components/PageSizer.vue";
 
 const articleQuery = ref('')
 const articleList = reactive<AppMsgEx[]>([])
@@ -40,7 +37,7 @@ const totalCount = ref<string>('-')
 
 const token = useToken()
 
-const pageSize = ref(5)
+const pageSize = ref(20)
 
 defineExpose({
   init,

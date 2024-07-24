@@ -250,7 +250,7 @@ async function bizLogin() {
   if (_token) {
     console.log('登录成功')
     token.value = _token
-    navigateTo('/home')
+    navigateTo('/')
   } else {
     console.log('系统繁忙，请稍后再试')
   }

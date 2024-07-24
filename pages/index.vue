@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <AccountList class="left" @select="selectAccount"/>
+  <div id="app" class="flex flex-col">
+    <Header @select="selectAccount"/>
     <ArticleList ref="articleListRef" class="right"/>
   </div>
 </template>
@@ -19,8 +19,6 @@ useHead({
   title: '微信公众号文章导出'
 })
 
-const token = useToken()
-const logoutHref = `/api/logout?token=${token.value}`
 
 const articleListRef = ref<typeof ArticleList | null>(null)
 
@@ -35,13 +33,6 @@ function selectAccount(account: AccountInfo) {
   display: flex;
   height: 100vh;
   overflow: hidden;
-
-  & > .left {
-    width: 600px;
-    border-right: 1px solid lightgray;
-    overflow-y: scroll;
-    overflow-x: hidden;
-  }
 
   & > .right {
     flex: 1;
