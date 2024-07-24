@@ -1,6 +1,6 @@
 <template>
   <li class="group relative flex border hover:border-slate-300 shadow hover:shadow-md rounded-md overflow-hidden">
-    <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute size-[100px] right-0 bottom-0">
+    <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute size-[100px] right-0 bottom-0 translate-x-full drop-shadow-[-100px_0_red]">
     <div v-if="cover" class="w-36 overflow-hidden">
       <img
           :src="proxyImage(cover)"
