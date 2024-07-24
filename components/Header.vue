@@ -1,12 +1,14 @@
 <template>
-  <header
-      class="sticky top-0 z-20 flex-none py-3 pl-5 pr-3 sm:pl-6 sm:pr-4 md:pr-3.5 lg:px-6 flex items-center space-x-4 antialiased">
+  <header class="sticky top-0 z-20 flex-none px-5 border-b flex items-center justify-between antialiased">
     <div class="flex-auto flex items-center min-w-0 space-x-6">
       <div class="text-md">当前选择公众号: <span class="text-sky-400 font-semibold">{{activeAccount?.nickname}}</span></div>
       <button @click="isOpen = true"
-              class="rounded-md text-sm font-semibold leading-6 py-1 px-3 hover:bg-sky-400 bg-sky-500 text-white shadow-sm dark:shadow-highlight/20">
+              class="rounded-md text-sm font-semibold leading-6 py-1 px-3 hover:bg-sky-400 bg-sky-500 text-white shadow-sm">
         切换
       </button>
+    </div>
+    <div class="flex items-center">
+      <mp-search v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>
     </div>
   </header>
 
@@ -23,22 +25,22 @@
           </div>
         </UForm>
       </div>
-      <div class="flex-1 px-4 py-5 sm:p-6">
-        <ul>
+      <div class="flex-1">
+        <ul class="divide-y antialiased">
           <li v-for="account in accountList"
               :key="account.fakeid"
-              class="flex mb-3"
+              class="flex items-center px-2 py-4 hover:bg-slate-50 hover:cursor-pointer"
               :class="{active: account.fakeid === activeAccount?.fakeid}"
               @click="selectAccount(account)"
           >
-            <img class="w-20 h-20 rounded mr-1" :src="proxyImage(account.round_head_img)" alt="">
+            <img class="size-20 mr-2" :src="proxyImage(account.round_head_img)" alt="">
             <div class="flex-1">
               <div class="flex justify-between">
-                <p class="nickname">{{ account.nickname }}</p>
-                <p class="type">{{ AccountTypeMap[account.service_type] }}</p>
+                <p class="font-semibold">{{ account.nickname }}</p>
+                <p class="text-sky-500 font-medium">{{ AccountTypeMap[account.service_type] }}</p>
               </div>
-              <p class="text-gray-500">微信号: {{ account.alias || '未设置' }}</p>
-              <p class="signature">{{ account.signature }}</p>
+              <p class="text-gray-500 text-sm">微信号: {{ account.alias || '未设置' }}</p>
+              <p class="text-sm mt-2">{{ account.signature }}</p>
             </div>
           </li>
         </ul>
@@ -63,8 +65,14 @@ const AccountTypeMap: Record<number, string> = {
   2: '服务号'
 }
 
-function proxyImage(url: string) {
-  return `https://service.champ.design/api/proxy?url=${encodeURIComponent(url)}`
+const articleQuery = ref('')
+function searchArticle() {
+  if (!activeAccount.value) {
+    alert('请先选择公众号')
+    return
+  }
+
+  emit('search', articleQuery.value)
 }
 
 const isOpen = ref(false)
@@ -93,7 +101,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 const token = useToken()
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'search'])
 
 const loading = ref(false)
 

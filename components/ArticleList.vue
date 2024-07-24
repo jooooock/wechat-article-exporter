@@ -1,10 +1,6 @@
 <template>
   <div class="pb-24">
-    <div class="sticky top-0 z-10 px-5 bg-white rounded border border-b flex items-center">
-      <div> (共有 {{ totalCount }} 条)</div>
-      <mp-search v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>
-    </div>
-    <ul id="articles">
+    <ul class="flex flex-col space-y-3 container mx-auto">
       <ArticleItem
           v-for="(article, index) in articleList"
           :key="article.appmsgid"
@@ -81,17 +77,6 @@ async function getArticleList() {
   }
 }
 
-function searchArticle() {
-  if (!activeAccount.value) {
-    alert('请先选择公众号')
-    return
-  }
-
-  articlePageNo = 1
-  articleList.length = 0
-  getArticleList()
-}
-
 function nextArticlePage() {
   articlePageNo++
   getArticleList()
@@ -100,11 +85,12 @@ function nextArticlePage() {
 /**
  * 初始化
  */
-function init() {
+function init(query: string) {
   articleList.length = 0
   articlePageNo = 1
   totalCount.value = '-'
   noMoreArticle.value = false
+  articleQuery.value = query
 
   getArticleList()
 }

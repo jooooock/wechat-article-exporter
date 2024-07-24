@@ -1,17 +1,23 @@
 <template>
-  <li :class="{isDeleted: isDeleted}">
-    <img v-if="cover" :src="proxyImage(cover)" alt="" class="cover">
-    <div class="content">
-      <div class="head">
-        <p class="title">
-          <span class="text-rose-600">#{{index}}. </span>
-          <span v-html="title"></span>
-        </p>
-        <p class="time whitespace-nowrap">{{ articleUpdateTime(updatedAt) }}</p>
+  <li class="group relative flex border hover:border-slate-300 shadow hover:shadow-md rounded-md overflow-hidden">
+    <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute size-[100px] right-0 bottom-0">
+    <div v-if="cover" class="w-36 overflow-hidden">
+      <img
+          :src="proxyImage(cover)"
+          alt=""
+          class="h-full object-cover group-hover:scale-105 transition">
+    </div>
+    <div class="p-4 flex-1 space-y-2">
+      <div class="flex">
+        <div class="flex-1">
+          <span class="text-rose-600 font-mono">#{{index}}.</span>
+          <h3 class="inline-block text-xl text-blue-800 font-semibold" v-html="title"></h3>
+        </div>
+        <p class="whitespace-nowrap text-sm text-gray-500">{{ formatTimeStamp(updatedAt) }}</p>
       </div>
-      <p class="digest">{{ digest }}</p>
-      <div class="actions">
-        <a :href="link" class="link underline text-blue-500" target="_blank">查看原文</a>
+      <p class="text-slate-600 text-sm">{{ digest }}</p>
+      <div class="space-x-3">
+        <a :href="link" class="underline text-blue-500 underline-offset-4" target="_blank">查看原文</a>
         <button class="hover:text-blue-800" @click="copyLink(link)" :disabled="copyBtnDisabled">{{copyBtnText}}</button>
         <button class="hover:text-blue-800" @click="download(link, title)" :disabled="downloading">{{downloading ? '下载中' : '下载'}}</button>
       </div>
@@ -20,8 +26,8 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from "dayjs";
 import {saveAs} from 'file-saver'
+import {formatTimeStamp, proxyImage} from "~/utils";
 
 interface Props {
   index: number
@@ -35,13 +41,6 @@ interface Props {
 
 defineProps<Props>()
 
-function proxyImage(url: string) {
-  return `https://service.champ.design/api/proxy?url=${encodeURIComponent(url)}`
-}
-
-function articleUpdateTime(update_time: number) {
-  return dayjs.unix(update_time).format('YYYY-MM-DD HH:mm')
-}
 
 const downloading = ref(false)
 async function download(link: string, title: string) {
@@ -99,63 +98,6 @@ function copyLink(link: string) {
 </script>
 
 <style scoped>
-li {
-  position: relative;
-  display: flex;
-  border: 1px solid lightgray;
-  border-radius: 8px;
-  margin: 20px;
-  padding: 10px 20px;
-  align-items: center;
-
-  &.isDeleted {
-    background-image: url("~/assets/deleted.png");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    background-size: 100px 100px;
-    background-blend-mode: lighten;
-  }
-
-  & > .cover {
-    display: block;
-    width: 100px;
-    height: 100px;
-    margin-right: 10px;
-    border-radius: 5px;
-  }
-
-  & > .content {
-    flex: 1;
-
-    & > .head {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-
-      & > .title {
-        font-size: 18px;
-        font-weight: bold;
-        color: darkblue;
-      }
-
-      & > .time {
-        font-size: 14px;
-      }
-    }
-
-    & > .digest {
-      font-size: 14px;
-    }
-
-    & > .actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      font-size: 14px;
-    }
-  }
-}
-
 ::v-global(.highlight) {
   color: red;
 }

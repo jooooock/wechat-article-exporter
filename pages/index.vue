@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="flex flex-col">
-    <Header @select="selectAccount"/>
+    <Header @select="selectAccount" @search="searchArticle"/>
     <ArticleList ref="articleListRef" class="right"/>
   </div>
 </template>
@@ -25,6 +25,9 @@ const articleListRef = ref<typeof ArticleList | null>(null)
 function selectAccount(account: AccountInfo) {
   activeAccount.value = account
   articleListRef.value?.init()
+}
+function searchArticle(query: string) {
+  articleListRef.value?.init(query)
 }
 </script>
 
