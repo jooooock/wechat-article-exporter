@@ -8,7 +8,8 @@
         切换
       </button>
     </div>
-    <div class="flex items-center">
+    <div class="flex items-center space-x-3">
+      <BatchDownloadButton v-if="activeAccount" />
       <mp-search v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>
     </div>
   </header>
