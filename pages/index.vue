@@ -1,7 +1,7 @@
 <template>
-  <div id="app" class="flex flex-col">
+  <div id="app" class="flex flex-col h-screen overflow-hidden">
     <Header @select="selectAccount" @search="searchArticle"/>
-    <ArticleList ref="articleListRef" class="right"/>
+    <ArticleList ref="articleListRef" class="flex-1 overflow-y-scroll"/>
   </div>
 </template>
 
@@ -30,17 +30,3 @@ function searchArticle(query: string) {
   articleListRef.value?.init(query)
 }
 </script>
-
-<style scoped>
-#app {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-
-  & > .right {
-    flex: 1;
-    overflow-y: scroll;
-    overflow-x: hidden;
-  }
-}
-</style>
