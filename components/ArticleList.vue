@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import type {AppMsgEx, AppMsgPublishResponse, PublishInfo, PublishPage} from "~/types/types";
-import {activeAccount} from "~/composables/useActiveAccount";
+
 
 const articleQuery = ref('')
 const articleList = reactive<AppMsgEx[]>([])
@@ -32,6 +32,7 @@ let articlePageNo = 1
 const totalCount = ref<string>('-')
 
 const token = useToken()
+const activeAccount = useActiveAccount()
 
 const pageSize = ref(20)
 

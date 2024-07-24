@@ -6,8 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import type {AccountInfo} from "~/types/types";
-import {activeAccount} from "~/composables/useActiveAccount";
 import type ArticleList from "~/components/ArticleList.vue";
 
 
@@ -19,11 +17,14 @@ useHead({
   title: '微信公众号文章导出'
 })
 
+onMounted(() => {
+  selectAccount()
+})
+
 
 const articleListRef = ref<typeof ArticleList | null>(null)
 
-function selectAccount(account: AccountInfo) {
-  activeAccount.value = account
+function selectAccount() {
   articleListRef.value?.init()
 }
 function searchArticle(query: string) {

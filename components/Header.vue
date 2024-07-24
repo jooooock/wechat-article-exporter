@@ -1,7 +1,8 @@
 <template>
   <header class="sticky top-0 z-20 flex-none px-5 border-b flex items-center justify-between antialiased">
     <div class="flex-auto flex items-center min-w-0 space-x-6">
-      <div class="text-md">当前选择公众号: <span class="text-sky-400 font-semibold">{{activeAccount?.nickname}}</span></div>
+      <div class="text-md">当前选择公众号: <span class="text-sky-400 font-semibold">{{ activeAccount?.nickname }}</span>
+      </div>
       <button @click="isOpen = true"
               class="rounded-md text-sm font-semibold leading-6 py-1 px-3 hover:bg-sky-400 bg-sky-500 text-white shadow-sm">
         切换
@@ -57,7 +58,7 @@
 import {z} from 'zod'
 import type {FormSubmitEvent} from '#ui/types'
 import type {AccountInfo, SearchBizResponse} from "~/types/types";
-import {activeAccount} from "~/composables/useActiveAccount";
+
 
 const AccountTypeMap: Record<number, string> = {
   0: '订阅号',
@@ -100,6 +101,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 
 const token = useToken()
+const activeAccount = useActiveAccount()
 
 const emit = defineEmits(['select', 'search'])
 
@@ -128,8 +130,12 @@ async function getAccountList() {
 }
 
 function selectAccount(account: AccountInfo) {
-  emit('select', account)
   isOpen.value = false
+  activeAccount.value = account
+
+  nextTick(() => {
+    emit('select', account)
+  })
 }
 
 function nextAccountPage() {

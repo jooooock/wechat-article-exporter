@@ -5,3 +5,9 @@
     </NuxtLayout>
   </div>
 </template>
+
+<style>
+.highlight {
+  color: red;
+}
+</style>

@@ -37,8 +37,10 @@
 
 <script setup lang="ts">
 import {saveAs} from 'file-saver'
-import {formatTimeStamp, proxyImage} from "~/utils";
 import {Loader} from 'lucide-vue-next';
+import {formatTimeStamp, proxyImage} from "~/utils";
+import JSZip from "jszip";
+import mime from "mime";
 
 interface Props {
   index: number
@@ -56,31 +58,72 @@ defineProps<Props>()
 const downloading = ref(false)
 
 async function download(link: string, title: string) {
-  downloading.value = true
-  const html = await $fetch<string>('/api/download?url=' + encodeURIComponent(link)).finally(() => {
-    downloading.value = false
-  })
+  try {
+    downloading.value = true
 
-  // const buffer = Uint8Array.from(atob(html), (c) => c.charCodeAt(0))
+    const fullHTML = await $fetch<string>('/api/download?url=' + encodeURIComponent(link))
 
-  const parser = new DOMParser()
-  const document = parser.parseFromString(html, 'text/html')
-  const $jsContent = document.querySelector('#js_content')
-  if (!$jsContent) {
-    alert('下载失败，请重试')
-    return
-  }
+    const parser = new DOMParser()
+    const document = parser.parseFromString(fullHTML, 'text/html')
+    const $pageContent = document.querySelector('#page-content')
+    if (!$pageContent) {
+      alert('下载失败，请重试')
+      return
+    }
+    $pageContent.querySelector('#js_content')?.removeAttribute('style')
 
-  $jsContent.removeAttribute('style')
-  const pageContent = document.querySelector('#page-content')!.outerHTML
 
-  const result = `<!DOCTYPE html>
-<html class="">
+    const zip = new JSZip()
+
+    const imgs = $pageContent.querySelectorAll('img')
+    zip.folder('assets')
+    for (const img of imgs) {
+      const imgData = await $fetch<Blob>(img.src)
+      const uuid = new Date().getTime() + Math.random().toString()
+      const ext = mime.getExtension(imgData.type)
+      zip.file(`assets/${uuid}.${ext}`, imgData)
+
+      // 重写路径，指向本地图片文件
+      img.src = `./assets/${uuid}.${ext}`
+    }
+
+    // 处理背景图片
+    const map = new Map<string, string>()
+    let pageContentHTML = $pageContent.outerHTML
+
+    // 收集背景图片
+    const bgImages = new Set<string>()
+    pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
+      bgImages.add(url)
+      return `${p1}${url}${p3}`
+    })
+    for (const url of bgImages) {
+      const imgData = await $fetch<Blob>(url)
+      const uuid = new Date().getTime() + Math.random().toString()
+      const ext = mime.getExtension(imgData.type)
+
+      zip.file(`assets/${uuid}.${ext}`, imgData)
+      map.set(url, `assets/${uuid}.${ext}`)
+    }
+
+    pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
+      if (map.has(url)) {
+        const path = map.get(url)!
+        return `${p1}./${path}${p3}`
+      } else {
+        console.warn('背景图片丢失')
+        return `${p1}${url}${p3}`
+      }
+    })
+
+
+
+    const indexHTML = `<!DOCTYPE html>
+<html>
 <head>
-    <meta name="wechat-enable-text-zoom-em" content="true">
+    <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="color-scheme" content="light dark">
     <meta name="viewport"
           content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
     <style>
@@ -94,14 +137,17 @@ max-width: 100%;
     </style>
 </head>
 <body>
-${pageContent}
+${pageContentHTML}
 </body>
 </html>`
 
-  const blob = new Blob([result], {
-    type: "text/html;charset=utf-8",
-  });
-  saveAs(blob, title)
+    zip.file('index.html', indexHTML)
+
+    const blob = await zip.generateAsync({type: 'blob'})
+    saveAs(blob, title)
+  } finally {
+    downloading.value = false
+  }
 }
 
 const copyBtnText = ref('复制链接')
@@ -118,9 +164,3 @@ function copyLink(link: string) {
   }, 1000)
 }
 </script>
-
-<style scoped>
-::v-global(.highlight) {
-  color: red;
-}
-</style>

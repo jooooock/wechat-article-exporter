@@ -1,3 +1,9 @@
 import type {AccountInfo} from "~/types/types";
+import {StorageSerializers} from "@vueuse/core";
 
-export const activeAccount: Ref<AccountInfo | null> = ref(null)
+
+export default () => {
+    return useLocalStorage<AccountInfo | null>('account', null, {
+        serializer: StorageSerializers.object
+    })
+}
