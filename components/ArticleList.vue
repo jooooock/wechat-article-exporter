@@ -60,21 +60,22 @@ async function getArticleList() {
 
   if (resp.base_resp.ret === 0) {
     const publish_page: PublishPage = JSON.parse(resp.publish_page)
+    const publish_list = publish_page.publish_list.filter(item => !!item.publish_info)
 
     totalCount.value = publish_page.total_count.toString()
 
-    if (publish_page.publish_list.length === 0) {
+    if (publish_list.length === 0) {
       // 全部加载完毕
       noMoreArticle.value = true
     }
-    publish_page.publish_list.forEach(item => {
+    publish_list.forEach(item => {
       const publish_info: PublishInfo = JSON.parse(item.publish_info)
       articleList.push(...publish_info.appmsgex)
     })
   } else if (resp.base_resp.ret === 200003) {
     navigateTo('/login')
   } else {
-    console.log(resp.base_resp.err_msg)
+    alert(resp.base_resp.err_msg)
   }
 }
 
