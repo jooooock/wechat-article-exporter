@@ -1,3 +1,7 @@
+/**
+ * 获取文章 html 内容接口
+ */
+
 interface DownloadQuery {
     url: string
 }

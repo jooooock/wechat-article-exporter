@@ -1,3 +1,7 @@
+/**
+ * 获取文章列表接口
+ */
+
 import {proxyMpRequest} from "~/server/utils";
 
 interface AppMsgPublishQuery {

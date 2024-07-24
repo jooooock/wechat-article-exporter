@@ -1,3 +1,7 @@
+/**
+ * 退出登录接口
+ */
+
 import {proxyMpRequest} from "~/server/utils";
 
 interface LogoutQuery {

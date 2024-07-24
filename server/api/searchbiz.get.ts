@@ -1,3 +1,7 @@
+/**
+ * 搜索公众号接口
+ */
+
 import {proxyMpRequest} from "~/server/utils";
 
 interface SearchBizQuery {
