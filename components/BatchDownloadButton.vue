@@ -7,7 +7,7 @@
     <span v-if="loading">{{phase}}:
       <span v-if="phase === '抓取文章链接'">{{articles.length}}/{{page}}</span>
       <span v-if="phase === '下载文章内容'">{{downloadedArticles.length}}/{{articles.length}}</span>
-      <span v-if="phase === '打包'">/{{downloadedArticles.length}}</span>
+      <span v-if="phase === '打包'">{{packedArticles.length}}/{{downloadedArticles.length}}</span>
     </span>
     <span v-else>批量下载</span>
   </button>
@@ -23,6 +23,7 @@ import mime from "mime";
 
 type AppMsgExWithHTML = AppMsgEx & {
   html?: string
+  packed?: boolean
 };
 
 const token = useToken()
@@ -33,6 +34,7 @@ const articles: AppMsgExWithHTML[] = reactive([])
 const loading = ref(false)
 const phase = ref()
 const downloadedArticles = computed(() => articles.filter(article => !!article.html))
+const packedArticles = computed(() => articles.filter(article => !!article.packed))
 
 async function batchDownload() {
   loading.value = true
@@ -43,32 +45,33 @@ async function batchDownload() {
     do {
       data = await getArticleList(page.value)
       articles.push(...data)
-      await sleep(5000)
+      await sleep(8000)
       page.value++
     } while (data.length > 0)
-
-    console.log(articles)
   } catch (e: any) {
     console.warn(e.message)
   }
 
 
   phase.value = '下载文章内容'
-  for (const article of articles.filter(article => !article.is_deleted)) {
-    try {
-      article.html = await downloadHTML(article)
-      await sleep(3000)
-    } catch (e: any) {
-      console.warn(e.message)
+  do {
+    for (const article of articles.filter(article => !article.is_deleted && !article.html)) {
+      try {
+        article.html = await downloadHTML(article)
+        await sleep(4000)
+      } catch (e: any) {
+        console.warn(e.message)
+      }
     }
-  }
+  } while (articles.filter(article => !article.is_deleted && !article.html).length > 0)
+
 
   phase.value = '打包'
   const zip = new JSZip()
   for (const article of downloadedArticles.value) {
     try {
-      await packArticle(article, zip.folder(article.title)!)
-      await sleep(2000)
+      await packArticle(article, zip.folder(article.title.replace(/\//g, '+'))!)
+      article.packed = true
     } catch (e: any) {
       console.warn(e.message)
     }
@@ -119,16 +122,15 @@ async function downloadHTML(article: AppMsgEx) {
   if (!$pageContent) {
     throw new Error('下载失败，请重试')
   }
-  return $pageContent.outerHTML
+  return fullHTML
 }
 
 async function packArticle(article: AppMsgExWithHTML, zip: JSZip) {
   try {
     const parser = new DOMParser()
-    const html = article.html!
-    const $pageContent = parser.parseFromString(article.html!, 'text/html')
+    const document = parser.parseFromString(article.html!, 'text/html')
+    const $pageContent = document.querySelector('#page-content')!
     $pageContent.querySelector('#js_content')?.removeAttribute('style')
-
 
     const imgs = $pageContent.querySelectorAll('img')
     zip.folder('assets')
@@ -144,7 +146,7 @@ async function packArticle(article: AppMsgExWithHTML, zip: JSZip) {
 
     // 处理背景图片
     const map = new Map<string, string>()
-    let pageContentHTML = article.html!
+    let pageContentHTML = $pageContent.outerHTML
 
     // 收集背景图片
     const bgImages = new Set<string>()
