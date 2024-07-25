@@ -1,12 +1,13 @@
 <template>
-  <div class="pb-24 pt-2">
-    <ul class="flex flex-col space-y-3 container mx-auto">
+  <div class="pb-24 pt-2 bg-zinc-200">
+    <ul class="flex justify-between container mx-auto flex-wrap">
       <ArticleItem
           v-for="(article, index) in articleList"
           :key="article.appmsgid"
           :index="index + 1"
           :title="article.title"
-          :cover="article.cover_img || article.cover"
+          :cover="article.pic_cdn_url_235_1 || article.pic_cdn_url_16_9 || article.cover_img || article.cover"
+          :cover-theme="article.cover_img_theme_color"
           :digest="article.digest"
           :is-deleted="article.is_deleted"
           :link="article.link"

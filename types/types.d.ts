@@ -98,6 +98,12 @@ export interface AppMsgInfo {
     smart_product: number
 }
 
+export interface RGB {
+    r: number
+    g: number
+    b: number
+}
+
 export interface AppMsgEx {
     aid: string
     album_id: string
@@ -109,6 +115,7 @@ export interface AppMsgEx {
     copyright_type: number
     cover: string
     cover_img?: string
+    cover_img_theme_color?: RGB
     create_time: number
     digest: string
     has_red_packet_cover: number

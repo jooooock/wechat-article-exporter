@@ -1,22 +1,18 @@
 <template>
-  <li class="group relative flex border hover:border-slate-300 shadow hover:shadow-md rounded-md overflow-hidden">
-    <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute size-[100px] right-0 bottom-0 translate-x-full drop-shadow-[-100px_0_red]">
-    <div v-if="cover" class="w-36 overflow-hidden">
+  <li class="group relative flex flex-col mb-4 bg-white w-full 2xl:w-[500px] xl:w-[400px] lg:w-[500px] shadow-md rounded-md overflow-hidden">
+    <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute z-10 size-[100px] right-0 top-64 translate-x-full drop-shadow-[-116px_0_red]">
+    <div v-if="cover" class="h-60 overflow-hidden" :style="{backgroundColor: themeColor(coverTheme!)}">
       <img
           :src="proxyImage(cover)"
           alt=""
-          class="h-full object-cover group-hover:scale-105 transition">
+          class="object-contain size-full group-hover:scale-110 ease-in-out transition duration-300">
     </div>
-    <div class="p-4 flex flex-col flex-1 space-y-2">
-      <div class="flex">
-        <div class="flex-1">
-          <span class="text-rose-600 font-mono">#{{ index }}.</span>
-          <h3 class="inline-block text-xl text-blue-800 font-semibold" v-html="title"></h3>
-        </div>
-        <p class="hidden whitespace-nowrap text-sm text-gray-500 md:block">{{ formatTimeStamp(updatedAt) }}</p>
-      </div>
-      <p class="flex-1 text-slate-600 text-sm">{{ digest }}</p>
-      <div class="flex space-x-3 antialiased">
+    <div class="p-6 flex flex-col flex-1 space-y-2">
+      <span class="absolute top-0 right-0 rounded text-zinc-600 bg-[rgba(255,255,255,.8)] py-1 px-2 font-mono">#{{ index }}</span>
+      <h3 class="text-xl text-blue-800 font-semibold" v-html="title"></h3>
+      <time class="hidden whitespace-nowrap text-sm text-gray-500 md:block">{{ formatTimeStamp(updatedAt) }}</time>
+      <p class="flex-1 text-zinc-400 text-sm pb-4">{{ digest }}</p>
+      <div class="flex space-x-3 border-t pt-4 antialiased">
         <a :href="link" class="h-8 px-4 font-semibold rounded border border-slate-200 text-sm text-slate-900 hover:border-slate-400 flex items-center justify-center" target="_blank">查看原文</a>
         <button
             class="h-8 px-4 font-semibold rounded-md border border-slate-200 text-sm text-slate-900 hover:border-slate-400 flex items-center justify-center"
@@ -39,6 +35,7 @@
 import {saveAs} from 'file-saver'
 import {Loader} from 'lucide-vue-next';
 import {formatTimeStamp, proxyImage, downloadArticleHTML, packHTMLAssets} from "~/utils";
+import type {RGB} from "~/types/types";
 
 
 interface Props {
@@ -49,10 +46,17 @@ interface Props {
   digest: string
   link: string
   isDeleted: boolean
+  coverTheme?: RGB
 }
 
 defineProps<Props>()
 
+function themeColor(rgb?: RGB) {
+  if (!rgb) {
+    return 'white'
+  }
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+}
 
 const downloading = ref(false)
 async function download(link: string, title: string) {

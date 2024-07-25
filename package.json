@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
+    "tailwindcss-debug-screens": "^2.2.1",
     "typescript": "^5.5.3"
   },
   "engines": {
