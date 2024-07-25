@@ -15,8 +15,9 @@ export function formatTimeStamp(timestamp: number) {
 /**
  * 下载文章的 html
  * @param articleURL
+ * @param title
  */
-export async function downloadArticleHTML(articleURL: string) {
+export async function downloadArticleHTML(articleURL: string, title?: string) {
     const fullHTML = await $fetch<string>('/api/download?url=' + encodeURIComponent(articleURL))
 
     // 验证是否正常
@@ -24,6 +25,9 @@ export async function downloadArticleHTML(articleURL: string) {
     const document = parser.parseFromString(fullHTML, 'text/html')
     const $pageContent = document.querySelector('#page-content')
     if (!$pageContent) {
+        if (title) {
+            console.info(title)
+        }
         throw new Error('下载失败，请重试')
     }
     return fullHTML
@@ -75,7 +79,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
             // 改写html中的引用路径，指向本地图片文件
             img.src = `./assets/${uuid}.${ext}`
         } catch (e) {
-            console.log('图片下载失败: ', img.src)
+            console.info('图片下载失败: ', img.src)
             console.error(e)
         }
     }
@@ -101,7 +105,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
             zip.file(`assets/${uuid}.${ext}`, imgData)
             url2pathMap.set(url, `assets/${uuid}.${ext}`)
         } catch (e) {
-            console.log('背景图片下载失败: ', url)
+            console.info('背景图片下载失败: ', url)
             console.error(e)
         }
     }
@@ -127,7 +131,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
             zip.file(`assets/${uuid}.css`, stylesheet)
             localLinks += `<link rel="stylesheet" href="./assets/${uuid}.css">`
         } catch (e) {
-            console.log('样式表下载失败: ', url)
+            console.info('样式表下载失败: ', url)
             console.error(e)
         }
     }
