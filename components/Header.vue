@@ -18,7 +18,7 @@
     <div
         class="rounded-lg divide-y divide-gray-100 dark:divide-gray-800 shadow bg-white dark:bg-gray-900 flex flex-col flex-1 overflow-y-scroll">
       <div class="sticky top-0 bg-white shadow">
-        <BaseSearch v-model="accountQuery" @search="searchAccount" placeholder="搜索公众号名称"/>
+        <BaseSearch v-model="accountQuery" @search="searchAccount" required placeholder="搜索公众号名称"/>
       </div>
       <div class="flex-1">
         <ul class="divide-y antialiased">

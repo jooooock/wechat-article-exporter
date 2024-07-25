@@ -6,6 +6,7 @@
           type="text"
           v-model="query"
           autocomplete="off"
+          :required="required"
           :placeholder="placeholder"
       >
       <svg width="24" height="24" fill="none" aria-hidden="true"
@@ -22,10 +23,14 @@
 
 <script setup lang="ts">
 interface Props {
-  placeholder: string
+  placeholder?: string
+  required?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  placeholder: '请输入...',
+  required: false,
+})
 
 const query = defineModel<string>()
 const emit = defineEmits(['search'])
