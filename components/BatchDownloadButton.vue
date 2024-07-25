@@ -79,7 +79,7 @@ async function batchDownload() {
   }
 
   const blob = await zip.generateAsync({type: 'blob'})
-  saveAs(blob, 'results.zip')
+  saveAs(blob, `${activeAccount.value?.nickname}.zip`)
 
   loading.value = false
 }
