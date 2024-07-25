@@ -16,10 +16,10 @@
         <p class="hidden whitespace-nowrap text-sm text-gray-500 md:block">{{ formatTimeStamp(updatedAt) }}</p>
       </div>
       <p class="flex-1 text-slate-600 text-sm">{{ digest }}</p>
-      <div class="flex space-x-3">
-        <a :href="link" class="bg-sky-900 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:ring-offset-sky-50 text-white text-sm font-semibold h-8 px-4 rounded flex items-center justify-center" target="_blank">查看原文</a>
+      <div class="flex space-x-3 antialiased">
+        <a :href="link" class="h-8 px-4 font-semibold rounded border border-slate-200 text-sm text-slate-900 hover:border-slate-400 flex items-center justify-center" target="_blank">查看原文</a>
         <button
-            class="bg-sky-900 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:ring-offset-sky-50 text-white text-sm font-semibold h-8 px-4 rounded flex items-center justify-center"
+            class="h-8 px-4 font-semibold rounded-md border border-slate-200 text-sm text-slate-900 hover:border-slate-400 flex items-center justify-center"
             @click="copyLink(link)" :disabled="copyBtnDisabled">{{ copyBtnText }}
         </button>
         <button
@@ -66,6 +66,7 @@ async function download(link: string, title: string) {
     saveAs(blob, title)
   } catch (e: any) {
     console.warn(e.message)
+    alert(e.message)
   } finally {
     downloading.value = false
   }
