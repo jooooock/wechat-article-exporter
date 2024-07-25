@@ -14,6 +14,7 @@
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@sparticuz/chromium": "^119.0.2",
     "@tailwindcss/typography": "^0.5.13",
+    "@vueuse/components": "^10.11.0",
     "@vueuse/core": "^10.11.0",
     "@vueuse/nuxt": "^10.11.0",
     "dayjs": "^1.11.12",

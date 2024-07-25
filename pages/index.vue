@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="flex flex-col h-screen overflow-hidden">
     <Header @select="selectAccount" @search="searchArticle"/>
-    <ArticleList ref="articleListRef" class="flex-1 overflow-y-scroll"/>
+    <ArticleList v-if="activeAccount" ref="articleListRef" class="flex-1 overflow-y-scroll"/>
   </div>
 </template>
 
@@ -17,11 +17,7 @@ useHead({
   title: '微信公众号文章导出'
 })
 
-onMounted(() => {
-  selectAccount()
-})
-
-
+const activeAccount = useActiveAccount()
 const articleListRef = ref<typeof ArticleList | null>(null)
 
 function selectAccount() {

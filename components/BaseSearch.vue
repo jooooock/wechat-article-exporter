@@ -1,8 +1,8 @@
 <template>
-  <form class="flex py-2 space-x-3" @submit.prevent="search">
-    <label class="relative">
+  <form class="flex justify-between p-2 space-x-3" @submit.prevent="search">
+    <label class="relative flex-1">
       <input
-          class="rounded-md border p-2 pl-8 outline-none hover:border-slate-300 focus:ring ring-sky-200 w-72"
+          class="rounded-md border p-2 pl-8 outline-none hover:border-slate-300 focus:ring ring-sky-200 w-full"
           type="text"
           v-model="query"
           autocomplete="off"

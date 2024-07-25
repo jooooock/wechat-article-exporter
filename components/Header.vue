@@ -9,23 +9,16 @@
       </button>
     </div>
     <div class="flex items-center space-x-3">
-      <BatchDownloadButton v-if="activeAccount" />
-      <mp-search v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>
+      <BatchDownloadButton v-if="activeAccount"/>
+      <BaseSearch v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>
     </div>
   </header>
 
   <USlideover v-model="isOpen" side="left">
     <div
         class="rounded-lg divide-y divide-gray-100 dark:divide-gray-800 shadow bg-white dark:bg-gray-900 flex flex-col flex-1 overflow-y-scroll">
-      <div class="px-4 py-5 sm:px-6 sticky top-0 bg-white">
-        <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-          <div class="flex">
-            <UFormGroup label="" name="query" class="flex-1">
-              <UInput v-model="state.query" placeholder="搜索公众号" autocomplete="off"/>
-            </UFormGroup>
-            <UButton type="submit" class="ml-2">搜索</UButton>
-          </div>
-        </UForm>
+      <div class="sticky top-0 bg-white shadow">
+        <BaseSearch v-model="accountQuery" @search="searchAccount" placeholder="搜索公众号名称"/>
       </div>
       <div class="flex-1">
         <ul class="divide-y antialiased">
@@ -46,9 +39,17 @@
             </div>
           </li>
         </ul>
-        <p v-if="loading" class="text-center mt-2 py-2">loading...</p>
-        <button v-else class="block mx-auto border-2 w-1/4 hover:border-amber-700 rounded py-1 px-3 mt-2"
-                @click="nextAccountPage" v-if="accountList.length > 0">下一页
+
+        <p v-if="loading" class="flex justify-center items-center my-2 py-2">
+          <Loader :size="28" class="animate-spin text-slate-500"/>
+        </p>
+        <button
+            v-else-if="accountList.length > 0"
+            @click="nextAccountPage"
+            class="block mx-auto my-2 h-10 px-6 font-semibold rounded-md border border-slate-200 text-slate-900 hover:border-slate-400"
+            type="button"
+        >
+          下一页
         </button>
       </div>
     </div>
@@ -56,9 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import {z} from 'zod'
-import type {FormSubmitEvent} from '#ui/types'
 import type {AccountInfo, SearchBizResponse} from "~/types/types";
+import {Loader} from "lucide-vue-next";
 
 
 const AccountTypeMap: Record<number, string> = {
@@ -67,7 +67,15 @@ const AccountTypeMap: Record<number, string> = {
   2: '服务号'
 }
 
+const isOpen = ref(false)
+const token = useToken()
+const activeAccount = useActiveAccount()
+
+const emit = defineEmits(['select', 'search'])
+
+
 const articleQuery = ref('')
+
 function searchArticle() {
   if (!activeAccount.value) {
     alert('请先选择公众号')
@@ -77,34 +85,16 @@ function searchArticle() {
   emit('search', articleQuery.value)
 }
 
-const isOpen = ref(false)
-
-const schema = z.object({
-  query: z.string(),
-})
-
-type Schema = z.output<typeof schema>
-
-const state = reactive({
-  query: undefined,
-})
 
 const accountQuery = ref('')
 const accountList = reactive<AccountInfo[]>([])
 let pageNo = 1
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  accountQuery.value = event.data.query
+async function searchAccount() {
   pageNo = 1
   accountList.length = 0
-  getAccountList()
+  await getAccountList()
 }
-
-
-const token = useToken()
-const activeAccount = useActiveAccount()
-
-const emit = defineEmits(['select', 'search'])
 
 const loading = ref(false)
 

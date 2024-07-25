@@ -1828,6 +1828,15 @@
   resolved "https://registry.npmjs.org/@vue/shared/-/shared-3.4.31.tgz#af9981f57def2c3f080c14bf219314fc0dc808a0"
   integrity sha512-Yp3wtJk//8cO4NItOPpi3QkLExAr/aLBGZMmTtW9WpdwBCJpRM6zj9WgWktXAl8IDIozwNMByT45JP3tO3ACWA==
 
+"@vueuse/components@^10.11.0":
+  version "10.11.0"
+  resolved "https://registry.npmjs.org/@vueuse/components/-/components-10.11.0.tgz#fd4191e30070bed3b51bdc4d33a9edb4b5da08de"
+  integrity sha512-ZvLZI23d5ZAtva5fGyYh/jQtZO8l+zJ5tAXyYNqHJZkq1o5yWyqZhENvSv5mfDmN5IuAOp4tq02mRmX/ipFGcg==
+  dependencies:
+    "@vueuse/core" "10.11.0"
+    "@vueuse/shared" "10.11.0"
+    vue-demi ">=0.14.8"
+
 "@vueuse/core@10.11.0", "@vueuse/core@^10.11.0":
   version "10.11.0"
   resolved "https://registry.npmjs.org/@vueuse/core/-/core-10.11.0.tgz#b042585a8bf98bb29c177b33999bd0e3fcd9e65d"

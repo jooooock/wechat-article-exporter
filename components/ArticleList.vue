@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-24">
+  <div class="pb-24 pt-2">
     <ul class="flex flex-col space-y-3 container mx-auto">
       <ArticleItem
           v-for="(article, index) in articleList"
@@ -13,21 +13,23 @@
           :updatedAt="article.update_time"
       />
     </ul>
-    <p v-if="loading" class="text-center mt-2 py-2">loading...</p>
-    <p v-else-if="noMoreData" class="text-center mt-2 py-2">全部加载完毕</p>
-    <button v-else class="block mx-auto border-2 w-1/4 hover:border-amber-700 rounded py-1 px-3 mt-2"
-            @click="nextArticlePage" v-if="articleList.length > 0">下一页
-    </button>
+    <p v-if="loading" class="flex justify-center items-center mt-2 py-2">
+      <Loader :size="28" class="animate-spin text-slate-500"/>
+    </p>
+    <p v-else-if="noMoreData" class="text-center mt-2 py-2 text-slate-400">已全部加载完毕</p>
+    <div v-element-visibility="onElementVisibility"></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type {AppMsgEx} from "~/types/types";
 import {getArticleList} from '~/utils'
+import {Loader} from "lucide-vue-next";
+import { vElementVisibility } from "@vueuse/components"
 
 
 const keyword = ref('')
-let pageNo = 1
+let pageNo = 0
 const articleList = reactive<AppMsgEx[]>([])
 
 
@@ -72,10 +74,22 @@ function nextArticlePage() {
  */
 function init(query: string) {
   articleList.length = 0
-  pageNo = 1
+  pageNo = 0
   noMoreData.value = false
   keyword.value = query
 
-  loadData()
+  if (bottomElementIsVisible.value) {
+    nextArticlePage()
+  }
+}
+
+
+// 判断是否触底
+const bottomElementIsVisible = ref(false)
+function onElementVisibility(visible: boolean) {
+  bottomElementIsVisible.value = visible
+  if (visible) {
+    nextArticlePage()
+  }
 }
 </script>
