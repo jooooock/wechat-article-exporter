@@ -3,7 +3,7 @@
     <div class="flex-auto flex items-center min-w-0">
       <div class="text-md">当前选择公众号: <span class="text-sky-400 font-semibold">{{ activeAccount?.nickname }}</span>
       </div>
-      <button @click="isOpen = true"
+      <button @click="openSwitcher"
               class="flex rounded text-sm leading-6 py-1 px-3 hover:bg-zinc-100 text-slate-500">
         <span class="sr-only">切换</span>
         <ArrowRightLeft :size="20" />
@@ -23,7 +23,7 @@
     </div>
   </header>
 
-  <USlideover v-model="isOpen" side="left">
+  <USlideover v-model="isOpen" side="left" :ui="{overlay: {background: 'bg-zinc-400/75'}}">
     <div
         class="rounded-lg divide-y divide-gray-100 dark:divide-gray-800 shadow bg-white dark:bg-gray-900 flex flex-col flex-1 overflow-y-scroll">
       <div class="sticky top-0 bg-white py-4 px-2 shadow">
@@ -76,24 +76,18 @@ const AccountTypeMap: Record<number, string> = {
   2: '服务号'
 }
 
-const isOpen = ref(false)
+
 const loginAccount = useLoginAccount()
 const activeAccount = useActiveAccount()
 
 const emit = defineEmits(['select', 'search'])
 
+const isOpen = ref(false)
 
-const articleQuery = ref('')
-
-function searchArticle() {
-  if (!activeAccount.value) {
-    alert('请先选择公众号')
-    return
-  }
-
-  emit('search', articleQuery.value)
+function openSwitcher() {
+  isOpen.value = true
+  accountQuery.value = activeAccount.value?.nickname!
 }
-
 
 const accountQuery = ref('')
 const accountList = reactive<AccountInfo[]>([])
@@ -141,5 +135,15 @@ function selectAccount(account: AccountInfo) {
 function nextAccountPage() {
   pageNo++
   getAccountList()
+}
+
+const articleQuery = ref('')
+function searchArticle() {
+  if (!activeAccount.value) {
+    alert('请先选择公众号')
+    return
+  }
+
+  emit('search', articleQuery.value)
 }
 </script>
