@@ -45,7 +45,7 @@ async function batchDownload() {
     do {
       data = await getArticleList(activeAccount.value?.fakeid!, token.value, page.value)
       articles.push(...data)
-      await sleep(8000)
+      await sleep(5000)
       page.value++
     } while (data.length > 0)
   } catch (e: any) {
@@ -59,7 +59,7 @@ async function batchDownload() {
       try {
 
         article.html = await downloadArticleHTML(article.link, article.title)
-        await sleep(6000)
+        await sleep(8000)
       } catch (e: any) {
         console.warn(e.message)
       }

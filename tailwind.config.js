@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {},
     debugScreens: {
-      position: ['top', 'left'],
+      position: ['bottom', 'right'],
       style: {
         backgroundColor: 'black',
         color: 'white',
