@@ -34,7 +34,7 @@ let pageNo = 0
 const articleList = reactive<AppMsgEx[]>([])
 
 
-const token = useToken()
+const loginAccount = useLoginAccount()
 const activeAccount = useActiveAccount()
 
 
@@ -48,7 +48,7 @@ const noMoreData = ref(false)
 async function loadData() {
   loading.value = true
   try {
-    const articles = await getArticleList(activeAccount.value?.fakeid!, token.value, pageNo, keyword.value)
+    const articles = await getArticleList(activeAccount.value?.fakeid!, loginAccount.value.token, pageNo, keyword.value)
     if (articles.length > 0) {
       articleList.push(...articles)
     } else {

@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import type {BizLoginResult, ScanLoginResult, StartLoginResult} from "~/types/types";
+import type {BizLoginResult, LoginInfoResult, ScanLoginResult, StartLoginResult} from "~/types/types";
 
 
 const qrcodeSrc = ref('')
@@ -116,7 +116,7 @@ const qrcodeTimer = ref<number | null>(null)
 const sessionid = new Date().getTime().toString() + Math.floor(Math.random() * 100);
 const hasStartLogin = ref(false)
 
-const token = useToken()
+const loginAccount = useLoginAccount()
 const SCAN_LOGIN_TYPE = {
   0: '等待扫码',
   1: '扫码成功，可登录账号=1',
@@ -249,8 +249,21 @@ async function bizLogin() {
   const _token = new URL(`http://localhost${result.redirect_url}`).searchParams.get('token')
   if (_token) {
     console.log('登录成功')
-    token.value = _token
-    navigateTo('/')
+    loginAccount.value = {
+      token: _token,
+    }
+
+    // 获取更多账号信息
+    try {
+      const {nick_name, head_img} = await $fetch<LoginInfoResult>(`/api/login/info?token=${_token}`)
+      loginAccount.value.nick_name = nick_name
+      loginAccount.value.head_img = head_img
+    } catch (e) {
+      console.info('获取账号信息失败')
+      console.error(e)
+    }
+
+    navigateTo('/', {replace: true})
   } else {
     console.log('系统繁忙，请稍后再试')
   }

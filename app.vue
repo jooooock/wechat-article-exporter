@@ -8,6 +8,14 @@
 
 <script setup lang="ts">
 const isDev = !import.meta.env.PROD
+
+const loginAccount = useLoginAccount()
+
+onMounted(() => {
+  if (!loginAccount.value) {
+    navigateTo('/login')
+  }
+})
 </script>
 
 <style>

@@ -26,7 +26,7 @@ type AppMsgExWithHTML = AppMsgEx & {
   packed?: boolean
 };
 
-const token = useToken()
+const loginAccount = useLoginAccount()
 const activeAccount = useActiveAccount()
 
 const page = ref(1)
@@ -43,7 +43,7 @@ async function batchDownload() {
     phase.value = '抓取文章链接'
     let data = []
     do {
-      data = await getArticleList(activeAccount.value?.fakeid!, token.value, page.value)
+      data = await getArticleList(activeAccount.value?.fakeid!, loginAccount.value.token, page.value)
       articles.push(...data)
       await sleep(5000)
       page.value++

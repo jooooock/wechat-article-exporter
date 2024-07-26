@@ -1,3 +1,14 @@
+export interface LoginAccount {
+    token: string
+    nick_name?: string
+    head_img?: string
+}
+
+export interface LoginInfoResult {
+    nick_name: string
+    head_img: string
+}
+
 export interface BaseResp {
     err_msg: string
     ret: number

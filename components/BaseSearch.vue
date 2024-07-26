@@ -1,5 +1,5 @@
 <template>
-  <form class="flex justify-between p-2 space-x-3" @submit.prevent="search">
+  <form class="flex justify-between space-x-3" @submit.prevent="search">
     <label class="relative flex-1">
       <input
           class="rounded-md border p-2 pl-8 outline-none hover:border-slate-300 focus:ring ring-sky-200 w-full"
@@ -17,7 +17,7 @@
                 stroke-linejoin="round"></circle>
       </svg>
     </label>
-    <button type="submit" class="px-4 rounded-md shadow bg-sky-500 text-white hover:bg-sky-400">搜索</button>
+    <button type="submit" class="px-4 rounded shadow bg-sky-500 text-white hover:bg-sky-400">搜索</button>
   </form>
 </template>
 
