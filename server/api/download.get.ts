@@ -1,6 +1,7 @@
 /**
  * 获取文章 html 内容接口
  */
+import {proxyMpRequest} from "~/server/utils";
 
 interface DownloadQuery {
     url: string
@@ -12,7 +13,8 @@ export default defineEventHandler(async (event) => {
     let html: string = await proxyMpRequest({
         event: event,
         endpoint: query.url,
-        method: 'GET'
+        method: 'GET',
+        withCredentials: false,
     }).then(resp => resp.text())
 
     // 处理 img data-src

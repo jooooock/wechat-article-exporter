@@ -9,17 +9,22 @@ interface RequestOptions {
     query?: Record<string, string | number>
     body?: Record<string, string | number>
     parseJson?: boolean
+    withCredentials?: boolean
 }
 
 export async function proxyMpRequest(options: RequestOptions) {
     const cookies = parseCookies(options.event)
     const cookie = Object.keys(cookies).map(key => `${key}=${cookies[key]}`).join(';')
 
+    if (options.withCredentials === undefined) {
+        options.withCredentials = true;
+    }
+
     const fetchInit: RequestInit = {
         method: options.method,
         headers: {
             Referer: 'https://mp.weixin.qq.com/',
-            Cookie: cookie,
+            Cookie: options.withCredentials ? cookie : '',
         },
     }
 
