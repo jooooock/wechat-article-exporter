@@ -4,6 +4,7 @@
     <div v-if="cover" class="h-60 overflow-hidden" :style="{backgroundColor: themeColor(coverTheme!)}">
       <img
           :src="proxyImage(cover)"
+          loading="lazy"
           alt=""
           class="object-contain size-full group-hover:scale-110 ease-in-out transition duration-300">
     </div>

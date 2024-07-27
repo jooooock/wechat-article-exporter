@@ -24,6 +24,8 @@ export async function proxyMpRequest(options: RequestOptions) {
         method: options.method,
         headers: {
             Referer: 'https://mp.weixin.qq.com/',
+            Origin: 'https://mp.weixin.qq.com',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
             Cookie: options.withCredentials ? cookie : '',
         },
     }

@@ -1,7 +1,10 @@
 import dayjs from "dayjs";
 import JSZip from "jszip";
 import mime from "mime";
-import type {AppMsgPublishResponse, PublishInfo, PublishPage} from "~/types/types";
+import type {AppMsgEx, AppMsgPublishResponse, PublishInfo, PublishPage} from "~/types/types";
+import {updateArticleCache} from "~/store/article";
+import {ARTICLE_LIST_PAGE_SIZE} from "~/config";
+import {getAssetCache, updateAssetCache} from "~/store/assetes";
 
 
 export function proxyImage(url: string) {
@@ -126,9 +129,21 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
     for (const link of links) {
         const url = link.href
         try {
-            const stylesheet = await $fetch<string>(url)
+            let stylesheetFile: Blob | null = null
+
+            // 检查缓存
+            const cachedAsset = await getAssetCache(url)
+            if (cachedAsset) {
+                stylesheetFile = cachedAsset.file
+            } else {
+                // 从网络上下载，并存入缓存
+                const stylesheet = await $fetch<string>(url)
+                stylesheetFile = new Blob([stylesheet], { type: 'text/css' })
+                await updateAssetCache({url: url, file: stylesheetFile})
+            }
+
             const uuid = new Date().getTime() + Math.random().toString()
-            zip.file(`assets/${uuid}.css`, stylesheet)
+            zip.file(`assets/${uuid}.css`, stylesheetFile)
             localLinks += `<link rel="stylesheet" href="./assets/${uuid}.css">`
         } catch (e) {
             console.info('样式表下载失败: ', url)
@@ -164,21 +179,23 @@ ${pageContentHTML}
     return zip
 }
 
+const PAGE_SIZE = ARTICLE_LIST_PAGE_SIZE
+
 /**
  * 获取文章列表
  * @param fakeid
  * @param token
- * @param page
+ * @param begin
  * @param keyword
  */
-export async function getArticleList(fakeid: string, token: string, page = 1, keyword = '') {
+export async function getArticleList(fakeid: string, token: string, begin = 0, keyword = ''): Promise<[AppMsgEx[], boolean]> {
     const resp = await $fetch<AppMsgPublishResponse>('/api/appmsgpublish', {
         method: 'GET',
         query: {
             id: fakeid,
             token: token,
-            page: page,
-            size: 20,
+            begin: begin,
+            size: PAGE_SIZE,
             keyword: keyword,
         }
     })
@@ -187,17 +204,23 @@ export async function getArticleList(fakeid: string, token: string, page = 1, ke
         const publish_page: PublishPage = JSON.parse(resp.publish_page)
         const publish_list = publish_page.publish_list.filter(item => !!item.publish_info)
 
-        if (publish_list.length === 0) {
-            // 全部加载完毕
-            return []
+        if (!keyword) {
+            try {
+                await updateArticleCache(publish_list, publish_list.length !== PAGE_SIZE, fakeid)
+            } catch (e) {
+                console.info('缓存失败')
+                console.error(e)
+            }
         }
-        return publish_list.flatMap(item => {
+
+        const articles = publish_list.flatMap(item => {
             const publish_info: PublishInfo = JSON.parse(item.publish_info)
             return publish_info.appmsgex
         })
+        return [articles, publish_list.length !== PAGE_SIZE]
     } else if (resp.base_resp.ret === 200003) {
         throw new Error('session expired')
     } else {
-        throw new Error(resp.base_resp.err_msg)
+        throw new Error(`${resp.base_resp.ret}:${resp.base_resp.err_msg}`)
     }
 }

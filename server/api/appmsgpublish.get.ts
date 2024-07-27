@@ -5,7 +5,7 @@
 import {proxyMpRequest} from "~/server/utils";
 
 interface AppMsgPublishQuery {
-    page?: number
+    begin?: number
     size?: number
     id: string
     keyword: string
@@ -17,9 +17,8 @@ export default defineEventHandler(async (event) => {
     const id = query.id
     const keyword = query.keyword
     const token = query.token
-    const page: number = query.page || 1
+    const begin: number = query.begin || 0
     const size: number = query.size || 5
-    const begin = (page - 1) * size
 
     const isSearching = !!keyword
 

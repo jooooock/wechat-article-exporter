@@ -37,6 +37,7 @@ export interface AccountInfo {
     round_head_img: string
     service_type: number
     signature: string
+    _loaded?: boolean
 }
 
 export interface SearchBizResponse {
