@@ -41,13 +41,3 @@
 ## License
 
 MIT
-
-17:20 左右出现
-```json
-{
-  "base_resp": {
-    "err_msg": "freq control",
-    "ret": 200013
-  }
-}
-```
