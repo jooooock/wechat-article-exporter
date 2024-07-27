@@ -18,7 +18,10 @@
             class="h-8 px-4 font-semibold rounded-md border border-slate-200 text-sm text-slate-900 hover:border-slate-400 flex items-center justify-center"
             @click="copyLink(link)" :disabled="copyBtnDisabled">{{ copyBtnText }}
         </button>
+
+        <!-- 删除的文章不显示下载按钮-->
         <button
+            v-if="!isDeleted"
             :disabled="downloading"
             @click="download(link, title)"
             class="bg-sky-900 hover:bg-sky-700 disabled:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:ring-offset-sky-50 text-white text-sm font-semibold h-8 px-4 rounded flex items-center justify-center"

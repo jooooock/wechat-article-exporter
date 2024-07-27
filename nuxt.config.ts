@@ -10,5 +10,5 @@ export default defineNuxtConfig({
         maxDuration: 60,
       }
     }
-  }
+  },
 })

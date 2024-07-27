@@ -1,7 +1,36 @@
 # wechat-article-exporter
 微信公众号文章导出工具
 
-> 受 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目的启发所写。
+> 受 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目的启发所写
+
+## Features
+
+- [x] 导出 html，打包了图片和样式文件，保证100%还原度
+- [x] 批量导出 html (**目前请慎用，原因请参考[微信接口频率限制](docs/微信接口频率限制.md)**)
+- [ ] 缓存文章列表数据，减少接口请求次数
+- [ ] 缓存样式文件，加快下载速度
+
+
+## 如何使用？
+
+### 1. 注册一个微信公众号 (已有账号的话跳过)
+
+前往 [微信公众平台](https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN) 注册，服务号和订阅号皆可。
+
+### 2. 二维码扫码登录
+
+进入 [登录页面](https://wechat-article-exporter.deno.dev/login)，用微信扫描页面上的二维码，然后选择自己的公众号进行登录。
+
+### 3. 搜索目标公众号，开始下载文章
+
+通过左上角的公众号切换按钮，搜索自己感兴趣的公众号，如下图所示：
+
+![切换账号](assets/switch-account.png)
+
+搜索示例：
+
+![搜索公众号](assets/search-account-sample.png)
+
 
 ## 原理
 
@@ -12,3 +41,13 @@
 ## License
 
 MIT
+
+17:20 左右出现
+```json
+{
+  "base_resp": {
+    "err_msg": "freq control",
+    "ret": 200013
+  }
+}
+```
