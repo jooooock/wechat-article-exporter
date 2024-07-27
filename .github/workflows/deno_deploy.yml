@@ -1,5 +1,4 @@
 name: deno-deploy
-run-name: ${{ github.actor }} is running Deploy Actions 🚀
 
 on:
   push:
