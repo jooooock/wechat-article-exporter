@@ -55,14 +55,14 @@ async function loadData() {
   try {
     const fakeid = activeAccount.value?.fakeid!
     const [articles, completed] = await getArticleList(fakeid, loginAccount.value.token, begin, keyword.value)
-    await handleArticleCache(articles, fakeid)
-
     articleList.push(...articles)
-
     // 全部加载完毕
     noMoreData.value = completed
+
+    await handleArticleCache(articles, fakeid)
   } catch (e: any) {
     alert(e.message)
+    console.error(e)
     if (e.message === 'session expired') {
       navigateTo('/login')
     }
@@ -84,7 +84,7 @@ async function loadArticlesFromCache(fakeid: string) {
 
   // 更新 begin 参数
   const count = articles.filter(article => article.itemidx === 1).length
-  console.info('消息数: ', count)
+  console.info('消息数:', count)
   begin += count
 
   const cachedInfo = await getInfoCache(fakeid)
@@ -94,7 +94,7 @@ async function loadArticlesFromCache(fakeid: string) {
 
   toast.add({
     title: `成功从缓存中加载了${articles.length}条数据`,
-    timeout: 1000,
+    timeout: 5000,
   })
 }
 
@@ -113,24 +113,25 @@ async function handleArticleCache(articles: AppMsgEx[], fakeid: string) {
   if (lastArticle) {
     // 检查是否存在比 lastArticle 更早的缓存数据
     if (await hitCache(fakeid, lastArticle.create_time)) {
-      toast.add({
-        icon: 'i-heroicons-circle-stack-20-solid',
-        title: '是否从缓存加载历史文章？',
-        description: '基于你的浏览记录，当前公众号的历史文章存在缓存，从缓存加载可以节省接口调用次数',
-        timeout: 0,
-        actions: [
-          {
-            label: '确定',
-            variant: 'solid',
-            color: 'black',
-            size: 'md',
-            block: true,
-            click: () => {
-              loadArticlesFromCache(fakeid)
-            }
-          }
-        ]
-      })
+      await loadArticlesFromCache(fakeid)
+      // toast.add({
+      //   icon: 'i-heroicons-circle-stack-20-solid',
+      //   title: '是否从缓存加载历史文章？',
+      //   description: '基于你的浏览记录，当前公众号的历史文章存在缓存，从缓存加载可以节省接口调用次数',
+      //   timeout: 0,
+      //   actions: [
+      //     {
+      //       label: '确定',
+      //       variant: 'solid',
+      //       color: 'black',
+      //       size: 'md',
+      //       block: true,
+      //       click: () => {
+      //         loadArticlesFromCache(fakeid)
+      //       }
+      //     }
+      //   ]
+      // })
     }
   }
 }
