@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="flex flex-col h-screen overflow-hidden">
-    <Header @select="selectAccount" @search="searchArticle"/>
+    <Header @select:account="selectAccount" @search:article="searchArticle"/>
     <ArticleList v-if="activeAccount" ref="articleListRef" class="flex-1 overflow-y-scroll"/>
   </div>
 </template>

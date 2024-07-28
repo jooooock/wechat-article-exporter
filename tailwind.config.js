@@ -4,11 +4,13 @@ module.exports = {
   theme: {
     extend: {},
     debugScreens: {
-      position: ['bottom', 'right'],
+      position: ['bottom', 'left'],
       style: {
         backgroundColor: 'black',
         color: 'white',
-        fontSize: '14px'
+        fontSize: '16px',
+        padding: '0.5rem',
+        borderRadius: '0.25rem',
       }
     },
   },

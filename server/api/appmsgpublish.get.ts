@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     const params: Record<string, string | number> = {
         sub: isSearching ? "search" : "list",
         search_field: isSearching ? "7" : "null",
-        begin: begin.toString(),
+        begin: begin,
         count: size,
         query: keyword,
         fakeid: id,

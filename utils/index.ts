@@ -1,9 +1,16 @@
 import dayjs from "dayjs";
 import JSZip from "jszip";
 import mime from "mime";
-import type {AppMsgEx, AppMsgPublishResponse, PublishInfo, PublishPage} from "~/types/types";
+import type {
+    AccountInfo,
+    AppMsgEx,
+    AppMsgPublishResponse,
+    PublishInfo,
+    PublishPage,
+    SearchBizResponse
+} from "~/types/types";
 import {updateArticleCache} from "~/store/article";
-import {ARTICLE_LIST_PAGE_SIZE} from "~/config";
+import {ARTICLE_LIST_PAGE_SIZE, ACCOUNT_LIST_PAGE_SIZE} from "~/config";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
 
 
@@ -179,7 +186,6 @@ ${pageContentHTML}
     return zip
 }
 
-const PAGE_SIZE = ARTICLE_LIST_PAGE_SIZE
 
 /**
  * 获取文章列表
@@ -188,14 +194,14 @@ const PAGE_SIZE = ARTICLE_LIST_PAGE_SIZE
  * @param begin
  * @param keyword
  */
-export async function getArticleList(fakeid: string, token: string, begin = 0, keyword = ''): Promise<[AppMsgEx[], boolean]> {
+export async function getArticleList(fakeid: string, token: string, begin = 0, keyword = ''): Promise<[AppMsgEx[], boolean, number]> {
     const resp = await $fetch<AppMsgPublishResponse>('/api/appmsgpublish', {
         method: 'GET',
         query: {
             id: fakeid,
             token: token,
             begin: begin,
-            size: PAGE_SIZE,
+            size: ARTICLE_LIST_PAGE_SIZE,
             keyword: keyword,
         }
     })
@@ -204,9 +210,13 @@ export async function getArticleList(fakeid: string, token: string, begin = 0, k
         const publish_page: PublishPage = JSON.parse(resp.publish_page)
         const publish_list = publish_page.publish_list.filter(item => !!item.publish_info)
 
+        // 返回的文章数量与请求的文章数量不一致就说明已结束
+        const isCompleted = publish_list.length !== ARTICLE_LIST_PAGE_SIZE
+
+        // 更新缓存，注意搜索的结果不能写入缓存
         if (!keyword) {
             try {
-                await updateArticleCache(publish_list, publish_list.length !== PAGE_SIZE, fakeid)
+                await updateArticleCache(publish_list, isCompleted, fakeid)
             } catch (e) {
                 console.info('缓存失败')
                 console.error(e)
@@ -217,7 +227,37 @@ export async function getArticleList(fakeid: string, token: string, begin = 0, k
             const publish_info: PublishInfo = JSON.parse(item.publish_info)
             return publish_info.appmsgex
         })
-        return [articles, publish_list.length !== PAGE_SIZE]
+        return [articles, isCompleted, publish_page.total_count]
+    } else if (resp.base_resp.ret === 200003) {
+        throw new Error('session expired')
+    } else {
+        throw new Error(`${resp.base_resp.ret}:${resp.base_resp.err_msg}`)
+    }
+}
+
+/**
+ * 获取公众号列表
+ * @param token
+ * @param begin
+ * @param keyword
+ */
+export async function getAccountList(token: string, begin = 0, keyword = ''): Promise<[AccountInfo[], boolean]> {
+    const resp = await $fetch<SearchBizResponse>('/api/searchbiz', {
+        method: 'GET',
+        query: {
+            keyword: keyword,
+            begin: begin,
+            size: ACCOUNT_LIST_PAGE_SIZE,
+            token: token,
+        }
+    })
+
+    if (resp.base_resp.ret === 0) {
+        // 公众号判断是否结束的逻辑与文章不太一样
+        // 当第一页的结果就少于5个则结束，否则只有当搜索结果为空才表示结束
+        const isCompleted = begin === 0 ? resp.total < ACCOUNT_LIST_PAGE_SIZE : resp.total === 0
+
+        return [resp.list, isCompleted]
     } else if (resp.base_resp.ret === 200003) {
         throw new Error('session expired')
     } else {

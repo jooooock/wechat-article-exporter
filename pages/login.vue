@@ -117,16 +117,7 @@ const sessionid = new Date().getTime().toString() + Math.floor(Math.random() * 1
 const hasStartLogin = ref(false)
 
 const loginAccount = useLoginAccount()
-const SCAN_LOGIN_TYPE = {
-  0: '等待扫码',
-  1: '扫码成功，可登录账号=1',
-  2: '扫码成功，可登录账号>1',
-  3: '没有可登录账号',
-  4: '登录失败',
-  5: '二维码已过期',
-  6: '二维码加载失败',
-  7: 'qq号需要绑定邮箱',
-}
+
 
 useHead({
   title: '登录 | 微信公众号文章导出'

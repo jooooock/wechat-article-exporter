@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-24 pt-2 bg-zinc-200">
+  <div class="relative pb-24 pt-2 bg-zinc-200">
     <ul class="flex justify-between container mx-auto flex-wrap">
       <ArticleItem
           v-for="(article, index) in articleList"
@@ -19,6 +19,8 @@
       <Loader :size="28" class="animate-spin text-slate-500"/>
     </p>
     <p v-else-if="noMoreData" class="text-center mt-2 py-2 text-slate-400">已全部加载完毕</p>
+
+    <span class="fixed right-[15px] bottom-0 z-50 font-mono bg-zinc-700 text-sm text-white p-2 rounded" v-if="totalPages > 0">加载进度: {{loadedPages}}/{{totalPages}}</span>
   </div>
 </template>
 
@@ -32,12 +34,15 @@ import {getInfoCache} from "~/store/info";
 import {ARTICLE_LIST_PAGE_SIZE} from "~/config";
 
 const toast = useToast()
-const initialPageSize = -1 * ARTICLE_LIST_PAGE_SIZE
 
 const keyword = ref('')
-let begin = initialPageSize
+let begin = ref(0)
 const articleList = reactive<AppMsgEx[]>([])
 
+// 总页码
+const totalPages = ref(0)
+// 已加载页码数
+const loadedPages = computed(() => Math.ceil(begin.value / ARTICLE_LIST_PAGE_SIZE))
 
 const loginAccount = useLoginAccount()
 const activeAccount = useActiveAccount()
@@ -54,12 +59,22 @@ async function loadData() {
   loading.value = true
   try {
     const fakeid = activeAccount.value?.fakeid!
-    const [articles, completed] = await getArticleList(fakeid, loginAccount.value.token, begin, keyword.value)
+    const [articles, completed, totalCount] = await getArticleList(fakeid, loginAccount.value.token, begin.value, keyword.value)
     articleList.push(...articles)
-    // 全部加载完毕
     noMoreData.value = completed
+    begin.value += articles.length
 
-    await handleArticleCache(articles, fakeid)
+    totalPages.value = Math.ceil(totalCount / ARTICLE_LIST_PAGE_SIZE)
+
+
+    // 加载可用的缓存
+    const lastArticle = articles.at(-1)
+    if (lastArticle && !keyword.value) {
+      // 检查是否存在比 lastArticle 更早的缓存数据
+      if (await hitCache(fakeid, lastArticle.create_time)) {
+        await loadArticlesFromCache(fakeid, lastArticle.create_time)
+      }
+    }
   } catch (e: any) {
     alert(e.message)
     console.error(e)
@@ -74,9 +89,8 @@ async function loadData() {
 /**
  * 从缓存加载当前公众号的历史文章
  */
-async function loadArticlesFromCache(fakeid: string) {
-  const lastArticle = articleList.at(-1)!
-  const articles = await getArticleCache(fakeid, lastArticle.create_time)
+async function loadArticlesFromCache(fakeid: string, create_time: number) {
+  const articles = await getArticleCache(fakeid, create_time)
 
   console.info(`从缓存中加载了${articles.length}条数据`)
 
@@ -85,7 +99,7 @@ async function loadArticlesFromCache(fakeid: string) {
   // 更新 begin 参数
   const count = articles.filter(article => article.itemidx === 1).length
   console.info('消息数:', count)
-  begin += count
+  begin.value += count
 
   const cachedInfo = await getInfoCache(fakeid)
   if (cachedInfo && cachedInfo.completed) {
@@ -98,63 +112,18 @@ async function loadArticlesFromCache(fakeid: string) {
   })
 }
 
-/**
- * 基于接口数据处理本地缓存逻辑
- * @param articles 接口获取的文章列表
- * @param fakeid 公众号id
- */
-async function handleArticleCache(articles: AppMsgEx[], fakeid: string) {
-  if (keyword.value) {
-    // 如果是搜索请求，则忽略缓存处理
-    return
-  }
-
-  const lastArticle = articles.at(-1)
-  if (lastArticle) {
-    // 检查是否存在比 lastArticle 更早的缓存数据
-    if (await hitCache(fakeid, lastArticle.create_time)) {
-      await loadArticlesFromCache(fakeid)
-      // toast.add({
-      //   icon: 'i-heroicons-circle-stack-20-solid',
-      //   title: '是否从缓存加载历史文章？',
-      //   description: '基于你的浏览记录，当前公众号的历史文章存在缓存，从缓存加载可以节省接口调用次数',
-      //   timeout: 0,
-      //   actions: [
-      //     {
-      //       label: '确定',
-      //       variant: 'solid',
-      //       color: 'black',
-      //       size: 'md',
-      //       block: true,
-      //       click: () => {
-      //         loadArticlesFromCache(fakeid)
-      //       }
-      //     }
-      //   ]
-      // })
-    }
-  }
-}
-
-/**
- * 加载下一页
- */
-function nextArticlePage() {
-  begin += ARTICLE_LIST_PAGE_SIZE
-  loadData()
-}
 
 /**
  * 初始化
  */
 function init(query: string) {
   articleList.length = 0
-  begin = initialPageSize
+  begin.value = 0
   noMoreData.value = false
   keyword.value = query
 
   if (bottomElementIsVisible.value) {
-    nextArticlePage()
+    loadData()
   }
 }
 
@@ -165,7 +134,7 @@ const bottomElementIsVisible = ref(false)
 function onElementVisibility(visible: boolean) {
   bottomElementIsVisible.value = visible
   if (visible && !noMoreData.value) {
-    nextArticlePage()
+    loadData()
   }
 }
 </script>
