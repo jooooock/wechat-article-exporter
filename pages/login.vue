@@ -244,16 +244,6 @@ async function bizLogin() {
       token: _token,
     }
 
-    // 获取更多账号信息
-    try {
-      const {nick_name, head_img} = await $fetch<LoginInfoResult>(`/api/login/info?token=${_token}`)
-      loginAccount.value.nick_name = nick_name
-      loginAccount.value.head_img = head_img
-    } catch (e) {
-      console.info('获取账号信息失败')
-      console.error(e)
-    }
-
     navigateTo('/', {replace: true})
   } else {
     console.log('系统繁忙，请稍后再试')

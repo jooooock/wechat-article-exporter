@@ -12,6 +12,7 @@ import type {
 import {updateArticleCache} from "~/store/article";
 import {ARTICLE_LIST_PAGE_SIZE, ACCOUNT_LIST_PAGE_SIZE} from "~/config";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
+import {updateAPICache} from "~/store/api";
 
 
 export function proxyImage(url: string) {
@@ -186,6 +187,7 @@ ${pageContentHTML}
     return zip
 }
 
+const loginAccount = useLoginAccount()
 
 /**
  * 获取文章列表
@@ -200,6 +202,20 @@ export async function getArticleList(fakeid: string, token: string, begin = 0, k
         query: {
             id: fakeid,
             token: token,
+            begin: begin,
+            size: ARTICLE_LIST_PAGE_SIZE,
+            keyword: keyword,
+        }
+    })
+
+    // 记录 api 调用
+    await updateAPICache({
+        name: 'appmsgpublish',
+        account: loginAccount.value.nick_name!,
+        call_time: new Date().getTime(),
+        is_normal: resp.base_resp.ret === 0 || resp.base_resp.ret === 200003,
+        payload: {
+            id: fakeid,
             begin: begin,
             size: ARTICLE_LIST_PAGE_SIZE,
             keyword: keyword,
@@ -249,6 +265,19 @@ export async function getAccountList(token: string, begin = 0, keyword = ''): Pr
             begin: begin,
             size: ACCOUNT_LIST_PAGE_SIZE,
             token: token,
+        }
+    })
+
+    // 记录 api 调用
+    await updateAPICache({
+        name: 'searchbiz',
+        account: loginAccount.value.nick_name!,
+        call_time: new Date().getTime(),
+        is_normal: resp.base_resp.ret === 0 || resp.base_resp.ret === 200003,
+        payload: {
+            begin: begin,
+            size: ACCOUNT_LIST_PAGE_SIZE,
+            keyword: keyword,
         }
     })
 

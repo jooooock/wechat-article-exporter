@@ -855,6 +855,11 @@
     methods "^1.1.2"
     path-to-regexp "^6.2.1"
 
+"@kurkle/color@^0.3.0":
+  version "0.3.2"
+  resolved "https://registry.npmjs.org/@kurkle/color/-/color-0.3.2.tgz#5acd38242e8bde4f9986e7913c8fdf49d3aa199f"
+  integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
+
 "@kwsites/file-exists@^1.1.1":
   version "1.1.1"
   resolved "https://registry.npmjs.org/@kwsites/file-exists/-/file-exists-1.1.1.tgz#ad1efcac13e1987d8dbaf235ef3be5b0d96faa99"
@@ -2212,6 +2217,18 @@ chalk@^5.3.0:
   version "5.3.0"
   resolved "https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz#67c20a7ebef70e7f3970a01f90fa210cb6860385"
   integrity sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==
+
+chart.js@^4.4.3:
+  version "4.4.3"
+  resolved "https://registry.npmjs.org/chart.js/-/chart.js-4.4.3.tgz#3b2e11e7010fefa99b07d0349236f5098e5226ad"
+  integrity sha512-qK1gkGSRYcJzqrrzdR6a+I0vQ4/R+SoODXyAjscQ/4mzuNzySaMCd+hyVxitSY1+L2fjPD1Gbn+ibNqRmwQeLw==
+  dependencies:
+    "@kurkle/color" "^0.3.0"
+
+chartjs-adapter-dayjs-4@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.npmjs.org/chartjs-adapter-dayjs-4/-/chartjs-adapter-dayjs-4-1.0.4.tgz#4e810c99d9f28c07364381317d01f1bc504c5b2e"
+  integrity sha512-yy9BAYW4aNzPVrCWZetbILegTRb7HokhgospPoC3b5iZ5qdlqNmXts2KdSp6AqnjkPAp/YWyHDxLvIvwt5x81w==
 
 chokidar@^3.5.1, chokidar@^3.5.3, chokidar@^3.6.0:
   version "3.6.0"
@@ -5969,6 +5986,11 @@ vue-bundle-renderer@^2.1.0:
   integrity sha512-uZ+5ZJdZ/b43gMblWtcpikY6spJd0nERaM/1RtgioXNfWFbjKlUwrS8HlrddN6T2xtptmOouWclxLUkpgcVX3Q==
   dependencies:
     ufo "^1.5.3"
+
+vue-chartjs@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.npmjs.org/vue-chartjs/-/vue-chartjs-5.3.1.tgz#73484d569ec4994ba5accd30fe6714ef28e86f5b"
+  integrity sha512-rZjqcHBxKiHrBl0CIvcOlVEBwRhpWAVf6rDU3vUfa7HuSRmGtCslc0Oc8m16oAVuk0erzc1FCtH1VCriHsrz+A==
 
 vue-demi@>=0.14.8:
   version "0.14.9"

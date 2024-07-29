@@ -2,7 +2,7 @@
   <div class="relative pb-24 pt-2 bg-zinc-200">
     <ul class="flex justify-between container mx-auto flex-wrap">
       <ArticleItem
-          v-for="(article, index) in articleList"
+          v-for="(article, index) in articleList.filter(article => hideDeleted ? !article.is_deleted : true)"
           :key="article.appmsgid"
           :index="index + 1"
           :title="article.title"
@@ -33,6 +33,13 @@ import {getArticleCache, hitCache} from "~/store/article";
 import {getInfoCache} from "~/store/info";
 import {ARTICLE_LIST_PAGE_SIZE} from "~/config";
 
+interface Props {
+  hideDeleted?: boolean
+}
+withDefaults(defineProps<Props>(), {
+  hideDeleted: false,
+})
+
 const toast = useToast()
 
 const keyword = ref('')
@@ -56,6 +63,7 @@ const loading = ref(false)
 const noMoreData = ref(false)
 
 async function loadData() {
+  console.log(1)
   loading.value = true
   try {
     const fakeid = activeAccount.value?.fakeid!
