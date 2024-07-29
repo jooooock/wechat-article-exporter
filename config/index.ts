@@ -1,7 +1,7 @@
 /**
  * 文章列表每页大小
  */
-export const ARTICLE_LIST_PAGE_SIZE = 10;
+export const ARTICLE_LIST_PAGE_SIZE = 20;
 
 /**
  * 公众号列表每页大小
