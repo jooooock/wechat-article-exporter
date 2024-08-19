@@ -3,7 +3,7 @@
     <ul class="flex justify-between container mx-auto flex-wrap">
       <ArticleItem
           v-for="(article, index) in articleList.filter(article => hideDeleted ? !article.is_deleted : true)"
-          :key="article.appmsgid"
+          :key="article.aid"
           :index="index + 1"
           :title="article.title"
           :cover="article.pic_cdn_url_235_1 || article.pic_cdn_url_16_9 || article.cover_img || article.cover"
@@ -63,7 +63,6 @@ const loading = ref(false)
 const noMoreData = ref(false)
 
 async function loadData() {
-  console.log(1)
   loading.value = true
   try {
     const fakeid = activeAccount.value?.fakeid!
