@@ -99,13 +99,10 @@ async function loadData() {
 async function loadArticlesFromCache(fakeid: string, create_time: number) {
   const articles = await getArticleCache(fakeid, create_time)
 
-  console.info(`从缓存中加载了${articles.length}条数据`)
-
   articleList.push(...articles)
 
   // 更新 begin 参数
   const count = articles.filter(article => article.itemidx === 1).length
-  console.info('消息数:', count)
   begin.value += count
 
   const cachedInfo = await getInfoCache(fakeid)

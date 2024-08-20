@@ -14,7 +14,6 @@ export interface Info {
  * @param info
  */
 export async function updateInfoCache(infoStore: IDBObjectStore, info: Info): Promise<boolean> {
-    console.log(info)
     return new Promise((resolve, reject) => {
         const request = infoStore.get(info.fakeid)
         request.onsuccess = () => {

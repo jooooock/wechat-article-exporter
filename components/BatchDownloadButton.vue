@@ -19,10 +19,8 @@ import type {AppMsgEx} from "~/types/types";
 import {sleep} from "@antfu/utils";
 import JSZip from "jszip";
 import {saveAs} from "file-saver";
-import {downloadArticleHTML, packHTMLAssets, getArticleList} from '~/utils'
-import {ARTICLE_LIST_PAGE_SIZE} from "~/config";
-import {getArticleCache, hitCache} from "~/store/article";
-import {getInfoCache} from "~/store/info";
+import {downloadArticleHTML, packHTMLAssets} from '~/utils'
+import {getArticleCache} from "~/store/article";
 
 
 type AppMsgExWithHTML = AppMsgEx & {
@@ -30,10 +28,8 @@ type AppMsgExWithHTML = AppMsgEx & {
   packed?: boolean
 };
 
-const loginAccount = useLoginAccount()
 const activeAccount = useActiveAccount()
 
-const begin = ref(0)
 const articleList: AppMsgExWithHTML[] = reactive([])
 const loading = ref(false)
 const phase = ref()
@@ -48,27 +44,14 @@ const packedArticles = computed(() => validArticles.value.filter(article => !!ar
 
 async function batchDownload() {
   loading.value = true
-  begin.value = 0
 
   const fakeid = activeAccount.value?.fakeid!
   try {
     phase.value = '抓取文章链接'
-    let completed = false
-    do {
-      await sleep(5 * 1000)
 
-      const [articles, _completed] = await getArticleList(fakeid, loginAccount.value.token, begin.value)
-      articleList.push(...articles)
-      completed = _completed
-      begin.value += ARTICLE_LIST_PAGE_SIZE
-
-      await sleep(5 * 1000)
-      if (await handleArticleCache(articles, fakeid)) {
-        completed = true
-      }
-
-      await sleep(10 * 1000)
-    } while (!completed)
+    const articles = await getArticleCache(fakeid, new Date().getTime())
+    articleList.push(...articles)
+    await sleep(2 * 1000)
   } catch (e: any) {
     console.warn(e.message)
   }
@@ -102,32 +85,6 @@ async function batchDownload() {
   saveAs(blob, `${activeAccount.value?.nickname}.zip`)
 
   loading.value = false
-}
-
-/**
- * 基于接口数据处理本地缓存逻辑
- * @param articles 接口获取的文章列表
- * @param fakeid 公众号id
- */
-async function handleArticleCache(articles: AppMsgEx[], fakeid: string) {
-  const lastArticle = articles.at(-1)
-  if (lastArticle) {
-    // 检查是否存在比 lastArticle 更早的缓存数据
-    if (await hitCache(fakeid, lastArticle.create_time)) {
-      const cachedArticles = await getArticleCache(fakeid, lastArticle.create_time)
-
-      articleList.push(...cachedArticles)
-
-      // 更新 begin 参数
-      const count = articleList.filter(article => article.itemidx === 1).length
-      begin.value += count
-
-      const cachedInfo = await getInfoCache(fakeid)
-      if (cachedInfo && cachedInfo.completed) {
-        return true
-      }
-    }
-  }
 }
 
 </script>
