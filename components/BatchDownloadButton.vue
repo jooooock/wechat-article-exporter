@@ -62,7 +62,7 @@ async function batchDownload() {
     for (const article of validArticles.value.filter(article => !article.html)) {
       try {
         article.html = await downloadArticleHTML(article.link, article.title)
-        await sleep(200)
+        await sleep(2000)
       } catch (e: any) {
         console.warn(e.message)
       }
