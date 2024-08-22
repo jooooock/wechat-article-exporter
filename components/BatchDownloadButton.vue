@@ -7,7 +7,7 @@
     <span v-if="loading">{{phase}}:
       <span v-if="phase === '抓取文章链接'">{{validArticles.length}}</span>
       <span v-if="phase === '下载文章内容'">{{downloadedArticles.length}}/{{validArticles.length}}</span>
-      <span v-if="phase === '打包'">{{packedArticles.length}}/{{validArticles.length}}</span>
+      <span v-if="phase === '打包'">{{packedArticles.length}}/{{downloadedArticles.length}}</span>
     </span>
     <span v-else>批量下载</span>
   </button>
@@ -42,6 +42,9 @@ const downloadedArticles = computed(() => validArticles.value.filter(article => 
 const packedArticles = computed(() => validArticles.value.filter(article => !!article.packed))
 
 
+/**
+ * 批量导出
+ */
 async function batchDownload() {
   loading.value = true
 
@@ -51,23 +54,27 @@ async function batchDownload() {
 
     const articles = await getArticleCache(fakeid, new Date().getTime())
     articleList.push(...articles)
-    await sleep(2 * 1000)
+    await sleep(1000)
   } catch (e: any) {
+    console.info('抓取文章链接失败:')
     console.warn(e.message)
   }
 
 
   phase.value = '下载文章内容'
-  do {
-    for (const article of validArticles.value.filter(article => !article.html)) {
-      try {
-        article.html = await downloadArticleHTML(article.link, article.title)
-        await sleep(2000)
-      } catch (e: any) {
-        console.warn(e.message)
-      }
+  for (const article of validArticles.value.filter(article => !article.html)) {
+    try {
+      article.html = await downloadArticleHTML(article.link, article.title)
+      await sleep(2000)
+    } catch (e: any) {
+      console.info('下载文章内容失败:')
+      console.warn(e.message)
+      break
     }
-  } while (validArticles.value.filter(article => !article.html).length > 0)
+  }
+  // do {
+  //
+  // } while (validArticles.value.filter(article => !article.html).length > 0)
 
 
   phase.value = '打包'
@@ -77,6 +84,7 @@ async function batchDownload() {
       await packHTMLAssets(article.html!, zip.folder(article.title.replace(/\//g, '+'))!)
       article.packed = true
     } catch (e: any) {
+      console.info('打包失败:')
       console.warn(e.message)
     }
   }
