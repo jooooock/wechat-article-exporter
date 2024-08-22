@@ -11,20 +11,19 @@
 <script setup lang="ts">
 import {type APICall, type ApiName, queryAPICall} from "~/store/api";
 import {
-  CategoryScale,
   Chart as ChartJS,
   type ChartData,
   type ChartOptions,
-  Colors,
+  Filler,
   Legend,
   LinearScale,
   LineElement,
+  LogarithmicScale,
   PointElement,
   TimeScale,
   Title,
-    type TooltipItem,
-    Filler,
-  Tooltip
+  Tooltip,
+    Colors,
 } from 'chart.js'
 import {Line} from 'vue-chartjs'
 import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm';
@@ -32,7 +31,7 @@ import {getArticleList} from '~/utils'
 import dayjs from "dayjs";
 
 
-ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement, LineElement, TimeScale, Filler)
+ChartJS.register(LinearScale, Title, Tooltip, Legend, PointElement, LineElement, TimeScale, Filler, LogarithmicScale, Colors)
 
 
 interface APICallWithValue extends APICall {
@@ -55,20 +54,22 @@ const loginAccount = useLoginAccount()
 
 
 const _data = ref<APICallWithValue[]>([])
+const amountData = computed(() => _data.value.map(record => record.amount))
+const countData = computed(() => _data.value.map(record => record.count))
 
-const chartData = computed<ChartData<'line', APICallWithValue[]>>(() => {
+const chartData = computed<ChartData<'line', number[]>>(() => {
   return {
-    // labels: _data.value.map(record => record.call_time),
+    labels: _data.value.map(record => record.call_time),
     datasets: [
       {
-        label: '文章列表接口',
-        // data: _data.value.map(record => record.total),
-        data: _data.value,
-        backgroundColor: 'rgb(14 165 233)',
-        parsing: {
-          xAxisKey: 'call_time',
-          yAxisKey: 'amount',
-        },
+        label: '数据量',
+        data: amountData.value,
+        yAxisID: 'y1',
+      },
+      {
+        label: '次数',
+        data: countData.value,
+        yAxisID: 'y2',
       },
     ],
   }
@@ -76,16 +77,6 @@ const chartData = computed<ChartData<'line', APICallWithValue[]>>(() => {
 
 const chartOptions: ChartOptions<'line'> = {
   responsive: true,
-  plugins: {
-    tooltip: {
-      callbacks: {
-        footer(tooltipItems: TooltipItem<'line'>[]): string | string[] | void {
-          const raw: APICallWithValue = tooltipItems[0].raw as APICallWithValue
-          return `调用次数: ${raw.count}`
-        }
-      }
-    }
-  },
   interaction: {
     intersect: false,
     mode: 'nearest',
@@ -102,15 +93,27 @@ const chartOptions: ChartOptions<'line'> = {
         unit: 'minute'
       },
       grid: {
-        tickColor: 'red'
+        tickColor: '#d5d5d5'
       },
     },
-    y: {
-      type: 'linear',
-      beginAtZero: true,
+    y1: {
+      type: 'logarithmic',
+      axis: 'y',
+      position: 'left',
       min: 0,
       title: {
         text: '数据量',
+        display: true,
+      },
+    },
+    y2: {
+      type: 'linear',
+      beginAtZero: true,
+      axis: 'y',
+      position: 'right',
+      min: 0,
+      title: {
+        text: '次数',
         display: true,
       },
       grace: '10%'
@@ -123,9 +126,9 @@ const chartOptions: ChartOptions<'line'> = {
  */
 async function callApi() {
   try {
-    await getArticleList(activeAccount.value?.fakeid!, loginAccount.value.token, 0)
+    await getArticleList(activeAccount.value?.fakeid!, loginAccount.value.token, 0, '1')
     // 正常的话，1分钟后继续调用
-    setTimeout(callApi, 60 * 1000)
+    setTimeout(callApi,  10 * 1000)
   } catch (e: any) {
     if (e.message === '200013:freq control') {
       // 接口被限制时，5分钟后继续调用
@@ -141,9 +144,9 @@ async function callApi() {
  * @param name
  */
 async function getApiCallData(name: ApiName) {
-  const start = dayjs(new Date()).subtract(30, 'minute').toDate().getTime()
+  const start = dayjs(new Date()).subtract(4, 'hours').toDate().getTime()
   const records = await queryAPICall(loginAccount.value.nick_name!, start)
-  const dataset = records.filter(record => record.name === name && !record.payload.keyword)
+  const dataset = records.filter(record => record.name === name && record.payload.keyword)
 
   const data: APICallWithValue[] = []
   let amount = 0

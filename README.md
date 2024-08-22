@@ -47,9 +47,10 @@
 
 ![公众号后台搜索文章](assets/search-article.png)
 
-## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/jooooock/wechat-article-exporter.svg?variant=adaptive)](https://starchart.cc/jooooock/wechat-article-exporter)
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline)](https://star-history.com/#jooooock/wechat-article-exporter&Timeline)
 
 
 ## License
