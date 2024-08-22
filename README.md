@@ -47,6 +47,11 @@
 
 ![公众号后台搜索文章](assets/search-article.png)
 
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/jooooock/wechat-article-exporter.svg?variant=adaptive)](https://starchart.cc/jooooock/wechat-article-exporter)
+
+
 ## License
 
 MIT
