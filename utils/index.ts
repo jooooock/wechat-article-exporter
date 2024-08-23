@@ -73,7 +73,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
     zip.folder('assets')
 
 
-    // 下载所有的图片
+    // 下载所有的图片 (图片地址已经在下载html接口中替换过了)
     const imgs = $pageContent.querySelectorAll<HTMLImageElement>('img[src]')
     for (const img of imgs) {
         if (!img.src) {
