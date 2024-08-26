@@ -30,5 +30,5 @@ export default defineEventHandler(async (event) => {
 })
 
 function proxyImage(url: string) {
-    return `https://service.champ.design/api/proxy?url=${encodeURIComponent(url)}`
+    return `https://vproxy-wechat-article.deno.dev/api/proxy?url=${encodeURIComponent(url)}`
 }
