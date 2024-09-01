@@ -33,5 +33,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: wechat-article-exporter
-          entrypoint: server/index.ts
+          entrypoint: utils/index.ts
           root: .output
