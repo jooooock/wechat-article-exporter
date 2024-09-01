@@ -34,4 +34,3 @@ jobs:
         with:
           project: wechat-article-exporter
           entrypoint: utils/index.ts
-          root: .output
