@@ -1,6 +1,7 @@
 const domains = [
     'mmbiz.qpic.cn',
-    'wx.qlogo.cn'
+    'mmbiz.qlogo.cn',
+    'wx.qlogo.cn',
 ]
 
 self.addEventListener('fetch', function (event) {
