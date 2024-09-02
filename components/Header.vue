@@ -22,7 +22,7 @@
       </a>
     </div>
     <div v-if="loginAccount" class="flex flex-col sm:flex-row items-center sm:space-x-2 ml-10">
-      <img v-if="loginAccount.head_img" :src="loginAccount.head_img" alt="" class="rounded-full size-10">
+      <img v-if="loginAccount.head_img" :src="proxyImage(loginAccount.head_img)" alt="" class="rounded-full size-10">
       <span v-if="loginAccount.nick_name">{{loginAccount.nick_name}}</span>
     </div>
   </header>

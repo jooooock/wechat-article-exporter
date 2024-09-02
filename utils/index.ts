@@ -13,6 +13,7 @@ import {updateArticleCache} from "~/store/article";
 import {ARTICLE_LIST_PAGE_SIZE, ACCOUNT_LIST_PAGE_SIZE} from "~/config";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
 import {updateAPICache} from "~/store/api";
+import {downloadBgImages, downloadImages} from "~/utils/download";
 
 
 export function proxyImage(url: string) {
@@ -72,34 +73,15 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
 
     zip.folder('assets')
 
-
-    // 下载所有的图片 (图片地址已经在下载html接口中替换过了)
-    const imgs = $pageContent.querySelectorAll<HTMLImageElement>('img[src]')
-    for (const img of imgs) {
-        if (!img.src) {
-            console.warn('img元素的src为空')
-            continue
-        }
-
-        try {
-            const imgData = await $fetch<Blob>(img.src)
-            const uuid = new Date().getTime() + Math.random().toString()
-            const ext = mime.getExtension(imgData.type)
-            zip.file(`assets/${uuid}.${ext}`, imgData)
-
-            // 改写html中的引用路径，指向本地图片文件
-            img.src = `./assets/${uuid}.${ext}`
-        } catch (e) {
-            console.info('图片下载失败: ', img.src)
-            console.error(e)
-        }
+    // 下载所有的图片
+    const imgs = $pageContent.querySelectorAll<HTMLImageElement>('img')
+    if (imgs.length > 0) {
+        await downloadImages([...imgs], zip)
     }
 
 
-    // 下载背景图片
-    // 背景图片无法用选择器选中并修改，因此用正则进行匹配替换
+    // 下载背景图片 背景图片无法用选择器选中并修改，因此用正则进行匹配替换
     let pageContentHTML = $pageContent.outerHTML
-    const url2pathMap = new Map<string, string>()
 
     // 收集所有的背景图片地址
     const bgImageURLs = new Set<string>()
@@ -107,29 +89,18 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
         bgImageURLs.add(url)
         return `${p1}${url}${p3}`
     })
-    for (const url of bgImageURLs) {
-        try {
-            const imgData = await $fetch<Blob>(url)
-            const uuid = new Date().getTime() + Math.random().toString()
-            const ext = mime.getExtension(imgData.type)
-
-            zip.file(`assets/${uuid}.${ext}`, imgData)
-            url2pathMap.set(url, `assets/${uuid}.${ext}`)
-        } catch (e) {
-            console.info('背景图片下载失败: ', url)
-            console.error(e)
-        }
+    if (bgImageURLs.size > 0) {
+        const url2pathMap = await downloadBgImages([...bgImageURLs], zip)
+        pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
+            if (url2pathMap.has(url)) {
+                const path = url2pathMap.get(url)!
+                return `${p1}./${path}${p3}`
+            } else {
+                console.warn('背景图片丢失: ', url)
+                return `${p1}${url}${p3}`
+            }
+        })
     }
-
-    pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
-        if (url2pathMap.has(url)) {
-            const path = url2pathMap.get(url)!
-            return `${p1}./${path}${p3}`
-        } else {
-            console.warn('背景图片丢失: ', url)
-            return `${p1}${url}${p3}`
-        }
-    })
 
     // 下载样式表
     let localLinks: string = ''
