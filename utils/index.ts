@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import JSZip from "jszip";
-import mime from "mime";
 import type {
     AccountInfo,
     AppMsgEx,
@@ -15,10 +14,6 @@ import {getAssetCache, updateAssetCache} from "~/store/assetes";
 import {updateAPICache} from "~/store/api";
 import {downloadBgImages, downloadImages} from "~/utils/download";
 
-
-export function proxyImage(url: string) {
-    return `https://vproxy-wechat-article.deno.dev/api/proxy?url=${encodeURIComponent(url)}`
-}
 
 export function formatTimeStamp(timestamp: number) {
     return dayjs.unix(timestamp).format('YYYY-MM-DD HH:mm')
@@ -48,9 +43,10 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
 /**
  * 打包 html 中的资源
  * @param html
+ * @param title
  * @param zip
  */
-export async function packHTMLAssets(html: string, zip?: JSZip) {
+export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     if (!zip) {
         zip = new JSZip();
     }
@@ -137,6 +133,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
+    <title>${title}</title>
     ${localLinks}
     <style>
         #page-content {

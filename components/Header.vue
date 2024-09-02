@@ -22,7 +22,7 @@
       </a>
     </div>
     <div v-if="loginAccount" class="flex flex-col sm:flex-row items-center sm:space-x-2 ml-10">
-      <img v-if="loginAccount.head_img" :src="proxyImage(loginAccount.head_img)" alt="" class="rounded-full size-10">
+      <img v-if="loginAccount.head_img" :src="loginAccount.head_img" alt="" class="rounded-full size-10">
       <span v-if="loginAccount.nick_name">{{loginAccount.nick_name}}</span>
     </div>
   </header>
@@ -41,7 +41,7 @@
               :class="{active: account.fakeid === activeAccount?.fakeid}"
               @click="selectAccount(account)"
           >
-            <img class="size-20 mr-2" :src="proxyImage(account.round_head_img)" alt="">
+            <img class="size-20 mr-2" :src="account.round_head_img" alt="">
             <div class="flex-1">
               <div class="flex justify-between">
                 <p class="font-semibold">{{ account.nickname }}</p>

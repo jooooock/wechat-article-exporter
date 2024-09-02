@@ -3,7 +3,7 @@
     <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute z-10 size-[100px] right-0 top-64 translate-x-full drop-shadow-[-116px_0_red]">
     <div v-if="cover" class="h-60 overflow-hidden" :style="{backgroundColor: themeColor(coverTheme!)}">
       <img
-          :src="proxyImage(cover)"
+          :src="cover"
           loading="lazy"
           alt=""
           class="object-contain size-full group-hover:scale-110 ease-in-out transition duration-300">
@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import {saveAs} from 'file-saver'
 import {Loader} from 'lucide-vue-next';
-import {formatTimeStamp, proxyImage, downloadArticleHTML, packHTMLAssets} from "~/utils";
+import {formatTimeStamp, downloadArticleHTML, packHTMLAssets} from "~/utils";
 import type {RGB} from "~/types/types";
 
 
@@ -68,7 +68,7 @@ async function download(link: string, title: string) {
     downloading.value = true
 
     const fullHTML = await downloadArticleHTML(link)
-    const zip = await packHTMLAssets(fullHTML)
+    const zip = await packHTMLAssets(fullHTML, title)
 
     const blob = await zip.generateAsync({type: 'blob'})
     saveAs(blob, title)
