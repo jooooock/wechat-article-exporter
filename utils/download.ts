@@ -7,7 +7,9 @@ let vproxy: string[] = JSON.parse(JSON.stringify(AVAILABLE_PROXY_LIST));
 
 async function downloadImage(img: HTMLImageElement, proxy: string, zip: JSZip) {
     try {
-        const imgData = await $fetch<Blob>(`${proxy}?url=${encodeURIComponent(img.src)}`)
+        const imgData = await $fetch<Blob>(`${proxy}?url=${encodeURIComponent(img.src)}`, {
+            retry: 0,
+        })
         const uuid = new Date().getTime() + Math.random().toString()
         const ext = mime.getExtension(imgData.type)
         zip.file(`assets/${uuid}.${ext}`, imgData)
@@ -23,7 +25,9 @@ async function downloadImage(img: HTMLImageElement, proxy: string, zip: JSZip) {
 
 async function downloadBackgroundImage(url: string, proxy: string, zip: JSZip, url2pathMap: Map<string, string>) {
     try {
-        const imgData = await $fetch<Blob>(`${proxy}?url=${encodeURIComponent(url)}`)
+        const imgData = await $fetch<Blob>(`${proxy}?url=${encodeURIComponent(url)}`, {
+            retry: 0,
+        })
         const uuid = new Date().getTime() + Math.random().toString()
         const ext = mime.getExtension(imgData.type)
 
@@ -61,7 +65,7 @@ function reset() {
 
 // 并发下载图片
 export async function downloadImages(imgs: HTMLImageElement[], zip: JSZip): Promise<boolean> {
-    const errors = new WeakMap<HTMLImageElement, number>()
+    const errors = new Map<HTMLImageElement, number>()
     const total = imgs.length
 
     reset()
@@ -88,22 +92,24 @@ export async function downloadImages(imgs: HTMLImageElement[], zip: JSZip): Prom
                 count++
                 releaseProxyResource(proxy)
             }).catch(() => {
-                console.warn(img.src)
                 errors.set(img, errors.get(img)! + 1)
 
                 if (errors.get(img)! >= 3) {
                     // 该图片已经失败了3次，则结束整个过程
                     stop = true
+                    console.warn('img: 失败3次已停止')
                     reject(new Error('图片下载失败'))
                     return
                 }
 
                 imgs.push(img)
+
                 // 失败，延迟2s再归还该资源
                 setTimeout(() => {
                     releaseProxyResource(proxy)
-                }, 2000)
+                }, 3000)
             }).finally(() => {
+                // console.log(`${count}/${total}`)
                 if (count === total) {
                     resolve(true)
                 }
@@ -140,6 +146,7 @@ export async function downloadBgImages(bgImgUrls: string[], zip: JSZip): Promise
                 if (errors.get(url)! >= 3) {
                     // 该图片已经失败了3次，则结束整个过程
                     stop = true
+                    console.warn('bg: 失败3次已停止')
                     reject(new Error('背景图片下载失败'))
                     return
                 }
@@ -148,7 +155,7 @@ export async function downloadBgImages(bgImgUrls: string[], zip: JSZip): Promise
                 // 失败，延迟2s再归还该资源
                 setTimeout(() => {
                     releaseProxyResource(proxy)
-                }, 2000)
+                }, 3000)
             }).finally(() => {
                 if (count === total) {
                     resolve(url2pathMap)
