@@ -21,6 +21,7 @@ export const ACCOUNT_TYPE: Record<number, string> = {
  * 代理池
  */
 export const AVAILABLE_PROXY_LIST: string[] = [
+    'https://vxproxy-01.deno.dev/',//  private
     'https://vproxy-01.deno.dev/',
     'https://vproxy-02.deno.dev/',
     'https://vproxy-03.deno.dev/',
