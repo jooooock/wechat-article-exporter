@@ -10,6 +10,7 @@
           <ArrowRightLeft :size="20" />
         </button>
       </div>
+<!--      <input type="file" @change="fileChange">-->
     </div>
     <div class="hidden space-x-5 lg:flex lg:items-center">
       <span class="text-slate-500 text-sm font-medium">隐藏已删除文章: </span>
@@ -73,7 +74,7 @@
 <script setup lang="ts">
 import type {AccountInfo} from "~/types/types";
 import {Loader, ArrowRightLeft} from "lucide-vue-next";
-import {getAccountList} from "~/utils";
+import {getAccountList, packHTMLAssets} from "~/utils";
 import {ACCOUNT_LIST_PAGE_SIZE, ACCOUNT_TYPE} from "~/config";
 
 
@@ -160,5 +161,23 @@ function searchArticle() {
 
 function toggleHideDeleted(value: boolean) {
   emit('toggle:deleted', value)
+}
+
+// 为了调试
+function fileChange(evt: Event) {
+  const files = (evt.target as HTMLInputElement).files!
+  if (files.length > 0) {
+    const file = files[0]
+
+    const reader = new FileReader()
+    reader.addEventListener('load', async (event: Event) => {
+      const html = reader.result as string
+
+      debugger
+
+      await packHTMLAssets(html, 'title')
+    })
+    reader.readAsText(file)
+  }
 }
 </script>

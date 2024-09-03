@@ -145,3 +145,8 @@ export interface AppMsgEx {
     title: string
     update_time: number
 }
+
+export type AppMsgExWithHTML = AppMsgEx & {
+    html?: string
+    packed?: boolean
+};

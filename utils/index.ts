@@ -3,6 +3,7 @@ import JSZip from "jszip";
 import type {
     AccountInfo,
     AppMsgEx,
+    AppMsgExWithHTML,
     AppMsgPublishResponse,
     PublishInfo,
     PublishPage,
@@ -14,6 +15,7 @@ import {getAssetCache, updateAssetCache} from "~/store/assetes";
 import {updateAPICache} from "~/store/api";
 import * as pool from '~/utils/pool'
 import mime from "mime";
+import {sleep} from "@antfu/utils";
 
 
 export function formatTimeStamp(timestamp: number) {
@@ -42,20 +44,21 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
     let html = ''
     const parser = new DOMParser()
 
-    const task = await pool.download(articleURL, async (url: string, proxy: string) => {
+    const htmlDownloadFn = async (url: string, proxy: string) => {
         const fullHTML = await downloadAssetWithProxy<string>(url, proxy)
 
         // 验证是否下载完整
         const document = parser.parseFromString(fullHTML, 'text/html')
-        const $pageContent = document.querySelector('#page-content')
-        if (!$pageContent) {
+        const $jsContent = document.querySelector('#js_content')
+        if (!$jsContent) {
             if (title) {
                 console.info(title)
             }
             throw new Error('下载失败，请重试')
         }
         html = fullHTML
-    })
+    }
+    const task = await pool.download(articleURL, htmlDownloadFn)
     console.log('html下载结果:')
     console.log(task)
 
@@ -64,6 +67,35 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
     }
 
     return html
+}
+
+export async function downloadArticleHTMLs(articles: AppMsgExWithHTML[]) {
+    const parser = new DOMParser()
+
+    const htmlDownloadFn = async (article: AppMsgExWithHTML, proxy: string) => {
+        const fullHTML = await downloadAssetWithProxy<string>(article.link, proxy)
+
+        // 验证是否下载完整
+        const document = parser.parseFromString(fullHTML, 'text/html')
+        const $jsContent = document.querySelector('#js_content')
+        if (!$jsContent) {
+            if (article.title) {
+                console.info(article.title)
+            }
+            throw new Error('下载失败，请重试')
+        }
+
+        article.html = fullHTML
+        await sleep(2000)
+    }
+    const startTime = Date.now()
+    const tasks = await pool.downloads(articles, htmlDownloadFn)
+    const endTime = Date.now();
+    const totalTime = (endTime - startTime) / 1000;
+
+    console.log('html下载结果:')
+    console.log(tasks)
+    console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
 }
 
 /**
@@ -79,16 +111,16 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
     const parser = new DOMParser()
     const document = parser.parseFromString(html, 'text/html')
-    const $pageContent = document.querySelector('#page-content')!
+    const $jsArticleContent = document.querySelector('#js_article')!
 
     // #js_content 默认是不可见的(通过js修改为可见)，需要移除该样式
-    $pageContent.querySelector('#js_content')?.removeAttribute('style')
+    $jsArticleContent.querySelector('#js_content')?.removeAttribute('style')
 
     // 删除无用dom元素
-    $pageContent.querySelector('#js_tags_preview_toast')?.remove()
-    $pageContent.querySelector('#content_bottom_area')?.remove()
-    $pageContent.querySelector('#js_temp_bottom_area')?.remove()
-    $pageContent.querySelectorAll('script').forEach(el => {
+    $jsArticleContent.querySelector('#js_tags_preview_toast')?.remove()
+    $jsArticleContent.querySelector('#content_bottom_area')?.remove()
+    $jsArticleContent.querySelector('#js_temp_bottom_area')?.remove()
+    $jsArticleContent.querySelectorAll('script').forEach(el => {
         el.remove()
     })
 
@@ -97,13 +129,12 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
     // 下载所有的图片
     const imgDownloadFn = async (img: HTMLImageElement, proxy: string) => {
-        img.src = img.src || img.dataset.src!
-        if (!img.src) {
-            console.warn('img元素的src为空')
+        const url = img.src || img.dataset.src!
+        if (!url) {
             return
         }
 
-        const imgData = await downloadAssetWithProxy<Blob>(img.src, proxy, 10)
+        const imgData = await downloadAssetWithProxy<Blob>(url, proxy, 10)
         const uuid = new Date().getTime() + Math.random().toString()
         const ext = mime.getExtension(imgData.type)
         zip.file(`assets/${uuid}.${ext}`, imgData)
@@ -111,21 +142,21 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         // 改写html中的引用路径，指向本地图片文件
         img.src = `./assets/${uuid}.${ext}`
     }
-    const imgs = $pageContent.querySelectorAll<HTMLImageElement>('img')
+    const imgs = $jsArticleContent.querySelectorAll<HTMLImageElement>('img')
     if (imgs.length > 0) {
         const startTime = Date.now()
-        const tasks = [...imgs].map(img => pool.download<HTMLImageElement>(img, imgDownloadFn))
-        const downloadResults = await Promise.all(tasks)
+        const downloadResults = await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
         const endTime = Date.now();
         const totalTime = (endTime - startTime) / 1000;
-        console.log('图片下载结果:')
-        console.log(downloadResults)
-        console.log(`总耗时: ${totalTime.toFixed(2)}s`);
+
+        console.debug('图片下载结果:')
+        console.debug(downloadResults)
+        console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
     }
 
 
     // 下载背景图片 背景图片无法用选择器选中并修改，因此用正则进行匹配替换
-    let pageContentHTML = $pageContent.outerHTML
+    let pageContentHTML = $jsArticleContent.outerHTML
 
     // 收集所有的背景图片地址
     const bgImageURLs = new Set<string>()
@@ -143,15 +174,16 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             zip.file(`assets/${uuid}.${ext}`, imgData)
             url2pathMap.set(url, `assets/${uuid}.${ext}`)
         }
-        const startTime = Date.now()
         const url2pathMap = new Map<string, string>()
-        const tasks = [...bgImageURLs].map(url => pool.download<string>(url, bgImgDownloadFn))
-        const downloadResults = await Promise.all(tasks)
+
+        const startTime = Date.now()
+        const downloadResults = await pool.downloads<string>([...bgImageURLs], bgImgDownloadFn)
         const endTime = Date.now();
         const totalTime = (endTime - startTime) / 1000;
-        console.log('背景图片下载结果:')
-        console.log(downloadResults)
-        console.log(`总耗时: ${totalTime.toFixed(2)}s`);
+
+        console.debug('背景图片下载结果:')
+        console.debug(downloadResults)
+        console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
 
         // 替换背景图片路径
         pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
@@ -189,13 +221,13 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     const links = document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')
     if (links.length > 0) {
         const startTime = Date.now()
-        const tasks = [...links].map(link => pool.download(link, linkDownloadFn))
-        const downloadResults = await Promise.all(tasks)
+        const downloadResults = await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn)
         const endTime = Date.now();
         const totalTime = (endTime - startTime) / 1000;
-        console.log('样式下载结果:')
-        console.log(downloadResults)
-        console.log(`总耗时: ${totalTime.toFixed(2)}s`);
+
+        console.debug('样式下载结果:')
+        console.debug(downloadResults)
+        console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
     }
 
     pool.usage()

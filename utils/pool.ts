@@ -207,6 +207,16 @@ export async function download<T>(url: T, downloadFn: DownloadFn<T>) {
     return await downloadWithRetry<T>(pool, url, downloadFn)
 }
 
+/**
+ * 使用代理池下载多个资源
+ * @param urls
+ * @param downloadFn
+ */
+export async function downloads<T>(urls: T[], downloadFn: DownloadFn<T>) {
+    const tasks = urls.map(url => download<T>(url, downloadFn))
+    return await Promise.all(tasks)
+}
+
 export function usage() {
     pool.printProxyUsage();
 }

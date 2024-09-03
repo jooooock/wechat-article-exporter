@@ -15,18 +15,13 @@
 
 <script setup lang="ts">
 import {Loader} from "lucide-vue-next";
-import type {AppMsgEx} from "~/types/types";
+import type {AppMsgExWithHTML} from "~/types/types";
 import {sleep} from "@antfu/utils";
 import JSZip from "jszip";
 import {saveAs} from "file-saver";
-import {downloadArticleHTML, packHTMLAssets} from '~/utils'
+import {downloadArticleHTMLs, packHTMLAssets} from '~/utils'
 import {getArticleCache} from "~/store/article";
 
-
-type AppMsgExWithHTML = AppMsgEx & {
-  html?: string
-  packed?: boolean
-};
 
 const activeAccount = useActiveAccount()
 
@@ -60,22 +55,8 @@ async function batchDownload() {
     console.warn(e.message)
   }
 
-
   phase.value = '下载文章内容'
-  for (const article of validArticles.value.filter(article => !article.html)) {
-    try {
-      article.html = await downloadArticleHTML(article.link, article.title)
-      await sleep(2000)
-    } catch (e: any) {
-      console.info('下载文章html失败:')
-      console.warn(e.message)
-      break
-    }
-  }
-  // do {
-  //
-  // } while (validArticles.value.filter(article => !article.html).length > 0)
-
+  await downloadArticleHTMLs(validArticles.value)
 
   phase.value = '打包'
   const zip = new JSZip()
