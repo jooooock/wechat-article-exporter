@@ -1,7 +1,7 @@
 # wechat-article-exporter
-微信公众号文章导出工具
 
-> 受 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目的启发所写
+微信公众号文章导出工具，100%还原文章样式。
+
 
 ## Features
 
@@ -40,9 +40,9 @@
 
 由于微信对相关接口有额度/频率的调用限制，所以批量导出功能并不会去批量获取新的数据，仅仅是将已缓存的数据导出。由于翻页时已经将数据进行了缓存，所以批量导出的数据即页面所显示的数据。
 
-## 代理节点
+## 代理池
 
-数据的下载采用代理节点，以便可以解决跨域、防盗链等一系列问题。
+数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
 
 目前有以下代理节点:
 ```
@@ -52,11 +52,18 @@ https://vproxy-03.deno.dev
 https://vproxy-04.deno.dev
 https://vproxy-05.deno.dev
 https://vproxy-06.deno.dev
-http://vproxy-01.jooooock.workers.dev
-http://vproxy-02.jooooock.workers.dev
+https://vproxy-01.jooooock.workers.dev
+https://vproxy-02.jooooock.workers.dev
 ```
 
-### Deno Deploy 代理节点代码
+> 以上节点都是部署在 Deno Deploy / Cloudflare Workers 上面的免费账户中，算是白嫖了这些托管平台的流量。
+> 
+> 代理节点越多，则下载速度越快。
+> 因此欢迎大家自己搭建一些节点，并进行共享。
+> 
+> 目前这些节点是公开的，后续打算加入签名验证机制，防止被恶意盗刷。
+
+### Deno Deploy 代理节点代码 (未进行签名验证，请酌情使用)
 ```ts
 function error(msg: Error | string) {
     return new Response(msg instanceof Error ? msg.message : msg, {
@@ -112,7 +119,7 @@ Deno.serve(async (req: Request) => {
 });
 ```
 
-### Cloudflare Worker 代理节点代码
+### Cloudflare Worker 代理节点代码 (未进行签名验证，请酌情使用)
 ```js
 function error(msg) {
     return new Response(msg instanceof Error ? msg.message : msg, {
@@ -171,16 +178,18 @@ export default {
 };
 ```
 
-代理节点越多，则下载速度越快。
-
-因此欢迎大家自己搭建一些节点，并进行共享。
-
 
 ## 原理
 
 在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的，如下图所示:
 
 ![公众号后台搜索文章](assets/search-article.png)
+
+
+## 感谢
+
+- 感谢 [Deno Deploy](https://deno.com/deploy)、[Cloudflare Workers](https://workers.cloudflare.com) 提供免费托管服务
+- 感谢 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目提供原理思路
 
 
 ## Star History

@@ -33,8 +33,8 @@ export const AVAILABLE_PROXY_LIST: string[] = [
     'https://vproxy-10.deno.dev/',
     'https://vproxy-11.deno.dev/',
     'https://vproxy-12.deno.dev/',
-    'http://vproxy-01.jooooock.workers.dev/',
-    'http://vproxy-02.jooooock.workers.dev/',
+    'https://vproxy-01.jooooock.workers.dev/',
+    'https://vproxy-02.jooooock.workers.dev/',
 ]
 
 /**
