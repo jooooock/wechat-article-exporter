@@ -41,7 +41,7 @@
               :class="{active: account.fakeid === activeAccount?.fakeid}"
               @click="selectAccount(account)"
           >
-            <img class="size-20 mr-2" :src="proxyImage(account.round_head_img)" alt="">
+            <img class="size-20 mr-2" :src="account.round_head_img" alt="">
             <div class="flex-1">
               <div class="flex justify-between">
                 <p class="font-semibold">{{ account.nickname }}</p>

@@ -81,7 +81,7 @@ async function batchDownload() {
   const zip = new JSZip()
   for (const article of downloadedArticles.value) {
     try {
-      await packHTMLAssets(article.html!, zip.folder(article.title.replace(/\//g, '+'))!)
+      await packHTMLAssets(article.html!, article.title, zip.folder(article.title.replace(/\//g, '+'))!)
       article.packed = true
     } catch (e: any) {
       console.info('打包失败:')

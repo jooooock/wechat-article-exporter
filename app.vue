@@ -18,6 +18,13 @@ onMounted(() => {
     navigateTo('/login')
   }
 })
+useHead({
+  script: [
+    {
+      src: '/register.js'
+    }
+  ]
+})
 </script>
 
 <style>

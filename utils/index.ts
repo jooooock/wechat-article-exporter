@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import JSZip from "jszip";
-import mime from "mime";
 import type {
     AccountInfo,
     AppMsgEx,
@@ -13,11 +12,8 @@ import {updateArticleCache} from "~/store/article";
 import {ARTICLE_LIST_PAGE_SIZE, ACCOUNT_LIST_PAGE_SIZE} from "~/config";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
 import {updateAPICache} from "~/store/api";
+import {downloadBgImages, downloadImages} from "~/utils/download";
 
-
-export function proxyImage(url: string) {
-    return `https://vproxy-wechat-article.deno.dev/api/proxy?url=${encodeURIComponent(url)}`
-}
 
 export function formatTimeStamp(timestamp: number) {
     return dayjs.unix(timestamp).format('YYYY-MM-DD HH:mm')
@@ -29,7 +25,9 @@ export function formatTimeStamp(timestamp: number) {
  * @param title
  */
 export async function downloadArticleHTML(articleURL: string, title?: string) {
-    const fullHTML = await $fetch<string>('/api/download?url=' + encodeURIComponent(articleURL))
+    const fullHTML = await $fetch<string>('/api/download?url=' + encodeURIComponent(articleURL), {
+        retryDelay: 2000,
+    })
 
     // 验证是否正常
     const parser = new DOMParser()
@@ -47,9 +45,10 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
 /**
  * 打包 html 中的资源
  * @param html
+ * @param title
  * @param zip
  */
-export async function packHTMLAssets(html: string, zip?: JSZip) {
+export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     if (!zip) {
         zip = new JSZip();
     }
@@ -72,34 +71,19 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
 
     zip.folder('assets')
 
-
-    // 下载所有的图片 (图片地址已经在下载html接口中替换过了)
-    const imgs = $pageContent.querySelectorAll<HTMLImageElement>('img[src]')
-    for (const img of imgs) {
-        if (!img.src) {
-            console.warn('img元素的src为空')
-            continue
-        }
-
+    // 下载所有的图片
+    const imgs = $pageContent.querySelectorAll<HTMLImageElement>('img')
+    if (imgs.length > 0) {
         try {
-            const imgData = await $fetch<Blob>(img.src)
-            const uuid = new Date().getTime() + Math.random().toString()
-            const ext = mime.getExtension(imgData.type)
-            zip.file(`assets/${uuid}.${ext}`, imgData)
-
-            // 改写html中的引用路径，指向本地图片文件
-            img.src = `./assets/${uuid}.${ext}`
+            await downloadImages([...imgs], zip)
         } catch (e) {
-            console.info('图片下载失败: ', img.src)
             console.error(e)
         }
     }
 
 
-    // 下载背景图片
-    // 背景图片无法用选择器选中并修改，因此用正则进行匹配替换
+    // 下载背景图片 背景图片无法用选择器选中并修改，因此用正则进行匹配替换
     let pageContentHTML = $pageContent.outerHTML
-    const url2pathMap = new Map<string, string>()
 
     // 收集所有的背景图片地址
     const bgImageURLs = new Set<string>()
@@ -107,29 +91,22 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
         bgImageURLs.add(url)
         return `${p1}${url}${p3}`
     })
-    for (const url of bgImageURLs) {
+    if (bgImageURLs.size > 0) {
         try {
-            const imgData = await $fetch<Blob>(url)
-            const uuid = new Date().getTime() + Math.random().toString()
-            const ext = mime.getExtension(imgData.type)
-
-            zip.file(`assets/${uuid}.${ext}`, imgData)
-            url2pathMap.set(url, `assets/${uuid}.${ext}`)
+            const url2pathMap = await downloadBgImages([...bgImageURLs], zip)
+            pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
+                if (url2pathMap.has(url)) {
+                    const path = url2pathMap.get(url)!
+                    return `${p1}./${path}${p3}`
+                } else {
+                    console.warn('背景图片丢失: ', url)
+                    return `${p1}${url}${p3}`
+                }
+            })
         } catch (e) {
-            console.info('背景图片下载失败: ', url)
             console.error(e)
         }
     }
-
-    pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
-        if (url2pathMap.has(url)) {
-            const path = url2pathMap.get(url)!
-            return `${p1}./${path}${p3}`
-        } else {
-            console.warn('背景图片丢失: ', url)
-            return `${p1}${url}${p3}`
-        }
-    })
 
     // 下载样式表
     let localLinks: string = ''
@@ -145,7 +122,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
                 stylesheetFile = cachedAsset.file
             } else {
                 // 从网络上下载，并存入缓存
-                const stylesheet = await $fetch<string>(url)
+                const stylesheet = await $fetch<string>(url, {retryDelay: 2000})
                 stylesheetFile = new Blob([stylesheet], { type: 'text/css' })
                 await updateAssetCache({url: url, file: stylesheetFile})
             }
@@ -166,6 +143,7 @@ export async function packHTMLAssets(html: string, zip?: JSZip) {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
+    <title>${title}</title>
     ${localLinks}
     <style>
         #page-content {
@@ -205,7 +183,8 @@ export async function getArticleList(fakeid: string, token: string, begin = 0, k
             begin: begin,
             size: ARTICLE_LIST_PAGE_SIZE,
             keyword: keyword,
-        }
+        },
+        retry: 0,
     })
 
     // 记录 api 调用
@@ -265,7 +244,8 @@ export async function getAccountList(token: string, begin = 0, keyword = ''): Pr
             begin: begin,
             size: ACCOUNT_LIST_PAGE_SIZE,
             token: token,
-        }
+        },
+        retry: 0,
     })
 
     // 记录 api 调用

@@ -1,5 +1,5 @@
 /**
- * 文章列表每页大小
+ * 文章列表每页大小，20为最大有效值
  */
 export const ARTICLE_LIST_PAGE_SIZE = 20;
 
@@ -16,6 +16,20 @@ export const ACCOUNT_TYPE: Record<number, string> = {
     1: '订阅号',
     2: '服务号'
 }
+
+/**
+ * 代理池
+ */
+export const AVAILABLE_PROXY_LIST: string[] = [
+    'https://vproxy-01.deno.dev/',
+    'https://vproxy-02.deno.dev/',
+    'https://vproxy-03.deno.dev/',
+    'https://vproxy-04.deno.dev/',
+    'https://vproxy-05.deno.dev/',
+    'https://vproxy-06.deno.dev/',
+    'http://vproxy-01.jooooock.workers.dev/',
+    'http://vproxy-02.jooooock.workers.dev/',
+]
 
 /**
  * 扫码状态
