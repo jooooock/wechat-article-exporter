@@ -67,7 +67,7 @@ async function batchDownload() {
       article.html = await downloadArticleHTML(article.link, article.title)
       await sleep(2000)
     } catch (e: any) {
-      console.info('下载文章内容失败:')
+      console.info('下载文章html失败:')
       console.warn(e.message)
       break
     }
