@@ -22,15 +22,15 @@
 
 ## :hammer: 使用
 
-### 1. 注册一个微信公众号 (已有账号的话跳过)
+#### 1. 注册一个微信公众号 (已有账号的话跳过)
 
 前往 [微信公众平台](https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN) 注册，服务号和订阅号皆可。
 
-### 2. 二维码扫码登录
+#### 2. 二维码扫码登录
 
 进入 [登录页面](https://wechat-article-exporter.deno.dev/login)，用微信扫描页面上的二维码，然后选择自己的公众号进行登录。
 
-### 3. 搜索目标公众号，开始下载文章
+#### 3. 搜索目标公众号，开始下载文章
 
 通过左上角的公众号切换按钮，搜索自己感兴趣的公众号，如下图所示：
 
@@ -47,7 +47,7 @@
 > 另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。
 
 <details>
-<summary><span style="font-size: 20px;font-weight: 600;">部署到 Deno Deploy</span></summary>
+<summary><span style="font-size: 16px;font-weight: 500;">部署到 Deno Deploy</span></summary>
 
 #### 1. Fork 该项目
 
