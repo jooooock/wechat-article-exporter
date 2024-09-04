@@ -8,7 +8,7 @@
 
 
 
-## :dart: Features
+## :dart: 特性
 
 - [x] 搜索公众号
 - [x] 搜索公众号内文章
@@ -20,7 +20,7 @@
 - [ ] 支持图片分享消息
 
 
-## :hammer: 如何使用？
+## :hammer: 使用
 
 ### 1. 注册一个微信公众号 (已有账号的话跳过)
 
@@ -37,11 +37,64 @@
 ![切换账号](assets/switch-account.png)
 
 
+## :rocket: 私有部署
+
+> [!WARNING]
+> 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
+> 
+> 或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。
+> 
+> 另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。
+
+<details>
+<summary><span style="font-size: 20px;font-weight: 600;">部署到 Deno Deploy</span></summary>
+
+#### 1. Fork 该项目
+
+![create a fork](assets/deploy/create-fork.png)
+
+#### 2. 点击 [New Project](https://dash.deno.com/new_project) 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
+
+![create deno deploy project](assets/deploy/create-deno-deploy-project.png)
+
+创建之后如下所示:
+
+![deno deploy project result](assets/deploy/deno-deploy-project-result.png)
+
+#### 3. 修改github仓库发布配置
+
+启用仓库的 workflows (默认fork的仓库是禁用的):
+
+![enable github workflows](assets/deploy/enable-github-workflows.png)
+
+修改`.github/workflows/deno_deploy.yml`:
+
+![update workflows project](assets/deploy/update-workflows-project.png)
+
+提交:
+
+![commit changes](assets/deploy/commit-changes.png)
+
+#### 4. 等待发布结果
+
+![deploy success](assets/deploy/deploy-success.png)
+
+![finally website](assets/deploy/finally-website.png)
+</details>
+
+
+
+## :bulb: 原理
+
+在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的。
+
+
 ## :loudspeaker: 关于批量导出
 
 由于微信对相关接口有额度/频率的调用限制，所以批量导出功能并不会去批量获取新的数据，仅仅是将已缓存的数据导出。由于翻页时已经将数据进行了缓存，所以批量导出的数据即页面所显示的数据。
 
-## :earth_americas: 代理池
+
+## :earth_americas: 关于代理池
 
 数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
 
@@ -58,10 +111,10 @@ https://vproxy-02.jooooock.workers.dev
 ```
 
 > 以上节点都是部署在 Deno Deploy / Cloudflare Workers 上面的免费账户中，算是白嫖了这些托管平台的流量。
-> 
+>
 > 代理节点越多，则下载速度越快。
 > 因此欢迎大家自己搭建一些节点，并进行共享。
-> 
+>
 > 目前这些节点是公开的，后续打算加入签名验证机制，防止被恶意盗刷。
 
 ### 代理节点代码 (未进行签名验证，请酌情使用)
@@ -187,58 +240,6 @@ export default {
 </details>
 
 
-## :rocket: 私有部署指南
-
-> [!WARNING]
-> 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
-> 
-> 或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。
-> 
-> 另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。
-
-<details>
-<summary><span style="font-size: 20px;font-weight: 600;">部署到 Deno Deploy</span></summary>
-
-#### 1. Fork 该项目
-
-![create a fork](assets/deploy/create-fork.png)
-
-#### 2. 点击 [New Project](https://dash.deno.com/new_project) 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
-
-![create deno deploy project](assets/deploy/create-deno-deploy-project.png)
-
-创建之后如下所示:
-
-![deno deploy project result](assets/deploy/deno-deploy-project-result.png)
-
-#### 3. 修改github仓库发布配置
-
-启用仓库的 workflows (默认fork的仓库是禁用的):
-
-![enable github workflows](assets/deploy/enable-github-workflows.png)
-
-修改`.github/workflows/deno_deploy.yml`:
-
-![update workflows project](assets/deploy/update-workflows-project.png)
-
-提交:
-
-![commit changes](assets/deploy/commit-changes.png)
-
-#### 4. 等待发布结果
-
-![deploy success](assets/deploy/deploy-success.png)
-
-![finally website](assets/deploy/finally-website.png)
-</details>
-
-
-
-## :bulb: 原理
-
-在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的。
-
-
 ## :heart: 感谢
 
 - 感谢 [Deno Deploy](https://deno.com/deploy)、[Cloudflare Workers](https://workers.cloudflare.com) 提供免费托管服务
@@ -257,11 +258,11 @@ export default {
 </table>
 
 
-## :star: Star History
+## :star: Star 历史
 
 [![Star History Chart](https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline)](https://star-history.com/#jooooock/wechat-article-exporter&Timeline)
 
 
-## :octocat: License
+## :octocat: 许可
 
 MIT
