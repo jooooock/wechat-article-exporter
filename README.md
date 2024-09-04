@@ -1,9 +1,14 @@
-# wechat-article-exporter
+<p align="center">
+  <a href="https://theme-stun.github.io/docs/zh-CN/" target="_blank" rel="noopener noreferrer">
+    <img src="./public/favicon.ico" alt="Stun Logo" width="100">
+  </a>
+</p>
 
-微信公众号文章导出工具，100%还原文章样式。
+<h3 align="center">微信公众号文章导出工具，100%还原文章样式。</h3>
 
 
-## Features
+
+## :dart: Features
 
 - [x] 搜索公众号
 - [x] 搜索公众号内文章
@@ -15,7 +20,7 @@
 - [ ] 支持图片分享消息
 
 
-## 如何使用？
+## :hammer: 如何使用？
 
 ### 1. 注册一个微信公众号 (已有账号的话跳过)
 
@@ -32,11 +37,11 @@
 ![切换账号](assets/switch-account.png)
 
 
-## 关于批量导出
+## :loudspeaker: 关于批量导出
 
 由于微信对相关接口有额度/频率的调用限制，所以批量导出功能并不会去批量获取新的数据，仅仅是将已缓存的数据导出。由于翻页时已经将数据进行了缓存，所以批量导出的数据即页面所显示的数据。
 
-## 代理池
+## :earth_americas: 代理池
 
 数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
 
@@ -182,9 +187,9 @@ export default {
 </details>
 
 
-## 私有部署指南
+## :rocket: 私有部署指南
 
-> [!WARNING]
+> [!WARNING] :warning:
 > 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
 > 
 > 或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。
@@ -229,18 +234,18 @@ export default {
 
 
 
-## 原理
+## :bulb: 原理
 
 在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的。
 
 
-## 感谢
+## :heart: 感谢
 
 - 感谢 [Deno Deploy](https://deno.com/deploy)、[Cloudflare Workers](https://workers.cloudflare.com) 提供免费托管服务
 - 感谢 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目提供原理思路
 
 
-## 捐赠与支持
+## :coffee: 捐赠与支持
 
 如果你觉得本项目帮助到了你，请给作者一个免费的 Star，也可以请作者喝杯咖啡，感谢你的支持！
 
@@ -252,11 +257,11 @@ export default {
 </table>
 
 
-## Star History
+## :star: Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline)](https://star-history.com/#jooooock/wechat-article-exporter&Timeline)
 
 
-## License
+## :octocat: License
 
 MIT
