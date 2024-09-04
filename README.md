@@ -234,6 +234,18 @@ export default {
 - 感谢 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目提供原理思路
 
 
+## 捐赠与支持
+
+如果你觉得本项目帮助到了你，请给作者一个免费的 Star，也可以请作者喝杯咖啡，感谢你的支持！
+
+<table>
+<tr>
+<td><a href="https://ko-fi.com/Y8Y3VBAML"><img src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="200" alt="buy me a coffee"></a></td>
+<td><img src="assets/wechat-reward-code.png" width="200" alt="微信赞赏码" /></td>
+</tr>
+</table>
+
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline)](https://star-history.com/#jooooock/wechat-article-exporter&Timeline)
