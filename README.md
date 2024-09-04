@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://theme-stun.github.io/docs/zh-CN/" target="_blank" rel="noopener noreferrer">
-    <img src="./public/favicon.ico" alt="Stun Logo" width="100">
+  <a href="https://wechat-article-exporter.deno.dev/" target="_blank" rel="noopener noreferrer">
+    <img src="./public/favicon.ico" alt="Logo" width="100">
   </a>
 </p>
 
