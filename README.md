@@ -189,7 +189,7 @@ export default {
 
 ## :rocket: 私有部署指南
 
-> [!WARNING] :warning:
+> [!WARNING]
 > 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
 > 
 > 或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。
