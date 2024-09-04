@@ -178,6 +178,48 @@ export default {
 };
 ```
 
+## 私有部署
+
+> [!WARNING]
+> 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
+> 
+> 或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。
+> 
+> 另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。
+
+### 部署到 Deno Deploy
+
+#### 1. Fork 该项目
+
+![create a fork](assets/deploy/create-fork.png)
+
+#### 2. 点击 [New Project](https://dash.deno.com/new_project) 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
+
+![create deno deploy project](assets/deploy/create-deno-deploy-project.png)
+
+创建之后如下所示:
+
+![deno deploy project result](assets/deploy/deno-deploy-project-result.png)
+
+#### 3. 修改github仓库发布配置
+
+启用仓库的 workflows (默认fork的仓库是禁用的):
+
+![enable github workflows](assets/deploy/enable-github-workflows.png)
+
+修改`.github/workflows/deno_deploy.yml`:
+
+![update workflows project](assets/deploy/update-workflows-project.png)
+
+提交:
+
+![commit changes](assets/deploy/commit-changes.png)
+
+#### 4. 等待发布结果
+
+![deploy success](assets/deploy/deploy-success.png)
+
+![finally website](assets/deploy/finally-website.png)
 
 ## 原理
 
