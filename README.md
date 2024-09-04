@@ -31,10 +31,6 @@
 
 ![切换账号](assets/switch-account.png)
 
-搜索示例：
-
-![搜索公众号](assets/search-account-sample.png)
-
 
 ## 关于批量导出
 
@@ -63,7 +59,10 @@ https://vproxy-02.jooooock.workers.dev
 > 
 > 目前这些节点是公开的，后续打算加入签名验证机制，防止被恶意盗刷。
 
-### Deno Deploy 代理节点代码 (未进行签名验证，请酌情使用)
+### 代理节点代码 (未进行签名验证，请酌情使用)
+<details>
+<summary>Deno Deploy</summary>
+
 ```ts
 function error(msg: Error | string) {
     return new Response(msg instanceof Error ? msg.message : msg, {
@@ -118,8 +117,11 @@ Deno.serve(async (req: Request) => {
     });
 });
 ```
+</details>
 
-### Cloudflare Worker 代理节点代码 (未进行签名验证，请酌情使用)
+<details>
+<summary>Cloudflare Worker</summary>
+
 ```js
 function error(msg) {
     return new Response(msg instanceof Error ? msg.message : msg, {
@@ -177,8 +179,10 @@ export default {
   },
 };
 ```
+</details>
 
-## 私有部署
+
+## 私有部署指南
 
 > [!WARNING]
 > 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
@@ -187,7 +191,8 @@ export default {
 > 
 > 另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。
 
-### 部署到 Deno Deploy
+<details>
+<summary><span style="font-size: 20px;font-weight: 600;">部署到 Deno Deploy</span></summary>
 
 #### 1. Fork 该项目
 
@@ -220,6 +225,9 @@ export default {
 ![deploy success](assets/deploy/deploy-success.png)
 
 ![finally website](assets/deploy/finally-website.png)
+</details>
+
+
 
 ## 原理
 
@@ -240,8 +248,8 @@ export default {
 
 <table>
 <tr>
-<td><a href="https://ko-fi.com/Y8Y3VBAML"><img src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="200" alt="buy me a coffee"></a></td>
-<td><img src="assets/wechat-reward-code.png" width="200" alt="微信赞赏码" /></td>
+<td><a href="https://ko-fi.com/Y8Y3VBAML"><img src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="400" alt="buy me a coffee"></a></td>
+<td><img src="assets/wechat-reward-code.png" height="400" width="400" alt="微信赞赏码" /></td>
 </tr>
 </table>
 
