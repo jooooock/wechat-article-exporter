@@ -5,6 +5,14 @@
 <h3 align="center">微信公众号文章导出工具，100%还原文章样式。</h3>
 
 [![Deploy][deploy-badge]][deploy]
+![GitHub stars]
+![GitHub forks]
+![GitHub License]
+![Website]
+![GitHub commit activity]
+![GitHub last commit]
+
+
 
 
 
@@ -270,9 +278,21 @@ MIT
 
 <!-- Definitions -->
 
-[deploy-badge]: https://github.com/jooooock/wechat-article-exporter/workflows/deno_deploy/badge.svg
+[deploy-badge]: https://img.shields.io/github/actions/workflow/status/jooooock/wechat-article-exporter/.github%2Fworkflows%2Fdeno_deploy.yml?label=Deploy
 
 [deploy]: https://github.com/jooooock/wechat-article-exporter/actions
+
+[Github stars]: https://img.shields.io/github/stars/jooooock/wechat-article-exporter?style=social&label=Star&style=plastic
+
+[Github forks]: https://img.shields.io/github/forks/jooooock/wechat-article-exporter?style=social&label=Fork&style=plastic
+
+[Github License]: https://img.shields.io/github/license/jooooock/wechat-article-exporter?label=License
+
+[Website]: https://img.shields.io/website?url=https%3A%2F%2Fwechat-article-exporter.deno.dev%2F&label=Website
+
+[Github commit activity]: https://img.shields.io/github/commit-activity/w/jooooock/wechat-article-exporter
+
+[Github last commit]: https://img.shields.io/github/last-commit/jooooock/wechat-article-exporter
 
 [微信公众平台]: https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN
 
