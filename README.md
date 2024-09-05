@@ -7,7 +7,6 @@
 <h3 align="center">微信公众号文章导出工具，100%还原文章样式。</h3>
 
 
-
 ## :dart: 特性
 
 - [x] 搜索公众号
@@ -22,15 +21,15 @@
 
 ## :hammer: 使用
 
-#### 1. 注册一个微信公众号 (已有账号的话跳过)
+1. 注册一个微信公众号 (已有账号的话跳过)
 
 前往 [微信公众平台](https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN) 注册，服务号和订阅号皆可。
 
-#### 2. 二维码扫码登录
+2. 二维码扫码登录
 
 进入 [登录页面](https://wechat-article-exporter.deno.dev/login)，用微信扫描页面上的二维码，然后选择自己的公众号进行登录。
 
-#### 3. 搜索目标公众号，开始下载文章
+3. 搜索目标公众号，开始下载文章
 
 通过左上角的公众号切换按钮，搜索自己感兴趣的公众号，如下图所示：
 
@@ -49,11 +48,11 @@
 <details>
 <summary><span style="font-size: 16px;font-weight: 500;">部署到 Deno Deploy</span></summary>
 
-#### 1. Fork 该项目
+1. Fork 该项目
 
 ![create a fork](assets/deploy/create-fork.png)
 
-#### 2. 点击 [New Project](https://dash.deno.com/new_project) 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
+2. 点击 [New Project](https://dash.deno.com/new_project) 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
 
 ![create deno deploy project](assets/deploy/create-deno-deploy-project.png)
 
@@ -61,7 +60,7 @@
 
 ![deno deploy project result](assets/deploy/deno-deploy-project-result.png)
 
-#### 3. 修改github仓库发布配置
+3. 修改github仓库发布配置
 
 启用仓库的 workflows (默认fork的仓库是禁用的):
 
@@ -75,7 +74,7 @@
 
 ![commit changes](assets/deploy/commit-changes.png)
 
-#### 4. 等待发布结果
+4. 等待发布结果
 
 ![deploy success](assets/deploy/deploy-success.png)
 
@@ -117,7 +116,8 @@ https://vproxy-02.jooooock.workers.dev
 >
 > 目前这些节点是公开的，后续打算加入签名验证机制，防止被恶意盗刷。
 
-### 代理节点代码 (未进行签名验证，请酌情使用)
+代理节点代码 (未进行签名验证，请酌情使用):
+
 <details>
 <summary>Deno Deploy</summary>
 
