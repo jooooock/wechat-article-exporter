@@ -1,18 +1,41 @@
 import {sleep} from "@antfu/utils";
 import dayjs from "dayjs";
 import {AVAILABLE_PROXY_LIST} from '~/config'
+import type {AppMsgExWithHTML} from "~/types/types";
 
+/**
+ * 代理实例
+ */
 interface ProxyInstance {
+    // 代理地址
     address: string
+
+    // 是否正在被使用
     busy: boolean
+
+    // 是否处于冷静期
     cooldown: boolean
+
+    // 使用次数
     usageCount: number
+
+    // 成功次数
     successCount: number
+
+    // 失败次数
     failureCount: number
+
+    // 下载流量
+    traffic: number
 }
 
-type DownloadFn<T> = (url: T, proxy: string) => Promise<void>
+// 代理下载的资源
+type DownloadResource = string | HTMLLinkElement | HTMLImageElement | AppMsgExWithHTML
 
+// 资源下载函数，返回资源大小
+type DownloadFn<T extends DownloadResource> = (resource: T, proxy: string) => Promise<number>
+
+// 资源下载结果
 export interface DownloadResult {
     // 总耗时 (s)
     totalTime: number
@@ -22,10 +45,30 @@ export interface DownloadResult {
 
     // 重试次数
     attempts: number
+
+    // 资源url
+    url: string
+
+    // 资源大小
+    size: number
 }
 
 function now() {
     return dayjs(new Date()).format("HH:mm:ss.SSS")
+}
+
+function formatTraffic(bytes: number) {
+    if (bytes < 1024) {
+        return `${bytes} Bytes`
+    } else if (bytes < 1024 ** 2) {
+        return `${(bytes / 1024).toFixed(2)} KB`
+    } else if (bytes < 1024 ** 3) {
+        return `${(bytes / (1024 ** 2)).toFixed(2)} MB`
+    } else if (bytes < 1024 ** 4) {
+        return `${(bytes / (1024 ** 3)).toFixed(2)} GB`
+    } else if (bytes < 1024 ** 5) {
+        return `${(bytes / (1024 ** 4)).toFixed(2)} TB`
+    }
 }
 
 class ProxyPool {
@@ -39,6 +82,7 @@ class ProxyPool {
             usageCount: 0,
             successCount: 0,
             failureCount: 0,
+            traffic: 0,
         }));
     }
 
@@ -74,50 +118,94 @@ class ProxyPool {
 
     printProxyUsage() {
         console.debug('代理使用情况:')
-        const usageData = this.proxies.map(proxy => ({
-            '代理': proxy.address,
-            '使用次数': proxy.usageCount,
-            '成功次数': proxy.successCount,
-            '失败次数': proxy.failureCount,
-            '成功率': proxy.usageCount === 0 ? '-' : ((proxy.successCount / proxy.usageCount) * 100).toFixed(2) + '%',
-        }));
+        let traffic = 0
+        const usageData = this.proxies.map(proxy => {
+            traffic += proxy.traffic
+            return {
+                '代理': proxy.address,
+                '使用次数': proxy.usageCount,
+                '下载流量': formatTraffic(proxy.traffic),
+                '成功次数': proxy.successCount,
+                '失败次数': proxy.failureCount,
+                '成功率': proxy.usageCount === 0 ? '-' : ((proxy.successCount / proxy.usageCount) * 100).toFixed(2) + '%',
+            }
+        });
+        // 增加总计
+        usageData.push({
+            '代理': '总计',
+            '使用次数': usageData.reduce((total, item) => total + item['使用次数'], 0),
+            '下载流量': formatTraffic(traffic),
+            '成功次数': usageData.reduce((total, item) => total + item['成功次数'], 0),
+            '失败次数': usageData.reduce((total, item) => total + item['失败次数'], 0),
+            '成功率': '-',
+        })
         console.table(usageData);
+    }
+
+    incrementTraffic(address: string, bytes: number) {
+        const proxy = this.proxies.find(proxy => proxy.address === address)
+        if (proxy) {
+            proxy.traffic += bytes
+        } else {
+            console.warn(`代理${address}未找到`)
+        }
     }
 }
 
 /**
  * 使用代理 proxy 下载资源
  * @param proxy
- * @param url
+ * @param resource
  * @param downloadFn
  */
-async function downloadResource<T>(proxy: ProxyInstance, url: T, downloadFn: DownloadFn<T>) {
+async function downloadResource<T extends DownloadResource>(proxy: ProxyInstance, resource: T, downloadFn: DownloadFn<T>): Promise<[boolean, number]> {
     try {
         // 执行下载任务
-        await downloadFn(url, proxy.address)
-        return true;
+        const size = await downloadFn(resource, proxy.address)
+        return [true, size];
     } catch (error) {
-        return false;
+        return [false, 0];
     }
 }
 
 /**
  * 使用代理池下载资源
  * @param pool
- * @param url
+ * @param resource
  * @param downloadFn
+ * @param useProxy
  * @param maxRetries
  */
-async function downloadWithRetry<T>(pool: ProxyPool, url: T, downloadFn: DownloadFn<T>, maxRetries = 3): Promise<DownloadResult> {
+async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, resource: T, downloadFn: DownloadFn<T>, useProxy = true, maxRetries = 3): Promise<DownloadResult> {
     let attempts = 0;
     let isSuccess = false;
+    let size: number = 0;
+
+    let resourceURL = ''
+    if (resource instanceof HTMLLinkElement) {
+        resourceURL = resource.href;
+    } else if (resource instanceof HTMLImageElement) {
+        resourceURL = resource.src || resource.dataset.src!
+    } else if (typeof resource === 'string') {
+        resourceURL = resource
+    } else {
+        resourceURL = resource.link
+    }
 
     const startTime = Date.now()
 
     while (attempts < maxRetries) {
-        const proxy = await pool.getAvailableProxy();
-        const success = await downloadResource<T>(proxy, url, downloadFn);
-        pool.releaseProxy(proxy, success);
+        let success: boolean
+
+        if (useProxy) {
+            // 使用代理下载
+            const proxy = await pool.getAvailableProxy();
+            [success, size] = await downloadResource<T>(proxy, resource, downloadFn);
+            pool.releaseProxy(proxy, success);
+        } else {
+            // 不使用代理下载
+            [success, size] = await downloadResource<T>({} as ProxyInstance, resource, downloadFn);
+        }
 
         if (success) {
             isSuccess = true
@@ -125,7 +213,7 @@ async function downloadWithRetry<T>(pool: ProxyPool, url: T, downloadFn: Downloa
         } else {
             attempts++;
             await sleep(200)
-            console.log(`[${now()}] Retrying ${url} (attempt ${attempts}/${maxRetries})`);
+            console.log(`[${now()}] Retrying ${resourceURL} (attempt ${attempts}/${maxRetries})`);
         }
     }
 
@@ -133,34 +221,39 @@ async function downloadWithRetry<T>(pool: ProxyPool, url: T, downloadFn: Downloa
     const totalTime = (endTime - startTime) / 1000;
 
     if (!isSuccess) {
-        console.warn(`[${now()}] Failed to download ${url} after ${maxRetries} attempts`);
+        console.warn(`[${now()}] Failed to download ${resourceURL} after ${maxRetries} attempts`);
     }
+
     return {
         totalTime,
         success: isSuccess,
         attempts,
+        url: resourceURL,
+        size,
     }
 }
 
 
-const pool = new ProxyPool(AVAILABLE_PROXY_LIST);
+export const pool = new ProxyPool(AVAILABLE_PROXY_LIST);
 
 /**
  * 使用代理池下载单个资源
  * @param url
  * @param downloadFn
+ * @param useProxy
  */
-export async function download<T>(url: T, downloadFn: DownloadFn<T>) {
-    return await downloadWithRetry<T>(pool, url, downloadFn)
+export async function download<T extends DownloadResource>(url: T, downloadFn: DownloadFn<T>, useProxy = true) {
+    return await downloadWithRetry<T>(pool, url, downloadFn, useProxy)
 }
 
 /**
  * 使用代理池下载多个资源
  * @param urls
  * @param downloadFn
+ * @param useProxy
  */
-export async function downloads<T>(urls: T[], downloadFn: DownloadFn<T>) {
-    const tasks = urls.map(url => download<T>(url, downloadFn))
+export async function downloads<T extends DownloadResource>(urls: T[], downloadFn: DownloadFn<T>, useProxy = true) {
+    const tasks = urls.map(url => download<T>(url, downloadFn, useProxy));
     return await Promise.all(tasks)
 }
 
@@ -181,6 +274,8 @@ export function formatDownloadResult(label: string, results: DownloadResult | Do
 
     // 打印下载耗时明细
     const downloadResults = results.map((result, index) => ({
+        URL: result.url,
+        size: result.size,
         '总耗时': result.totalTime,
         '重试次数': result.attempts,
         '是否下载成': result.success,

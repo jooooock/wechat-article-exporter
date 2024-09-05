@@ -30,10 +30,19 @@ export function formatTimeStamp(timestamp: number) {
  * @param timeout 超时时间(单位: 秒)，默认 30
  */
 async function downloadAssetWithProxy<T extends Blob | string>(url: string, proxy: string, timeout = 30) {
-    return await $fetch<T>(`${proxy}?url=${encodeURIComponent(url)}`, {
+    const result = await $fetch<T>(`${proxy}?url=${encodeURIComponent(url)}`, {
         retry: 0,
         timeout: timeout * 1000,
     })
+
+    // 统计代理下载资源流量
+    if (result instanceof Blob) {
+        pool.pool.incrementTraffic(proxy, result.size)
+    } else {
+        pool.pool.incrementTraffic(proxy, new Blob([result]).size)
+    }
+
+    return result
 }
 
 async function measureExecutionTime(label: string, taskFn: () => Promise<DownloadResult | DownloadResult[]>) {
@@ -69,6 +78,8 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
             throw new Error('下载失败，请重试')
         }
         html = fullHTML
+
+        return new Blob([html]).size
     }
 
     await measureExecutionTime('html下载结果:', async () => {
@@ -104,6 +115,8 @@ export async function downloadArticleHTMLs(articles: AppMsgExWithHTML[]) {
 
         article.html = fullHTML
         await sleep(2000)
+
+        return new Blob([fullHTML]).size
     }
 
     await measureExecutionTime('html下载结果:', async () => {
@@ -144,7 +157,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     const imgDownloadFn = async (img: HTMLImageElement, proxy: string) => {
         const url = img.src || img.dataset.src!
         if (!url) {
-            return
+            return 0
         }
 
         const imgData = await downloadAssetWithProxy<Blob>(url, proxy, 10)
@@ -154,6 +167,8 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
         // 改写html中的引用路径，指向本地图片文件
         img.src = `./assets/${uuid}.${ext}`
+
+        return imgData.size
     }
     const imgs = $jsArticleContent.querySelectorAll<HTMLImageElement>('img')
     if (imgs.length > 0) {
@@ -181,6 +196,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
             zip.file(`assets/${uuid}.${ext}`, imgData)
             url2pathMap.set(url, `assets/${uuid}.${ext}`)
+            return imgData.size
         }
         const url2pathMap = new Map<string, string>()
 
@@ -219,12 +235,14 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         const uuid = new Date().getTime() + Math.random().toString()
         zip.file(`assets/${uuid}.css`, stylesheetFile)
         localLinks += `<link rel="stylesheet" href="./assets/${uuid}.css">`
+
+        return stylesheetFile.size
     }
     let localLinks: string = ''
     const links = document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')
     if (links.length > 0) {
         await measureExecutionTime('样式下载结果:', async () => {
-            return await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn)
+            return await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn, false)
         })
     }
 
