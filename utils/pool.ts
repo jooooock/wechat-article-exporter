@@ -2,11 +2,12 @@ import {sleep} from "@antfu/utils";
 import dayjs from "dayjs";
 import {AVAILABLE_PROXY_LIST} from '~/config'
 import type {AppMsgExWithHTML} from "~/types/types";
+import {updateProxiesCache} from "~/store/proxy";
 
 /**
  * 代理实例
  */
-interface ProxyInstance {
+export interface ProxyInstance {
     // 代理地址
     address: string
 
@@ -84,6 +85,15 @@ class ProxyPool {
             failureCount: 0,
             traffic: 0,
         }));
+    }
+
+    init() {
+        this.proxies.forEach(proxy => {
+            proxy.usageCount = 0
+            proxy.successCount = 0
+            proxy.failureCount = 0
+            proxy.traffic = 0
+        })
     }
 
     async getAvailableProxy() {
@@ -181,7 +191,7 @@ async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, re
     let isSuccess = false;
     let size: number = 0;
 
-    let resourceURL = ''
+    let resourceURL: string
     if (resource instanceof HTMLLinkElement) {
         resourceURL = resource.href;
     } else if (resource instanceof HTMLImageElement) {
@@ -238,23 +248,31 @@ export const pool = new ProxyPool(AVAILABLE_PROXY_LIST);
 
 /**
  * 使用代理池下载单个资源
- * @param url
+ * @param resource
  * @param downloadFn
  * @param useProxy
  */
-export async function download<T extends DownloadResource>(url: T, downloadFn: DownloadFn<T>, useProxy = true) {
-    return await downloadWithRetry<T>(pool, url, downloadFn, useProxy)
+async function download<T extends DownloadResource>(resource: T, downloadFn: DownloadFn<T>, useProxy = true) {
+    return await downloadWithRetry<T>(pool, resource, downloadFn, useProxy)
 }
 
 /**
  * 使用代理池下载多个资源
- * @param urls
+ * @param resources
  * @param downloadFn
  * @param useProxy
  */
-export async function downloads<T extends DownloadResource>(urls: T[], downloadFn: DownloadFn<T>, useProxy = true) {
-    const tasks = urls.map(url => download<T>(url, downloadFn, useProxy));
-    return await Promise.all(tasks)
+export async function downloads<T extends DownloadResource>(resources: T[], downloadFn: DownloadFn<T>, useProxy = true) {
+    // 初始化 pool
+    pool.init()
+
+    const tasks = resources.map(resource => download<T>(resource, downloadFn, useProxy));
+    const result = await Promise.all(tasks)
+
+    // 保存代理使用数据
+    await updateProxiesCache(pool.proxies)
+
+    return result
 }
 
 /**
@@ -273,10 +291,10 @@ export function formatDownloadResult(label: string, results: DownloadResult | Do
     console.debug(`总耗时: ${total.toFixed(2)}s`);
 
     // 打印下载耗时明细
-    const downloadResults = results.map((result, index) => ({
+    const downloadResults = results.map(result => ({
         URL: result.url,
         size: result.size,
-        '总耗时': result.totalTime,
+        '耗时': result.totalTime,
         '重试次数': result.attempts,
         '是否下载成': result.success,
     }))

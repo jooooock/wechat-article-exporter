@@ -1,6 +1,6 @@
 export function openDatabase() {
     return new Promise<IDBDatabase>((resolve, reject) => {
-        const request = window.indexedDB.open('wechat-article-exporter', 2)
+        const request = window.indexedDB.open('wechat-article-exporter', 3)
         request.onerror = (evt) => {
             reject(evt)
         }
@@ -38,6 +38,12 @@ export function openDatabase() {
                 const apiStore = db.createObjectStore('api', {autoIncrement: true})
                 apiStore.createIndex('account', 'account')
                 apiStore.createIndex('account_call_time', ['account', 'call_time'])
+            }
+
+
+            // 创建v3版本相关的数据库
+            if (!db.objectStoreNames.contains('proxy')) {
+                db.createObjectStore('proxy', {keyPath: 'address'})
             }
         }
     })

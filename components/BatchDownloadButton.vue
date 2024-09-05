@@ -21,6 +21,7 @@ import JSZip from "jszip";
 import {saveAs} from "file-saver";
 import {downloadArticleHTMLs, packHTMLAssets} from '~/utils'
 import {getArticleCache} from "~/store/article";
+import {uploadProxy} from "~/store/proxy";
 
 
 const activeAccount = useActiveAccount()
@@ -72,6 +73,8 @@ async function batchDownload() {
 
   const blob = await zip.generateAsync({type: 'blob'})
   saveAs(blob, `${activeAccount.value?.nickname}.zip`)
+
+  await uploadProxy()
 
   loading.value = false
 }

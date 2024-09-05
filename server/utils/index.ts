@@ -44,3 +44,17 @@ export async function proxyMpRequest(options: RequestOptions) {
         return response.then(resp => resp.json())
     }
 }
+
+export function formatTraffic(bytes: number) {
+    if (bytes < 1024) {
+        return `${bytes} Bytes`
+    } else if (bytes < 1024 ** 2) {
+        return `${(bytes / 1024).toFixed(2)} KB`
+    } else if (bytes < 1024 ** 3) {
+        return `${(bytes / (1024 ** 2)).toFixed(2)} MB`
+    } else if (bytes < 1024 ** 4) {
+        return `${(bytes / (1024 ** 3)).toFixed(2)} GB`
+    } else if (bytes < 1024 ** 5) {
+        return `${(bytes / (1024 ** 4)).toFixed(2)} TB`
+    }
+}

@@ -83,7 +83,7 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
     }
 
     await measureExecutionTime('html下载结果:', async () => {
-        return await pool.download(articleURL, htmlDownloadFn)
+        return await pool.downloads([articleURL], htmlDownloadFn)
     })
 
     if (!html) {
@@ -183,7 +183,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
     // 收集所有的背景图片地址
     const bgImageURLs = new Set<string>()
-    pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
+    pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (_, p1, url, p3) => {
         bgImageURLs.add(url)
         return `${p1}${url}${p3}`
     })
@@ -205,7 +205,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         })
 
         // 替换背景图片路径
-        pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
+        pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (_, p1, url, p3) => {
             if (url2pathMap.has(url)) {
                 const path = url2pathMap.get(url)!
                 return `${p1}./${path}${p3}`
@@ -220,7 +220,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     // 下载样式表
     const linkDownloadFn = async (link: HTMLLinkElement) => {
         const url = link.href
-        let stylesheetFile: Blob | null = null
+        let stylesheetFile: Blob | null
 
         // 检查缓存
         const cachedAsset = await getAssetCache(url)
@@ -245,8 +245,6 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             return await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn, false)
         })
     }
-
-    pool.usage()
 
     const indexHTML = `<!DOCTYPE html>
 <html lang="zh_CN">

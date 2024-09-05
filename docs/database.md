@@ -146,3 +146,37 @@ interface APICall {
 
 - account
 - account_call_time (复合索引)
+
+
+## version: 3
+
+### `proxy` store
+
+用于统计代理使用情况。
+
+对象数据结构如下:
+
+```ts
+interface Proxy {
+    // 代理地址 (keyPath)
+    address: string
+
+    // 是否正在被使用
+    busy: boolean
+
+    // 是否处于冷静期
+    cooldown: boolean
+
+    // 使用次数
+    usageCount: number
+
+    // 成功次数
+    successCount: number
+
+    // 失败次数
+    failureCount: number
+
+    // 下载流量
+    traffic: number
+}
+```
