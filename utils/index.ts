@@ -16,6 +16,7 @@ import {updateAPICache} from "~/store/api";
 import * as pool from '~/utils/pool'
 import mime from "mime";
 import {sleep} from "@antfu/utils";
+import type {DownloadResult} from "~/utils/pool";
 
 
 export function formatTimeStamp(timestamp: number) {
@@ -33,6 +34,17 @@ async function downloadAssetWithProxy<T extends Blob | string>(url: string, prox
         retry: 0,
         timeout: timeout * 1000,
     })
+}
+
+async function measureExecutionTime(label: string, taskFn: () => Promise<DownloadResult | DownloadResult[]>) {
+    const start = Date.now()
+    const result = await taskFn()
+    const end = Date.now()
+    const total = (end - start) / 1000;
+
+    pool.formatDownloadResult(label, result, total)
+
+    return result
 }
 
 /**
@@ -58,9 +70,10 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
         }
         html = fullHTML
     }
-    const task = await pool.download(articleURL, htmlDownloadFn)
-    console.log('html下载结果:')
-    console.log(task)
+
+    await measureExecutionTime('html下载结果:', async () => {
+        return await pool.download(articleURL, htmlDownloadFn)
+    })
 
     if (!html) {
         throw new Error('下载html失败，请稍后重试')
@@ -69,6 +82,10 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
     return html
 }
 
+/**
+ * 批量下载文章 html
+ * @param articles
+ */
 export async function downloadArticleHTMLs(articles: AppMsgExWithHTML[]) {
     const parser = new DOMParser()
 
@@ -88,14 +105,10 @@ export async function downloadArticleHTMLs(articles: AppMsgExWithHTML[]) {
         article.html = fullHTML
         await sleep(2000)
     }
-    const startTime = Date.now()
-    const tasks = await pool.downloads(articles, htmlDownloadFn)
-    const endTime = Date.now();
-    const totalTime = (endTime - startTime) / 1000;
 
-    console.log('html下载结果:')
-    console.log(tasks)
-    console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
+    await measureExecutionTime('html下载结果:', async () => {
+        return  await pool.downloads(articles, htmlDownloadFn)
+    })
 }
 
 /**
@@ -144,14 +157,9 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     }
     const imgs = $jsArticleContent.querySelectorAll<HTMLImageElement>('img')
     if (imgs.length > 0) {
-        const startTime = Date.now()
-        const downloadResults = await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
-        const endTime = Date.now();
-        const totalTime = (endTime - startTime) / 1000;
-
-        console.debug('图片下载结果:')
-        console.debug(downloadResults)
-        console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
+        await measureExecutionTime('图片下载结果:', async () => {
+            return await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
+        })
     }
 
 
@@ -176,14 +184,9 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         }
         const url2pathMap = new Map<string, string>()
 
-        const startTime = Date.now()
-        const downloadResults = await pool.downloads<string>([...bgImageURLs], bgImgDownloadFn)
-        const endTime = Date.now();
-        const totalTime = (endTime - startTime) / 1000;
-
-        console.debug('背景图片下载结果:')
-        console.debug(downloadResults)
-        console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
+        await measureExecutionTime('背景图片下载结果:', async () => {
+            return await pool.downloads<string>([...bgImageURLs], bgImgDownloadFn)
+        })
 
         // 替换背景图片路径
         pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (match, p1, url, p3) => {
@@ -220,14 +223,9 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     let localLinks: string = ''
     const links = document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')
     if (links.length > 0) {
-        const startTime = Date.now()
-        const downloadResults = await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn)
-        const endTime = Date.now();
-        const totalTime = (endTime - startTime) / 1000;
-
-        console.debug('样式下载结果:')
-        console.debug(downloadResults)
-        console.debug(`总耗时: ${totalTime.toFixed(2)}s`);
+        await measureExecutionTime('样式下载结果:', async () => {
+            return await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn)
+        })
     }
 
     pool.usage()

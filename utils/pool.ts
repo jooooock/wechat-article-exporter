@@ -13,11 +13,13 @@ interface ProxyInstance {
 
 type DownloadFn<T> = (url: T, proxy: string) => Promise<void>
 
-interface DownloadResult {
+export interface DownloadResult {
     // 总耗时 (s)
     totalTime: number
+
     // 是否成功
     success: boolean
+
     // 重试次数
     attempts: number
 }
@@ -71,6 +73,7 @@ class ProxyPool {
     }
 
     printProxyUsage() {
+        console.debug('代理使用情况:')
         const usageData = this.proxies.map(proxy => ({
             '代理': proxy.address,
             '使用次数': proxy.usageCount,
@@ -142,62 +145,6 @@ async function downloadWithRetry<T>(pool: ProxyPool, url: T, downloadFn: Downloa
 
 const pool = new ProxyPool(AVAILABLE_PROXY_LIST);
 
-export async function run() {
-    const urls = [
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        // '6',
-        // '7',
-        // '8',
-        // '9',
-        // '10'
-    ];
-
-    // 下载函数
-    const downloadFn: DownloadFn<string> = async (url: string, proxy: string) => {
-        // 模拟下载操作
-        return new Promise((resolve, reject) => {
-            console.log(`Downloading ${url} using ${proxy}...`);
-
-            setTimeout(() => {
-                if (Math.random() > 0.3) {
-                    resolve()
-                } else {
-                    reject(new Error('Download failed'))
-                }
-            }, Math.random() * 3000)
-        });
-    }
-
-    const startTime = Date.now()
-    const downloadTasks = urls.map(url => downloadWithRetry(pool, url, downloadFn));
-    const results = await Promise.all(downloadTasks)
-
-    console.log('================ 下载完毕 =====================')
-
-    const endTime = Date.now();
-    const totalTime = (endTime - startTime) / 1000;
-
-    // 打印所有资源的总耗时
-    console.log(`Total time taken for all downloads: ${totalTime.toFixed(2)} seconds`);
-
-    // 打印下载耗时明细
-    const downloadResults = results.map((result, index) => ({
-        URL: urls[index],
-        '总耗时(s)': result.totalTime.toFixed(2),
-        '重试次数': result.attempts,
-        '是否下载成': result.success ? 'Yes' : 'No',
-    }))
-    console.table(downloadResults)
-
-
-    // 打印代理使用次数
-    pool.printProxyUsage();
-}
-
 /**
  * 使用代理池下载单个资源
  * @param url
@@ -217,6 +164,26 @@ export async function downloads<T>(urls: T[], downloadFn: DownloadFn<T>) {
     return await Promise.all(tasks)
 }
 
+/**
+ * 打印代理使用次数
+ */
 export function usage() {
     pool.printProxyUsage();
+}
+
+export function formatDownloadResult(label: string, results: DownloadResult | DownloadResult[], total: number) {
+    if (!Array.isArray(results)) {
+        results = [results]
+    }
+
+    console.debug(label)
+    console.debug(`总耗时: ${total.toFixed(2)}s`);
+
+    // 打印下载耗时明细
+    const downloadResults = results.map((result, index) => ({
+        '总耗时': result.totalTime,
+        '重试次数': result.attempts,
+        '是否下载成': result.success,
+    }))
+    console.table(downloadResults)
 }

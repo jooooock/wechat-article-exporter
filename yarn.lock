@@ -353,6 +353,36 @@
   resolved "https://registry.npmjs.org/@csstools/selector-specificity/-/selector-specificity-3.1.1.tgz#63085d2995ca0f0e55aa8b8a07d69bfd48b844fe"
   integrity sha512-a7cxGcJ2wIlMFLlh8z2ONm+715QkPHiyJcxwQlKOz/03GPw1COpfhcmC9wm4xlZfp//jWHNNMwzjtqHXVWU9KA==
 
+"@deno/kv-darwin-arm64@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/@deno/kv-darwin-arm64/-/kv-darwin-arm64-0.8.2.tgz#79c41660b08ed7b3574cc0d240334a0692a631e5"
+  integrity sha512-4zEqI6DLgPwlr4zvPbsJpYVy6UnHk8T+JaK/WwXbiyAPZlLpQSORP1ylkl3aWhUEpSkcMe9h38zvvkuZOFELcw==
+
+"@deno/kv-darwin-x64@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/@deno/kv-darwin-x64/-/kv-darwin-x64-0.8.2.tgz#de5f2bb1df3e6940e316e05e0926bc34b677bc62"
+  integrity sha512-EPSyX1R2CkY8nLgPF2o3R9ellaf4T3UC0V2VCCpqMR0TYqIuGtgl5+MG22qnomFrL5yRJ5Raxy2kbXrxREfw8A==
+
+"@deno/kv-linux-x64-gnu@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/@deno/kv-linux-x64-gnu/-/kv-linux-x64-gnu-0.8.2.tgz#3436d899cde1a32a5e3ae6c3f00c94e12f1356cc"
+  integrity sha512-lxxyUBBh2RdYsi+4wy0VcQh/D0gjhAOBk3CUQJq2oapUMQpYCe2b+RNw21WncUscvjWBAWs4QXg6ixeuhjxQyQ==
+
+"@deno/kv-win32-x64-msvc@0.8.2":
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/@deno/kv-win32-x64-msvc/-/kv-win32-x64-msvc-0.8.2.tgz#ba27298ca1737ecba39b98c2ddfb5808e273b213"
+  integrity sha512-COpy1BpzvQmn5Gq39VBenQ2t31Xx0BzGDW2phooRlENlYJDz/u7dIGm1K7wtUWjpyAMduInDr0bfi+bf+RFuoA==
+
+"@deno/kv@^0.8.2":
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/@deno/kv/-/kv-0.8.2.tgz#e8da229d193a02e7e7cd2bbdc30044add4bf9b26"
+  integrity sha512-dSvr7pBG5AcYMbWiFz8vGVoh40+vQ8avzJpifNz86Wq/nMNjqESCLjor4/A9A0g1mAWzWPlRG/fvgCrzZ+8ZCg==
+  optionalDependencies:
+    "@deno/kv-darwin-arm64" "0.8.2"
+    "@deno/kv-darwin-x64" "0.8.2"
+    "@deno/kv-linux-x64-gnu" "0.8.2"
+    "@deno/kv-win32-x64-msvc" "0.8.2"
+
 "@egoist/tailwindcss-icons@^1.8.1":
   version "1.8.1"
   resolved "https://registry.npmjs.org/@egoist/tailwindcss-icons/-/tailwindcss-icons-1.8.1.tgz#bd47cdd5fc490760561a0bb3d8ea0ff275369405"
