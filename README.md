@@ -1,10 +1,11 @@
 <p align="center">
-  <a href="https://wechat-article-exporter.deno.dev/" target="_blank" rel="noopener noreferrer">
-    <img src="./public/favicon.ico" alt="Logo" width="100">
-  </a>
+  <img src="./public/favicon.ico" alt="Logo" width="100">
 </p>
 
 <h3 align="center">微信公众号文章导出工具，100%还原文章样式。</h3>
+
+[![Deploy][deploy-badge]][deploy]
+
 
 
 ## :dart: 特性
@@ -23,17 +24,17 @@
 
 1. 注册一个微信公众号 (已有账号的话跳过)
 
-前往 [微信公众平台](https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN) 注册，服务号和订阅号皆可。
+前往 [微信公众平台] 注册，服务号和订阅号皆可。
 
 2. 二维码扫码登录
 
-进入 [登录页面](https://wechat-article-exporter.deno.dev/login)，用微信扫描页面上的二维码，然后选择自己的公众号进行登录。
+进入 [登录页面]，用微信扫描页面上的二维码，然后选择自己的公众号进行登录。
 
 3. 搜索目标公众号，开始下载文章
 
 通过左上角的公众号切换按钮，搜索自己感兴趣的公众号，如下图所示：
 
-![切换账号](assets/switch-account.png)
+![切换账号]
 
 
 ## :rocket: 私有部署
@@ -50,35 +51,35 @@
 
 1. Fork 该项目
 
-![create a fork](assets/deploy/create-fork.png)
+![create a fork][create-a-fork]
 
-2. 点击 [New Project](https://dash.deno.com/new_project) 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
+2. 点击 [New Project][new-deno-deploy-project] 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
 
-![create deno deploy project](assets/deploy/create-deno-deploy-project.png)
+![create deno deploy project][create-deno-deploy-project]
 
 创建之后如下所示:
 
-![deno deploy project result](assets/deploy/deno-deploy-project-result.png)
+![deno deploy project result][deno-deploy-project-create-result]
 
 3. 修改github仓库发布配置
 
 启用仓库的 workflows (默认fork的仓库是禁用的):
 
-![enable github workflows](assets/deploy/enable-github-workflows.png)
+![enable github workflows][enable-github-workflows]
 
 修改`.github/workflows/deno_deploy.yml`:
 
-![update workflows project](assets/deploy/update-workflows-project.png)
+![update workflows project][update-workflows-project]
 
 提交:
 
-![commit changes](assets/deploy/commit-changes.png)
+![commit changes][commit-changes]
 
 4. 等待发布结果
 
-![deploy success](assets/deploy/deploy-success.png)
+![deploy success][deploy-success]
 
-![finally website](assets/deploy/finally-website.png)
+![finally website][finally-website]
 </details>
 
 
@@ -242,8 +243,8 @@ export default {
 
 ## :heart: 感谢
 
-- 感谢 [Deno Deploy](https://deno.com/deploy)、[Cloudflare Workers](https://workers.cloudflare.com) 提供免费托管服务
-- 感谢 [WeChat_Article](https://github.com/1061700625/WeChat_Article) 项目提供原理思路
+- 感谢 [Deno Deploy]、[Cloudflare Workers] 提供免费托管服务
+- 感谢 [WeChat_Article] 项目提供原理思路
 
 
 ## :coffee: 捐赠与支持
@@ -260,9 +261,49 @@ export default {
 
 ## :star: Star 历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline)](https://star-history.com/#jooooock/wechat-article-exporter&Timeline)
+[![Star History Chart]][Star History Chart Link]
 
 
 ## :memo: 许可
 
 MIT
+
+<!-- Definitions -->
+
+[deploy-badge]: https://github.com/jooooock/wechat-article-exporter/workflows/deno_deploy/badge.svg
+
+[deploy]: https://github.com/jooooock/wechat-article-exporter/actions
+
+[微信公众平台]: https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN
+
+[登录页面]: https://wechat-article-exporter.deno.dev/login
+
+[切换账号]: assets/switch-account.png
+
+[create-a-fork]: assets/deploy/create-fork.png
+
+[new-deno-deploy-project]: https://dash.deno.com/new_project
+
+[create-deno-deploy-project]: assets/deploy/create-deno-deploy-project.png
+
+[deno-deploy-project-create-result]: assets/deploy/deno-deploy-project-result.png
+
+[enable-github-workflows]: assets/deploy/enable-github-workflows.png
+
+[update-workflows-project]: assets/deploy/update-workflows-project.png
+
+[commit-changes]: assets/deploy/commit-changes.png
+
+[deploy-success]: assets/deploy/deploy-success.png
+
+[finally-website]: assets/deploy/finally-website.png
+
+[Deno Deploy]: https://deno.com/deploy
+
+[Cloudflare Workers]: https://workers.cloudflare.com
+
+[Wechat_Article]: https://github.com/1061700625/WeChat_Article
+
+[Star History Chart]: https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline
+
+[Star History Chart Link]: https://star-history.com/#jooooock/wechat-article-exporter&Timeline
