@@ -263,6 +263,6 @@ export default {
 [![Star History Chart](https://api.star-history.com/svg?repos=jooooock/wechat-article-exporter&type=Timeline)](https://star-history.com/#jooooock/wechat-article-exporter&Timeline)
 
 
-## :octocat: 许可
+## :memo: 许可
 
 MIT
