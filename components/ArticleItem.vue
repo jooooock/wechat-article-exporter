@@ -10,7 +10,7 @@
     </div>
     <div class="p-6 flex flex-col flex-1 space-y-2">
       <span class="absolute top-0 right-0 rounded text-zinc-600 bg-[rgba(255,255,255,.8)] py-1 px-2 font-mono">#{{ index }}</span>
-      <h3 class="text-xl text-blue-800 font-semibold" v-html="title"></h3>
+      <h3 class="text-xl text-blue-800 font-semibold" :class="isOriginal ? 'original' : ''" v-html="title"></h3>
       <time class="hidden whitespace-nowrap text-sm text-gray-500 md:block">{{ formatTimeStamp(updatedAt) }}</time>
       <p class="flex-1 text-zinc-400 text-sm pb-4">{{ digest }}</p>
       <div class="flex space-x-3 border-t pt-4 antialiased">
@@ -52,6 +52,7 @@ interface Props {
   link: string
   isDeleted: boolean
   coverTheme?: RGB
+  isOriginal: boolean
 }
 
 defineProps<Props>()
@@ -97,3 +98,10 @@ function copyLink(link: string) {
   }, 1000)
 }
 </script>
+
+<style scoped>
+.original::before {
+  content: "【原创】";
+  color: green;
+}
+</style>
