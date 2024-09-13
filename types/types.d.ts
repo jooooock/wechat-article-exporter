@@ -31,6 +31,7 @@ export interface BizLoginResult {
 }
 
 export interface AccountInfo {
+    type: 'account'
     alias: string
     fakeid: string
     nickname: string
@@ -38,6 +39,12 @@ export interface AccountInfo {
     service_type: number
     signature: string
     _loaded?: boolean
+}
+
+export interface AuthorInfo {
+    type: 'author'
+    nickname: string
+    fakeid: string
 }
 
 export interface SearchBizResponse {

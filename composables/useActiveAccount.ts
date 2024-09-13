@@ -1,9 +1,9 @@
-import type {AccountInfo} from "~/types/types";
+import type {AccountInfo, AuthorInfo} from "~/types/types";
 import {StorageSerializers} from "@vueuse/core";
 
 
 export default () => {
-    return useLocalStorage<AccountInfo | null>('account', null, {
+    return useLocalStorage<AccountInfo | AuthorInfo | null>('account', null, {
         serializer: StorageSerializers.object
     })
 }
