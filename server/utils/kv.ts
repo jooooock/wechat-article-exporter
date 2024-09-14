@@ -5,7 +5,7 @@ export const useKv = async () => {
     if (process.dev) {
         const OpenKV = () => import('@deno/kv')
         const { openKv } = await OpenKV()
-        return openKv('_data/kv.db')
+        return openKv('')
     }
     throw createError({
         statusCode: 500,

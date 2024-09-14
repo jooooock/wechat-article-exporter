@@ -57,4 +57,5 @@ export default defineEventHandler(async (event) => {
     const op = kv.atomic()
     op.set(['proxy', body.account, body.nickname, Date.now()], body)
     await op.commit()
+    kv.close()
 })
