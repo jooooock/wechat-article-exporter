@@ -6,6 +6,11 @@ export interface Info {
     completed: boolean
     count: number
     articles: number
+
+    // 公众号昵称
+    nickname?: string
+    // 公众号头像
+    round_head_img?: string
 }
 
 /**
@@ -24,12 +29,16 @@ export async function updateInfoCache(infoStore: IDBObjectStore, info: Info): Pr
                 }
                 infoCache.count += info.count
                 infoCache.articles += info.articles
+                infoCache.nickname = info.nickname
+                infoCache.round_head_img = info.round_head_img
             } else {
                 infoCache = {
                     fakeid: info.fakeid,
                     completed: info.completed,
                     count: info.count,
                     articles: info.articles,
+                    nickname: info.nickname,
+                    round_head_img: info.round_head_img,
                 }
             }
 
@@ -59,6 +68,28 @@ export async function getInfoCache(fakeid: string): Promise<Info | undefined> {
         request.onsuccess = () => {
             const info: Info | undefined = request.result
             resolve(info)
+        }
+        request.onerror = (evt) => {
+            reject(evt)
+        }
+    })
+}
+
+export async function getAllInfo(): Promise<Info[]> {
+    const db = await openDatabase()
+    const infos: Info[] = []
+
+    return new Promise((resolve, reject) => {
+        const store = db.transaction('info').objectStore('info')
+        const request = store.openCursor()
+        request.onsuccess = (event) => {
+            const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result
+            if (cursor) {
+                infos.push(cursor.value)
+                cursor.continue()
+            } else {
+                resolve(infos)
+            }
         }
         request.onerror = (evt) => {
             reject(evt)

@@ -3,6 +3,8 @@ import {openDatabase} from "~/store/db";
 import {updateInfoCache} from "~/store/info";
 
 
+const activeAccount = useActiveAccount()
+
 async function updateArticle(articleStore: IDBObjectStore, article: AppMsgEx, fakeid: string): Promise<IDBValidKey> {
     const key = `${fakeid}:${article.aid}`
 
@@ -72,6 +74,8 @@ export async function updateArticleCache(publishList: PublishListItem[], complet
         completed: completed,
         count: msgCount,
         articles: articleCount,
+        nickname: activeAccount.value?.nickname,
+        round_head_img: activeAccount.value?.type === 'author' ? undefined : activeAccount.value?.round_head_img,
     })
 }
 
