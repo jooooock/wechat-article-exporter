@@ -4,22 +4,26 @@
       <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">数据导出</h1>
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
-      <ul class="flex flex-col h-full w-[300px] overflow-y-scroll">
-        <li v-for="info in infos" :key="info.fakeid" class="px-4 py-4" :class="{'bg-slate-4': selectedAccount === info.fakeid}" @click="selectAccount(info)">
-          <p>公众号: {{info.fakeid}}</p>
-          <p>昵称: {{info.nickname || 'unknown'}}</p>
-          <p>缓存文章数: {{info.articles}}</p>
+      <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
+        <li v-for="info in infos" :key="info.fakeid" class="relative px-4 pr-16 py-4"
+            :class="{'bg-slate-3': selectedAccount === info.fakeid}" @click="selectAccount(info)">
+          <p>公众号:
+            <span v-if="info.nickname" class="text-xl font-medium">{{ info.nickname }}</span>
+            <span v-else></span>
+          </p>
+          <p>ID: <span class="font-mono">{{ info.fakeid }}</span></p>
+          <UBadge variant="subtle" color="red" class="absolute top-4 right-2">{{info.articles}}</UBadge>
         </li>
       </ul>
       <main class="flex-1 h-full overflow-y-scroll">
         <div v-if="loading" class="flex justify-center items-center mt-5">
           <Loader :size="28" class="animate-spin text-slate-500"/>
         </div>
-        <div v-else-if="selectedAccount">
+        <div class="relative" v-else-if="selectedAccount">
           <div class="sticky top-0 z-50 bg-white flex justify-between items-center  px-4 h-[40px]">
             <div class="flex items-center space-x-4">
               <span>过滤条件:</span>
-              <UInput v-model="query.title" placeholder="请输入标题过滤" color="blue" />
+              <UInput v-model="query.title" placeholder="请输入标题过滤" color="blue"/>
 
               <UPopover :popper="{ placement: 'bottom-start' }">
                 <UButton icon="i-heroicons-calendar-days-20-solid" color="gray">
@@ -42,49 +46,55 @@
                       />
                     </div>
 
-                    <DatePicker v-model="query.dateRange" @close="close" />
+                    <DatePicker v-model="query.dateRange" @close="close"/>
                   </div>
                 </template>
               </UPopover>
 
-              <USelectMenu class="w-40" v-model="query.authors" :options="articleAuthors" multiple placeholder="选择作者" />
+              <USelectMenu class="w-40" color="blue" v-model="query.authors" :options="articleAuthors" multiple
+                           placeholder="选择作者"/>
 
               <USelect v-model="query.isOriginal" :options="originalOptions" color="blue"/>
 
               <UButton color="gray" variant="solid" @click="search">搜索</UButton>
             </div>
             <div>
-              <UButton color="black" variant="solid" :disabled="!downloadBtnEnabled" @click="download">批量下载</UButton>
+              <UButton color="black" variant="solid" :disabled="selectedArticles.length === 0" @click="download">批量下载
+              </UButton>
             </div>
           </div>
           <table class="w-full border-collapse border rounded-md">
             <thead class="sticky top-[40px] z-10 bg-white">
             <tr>
               <th>
-                <UCheckbox class="justify-center" :indeterminate="isIndeterminate" v-model="checkAll" @change="onCheckAllChange" color="blue" />
+                <UCheckbox class="justify-center" :indeterminate="isIndeterminate" v-model="checkAll"
+                           @change="onCheckAllChange" color="blue"/>
               </th>
               <th>序号</th>
               <th>标题</th>
               <th>发布日期</th>
               <th>作者</th>
               <th>是否原创</th>
-              <th>是否删除</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(article, index) in articles.filter(article => article.display)" :key="article.aid">
+            <tr v-for="(article, index) in displayedArticles" :key="article.aid">
               <td class="text-center" @click="toggleArticleCheck(article)">
-                <UCheckbox class="justify-center" v-model="article.checked" color="blue" />
+                <UCheckbox class="justify-center" v-model="article.checked" color="blue"/>
               </td>
-              <td class="text-center font-mono">{{index+1}}</td>
-              <td class="px-4 font-mono">{{maxLen(article.title)}}</td>
-              <td class="text-center font-mono">{{formatTimeStamp(article.update_time)}}</td>
-              <td class="text-center">{{article.author_name || '--'}}</td>
-              <td class="text-center">{{article.copyright_stat === 1 && article.copyright_type === 1 ? '原创' : ''}}</td>
-              <td class="text-center">{{article.is_deleted ? '已删除' : ''}}</td>
+              <td class="text-center font-mono">{{ index + 1 }}</td>
+              <td class="px-4 font-mono">{{ maxLen(article.title) }}</td>
+              <td class="text-center font-mono">{{ formatTimeStamp(article.update_time) }}</td>
+              <td class="text-center">{{ article.author_name }}</td>
+              <td class="text-center">{{ article.copyright_stat === 1 && article.copyright_type === 1 ? '原创' : '' }}
+              </td>
             </tr>
             </tbody>
           </table>
+          <!-- 状态栏 -->
+          <div class="sticky bottom-0 h-[40px] bg-white text-rose-500 flex items-center px-4">
+            共 {{displayedArticles.length}} 条有效数据，已选中 {{selectedArticles.length}} 条数据
+          </div>
         </div>
       </main>
     </div>
@@ -98,7 +108,7 @@ import type {AppMsgEx} from "~/types/types";
 import {formatTimeStamp} from "~/utils";
 import {Loader} from "lucide-vue-next";
 import {sleep} from "@antfu/utils";
-import { sub, format, isSameDay, type Duration } from 'date-fns'
+import {type Duration, format, isSameDay, sub} from 'date-fns'
 
 interface Article extends AppMsgEx {
   checked: boolean
@@ -120,12 +130,18 @@ const checkAll = ref(false)
 const isIndeterminate = ref(false)
 
 async function selectAccount(info: Info) {
-  selectedAccount.value = info.fakeid
-  switchTableData(info.fakeid).catch(() => {})
+  if (info.fakeid !== selectedAccount.value) {
+    selectedAccount.value = info.fakeid
+    switchTableData(info.fakeid).catch(() => {
+    })
+  }
 }
 
-const downloadBtnEnabled = computed(() => {
-  return articles.filter(article => article.checked && article.display).length > 0
+const displayedArticles = computed(() => {
+  return articles.filter(article => article.display)
+})
+const selectedArticles = computed(() => {
+  return articles.filter(article => article.checked && article.display)
 })
 
 async function switchTableData(fakeid: string) {
@@ -135,7 +151,12 @@ async function switchTableData(fakeid: string) {
   loading.value = true
   articles.length = 0
   const data = await getArticleCache(fakeid, Date.now())
-  articles.push(...data.map(article => ({...article, checked: false, display: true })))
+  articles.push(...data.filter(article => !article.is_deleted).map(article => ({
+    ...article,
+    checked: false,
+    display: true,
+    author_name: article.author_name || '--',
+  })))
   await sleep(500)
   loading.value = false
 
@@ -172,6 +193,7 @@ function toggleArticleCheck(article: Article) {
     checkAll.value = false
   }
 }
+
 function onCheckAllChange(evt: InputEvent) {
   if (checkAll.value) {
     articles.forEach(article => {
@@ -187,40 +209,44 @@ function onCheckAllChange(evt: InputEvent) {
 }
 
 const articleAuthors = computed(() => {
-  const authors = [...new Set(articles.map(article => article.author_name).filter(author => !!author))]
-  authors.push('--')
-  return authors
+  return [...new Set(articles.map(article => article.author_name).filter(author => !!author))]
 })
 
-function isRangeSelected (duration: Duration) {
+function isRangeSelected(duration: Duration) {
   return isSameDay(query.dateRange.start, sub(new Date(), duration)) && isSameDay(query.dateRange.end, new Date())
 }
 
-function selectRange (duration: Duration) {
-  query.dateRange = { start: sub(new Date(), duration), end: new Date() }
+function selectRange(duration: Duration) {
+  query.dateRange = {start: sub(new Date(), duration), end: new Date()}
 }
+
 const ranges = [
-  { label: '最近7天', duration: { days: 7 } },
-  { label: '最近14天', duration: { days: 14 } },
-  { label: '最近30天', duration: { days: 30 } },
-  { label: '最近3个月', duration: { months: 3 } },
-  { label: '最近6个月', duration: { months: 6 } },
-  { label: '最近1年', duration: { years: 1 } }
+  {label: '最近7天', duration: {days: 7}},
+  {label: '最近14天', duration: {days: 14}},
+  {label: '最近30天', duration: {days: 30}},
+  {label: '最近3个月', duration: {months: 3}},
+  {label: '最近6个月', duration: {months: 6}},
+  {label: '最近1年', duration: {years: 1}},
+  {label: '最近3年', duration: {years: 3}},
+  {label: '最近5年', duration: {years: 5}},
+  {label: '所有', duration: {years: 20}},
 ]
 const originalOptions = ['原创', '非原创', '所有']
 
 interface ArticleQuery {
   title: string
-  dateRange: {start: Date, end: Date}
+  dateRange: { start: Date, end: Date }
   authors: string[]
   isOriginal: '原创' | '非原创' | '所有'
 }
+
 const query = reactive<ArticleQuery>({
   title: '',
-  dateRange: {start: sub(new Date(), { days: 14 }), end: new Date()},
+  dateRange: {start: sub(new Date(), {days: 14}), end: new Date()},
   authors: [],
   isOriginal: '所有',
 })
+
 function search() {
   checkAll.value = false
   isIndeterminate.value = false
@@ -256,17 +282,21 @@ function download() {
 table {
   border-collapse: collapse;
 }
+
 table th {
   padding: 0.5rem 0.25rem;
 }
+
 table th,
 table td {
   border: 1px solid #00002d17;
   padding: 0.25rem 0.5rem;
 }
+
 tr:nth-child(even) {
   background-color: #00005506;
 }
+
 tr:hover {
   background-color: #00005506;
 }
