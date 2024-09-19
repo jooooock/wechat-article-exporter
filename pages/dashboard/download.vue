@@ -16,8 +16,11 @@
           <Loader :size="28" class="animate-spin text-slate-500"/>
         </div>
         <table v-else-if="selectedAccount" class="w-full border-collapse border rounded-md">
-          <thead class="sticky top-0 bg-white">
+          <thead class="sticky top-0 z-50 bg-white">
           <tr>
+            <th>
+              <UCheckbox class="justify-center" :indeterminate="isIndeterminate" v-model="checkAll" @change="onCheckAllChange" color="blue" />
+            </th>
             <th>序号</th>
             <th>标题</th>
             <th>发布日期</th>
@@ -27,7 +30,10 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(article, index) in articles" :key="article.aid">
+          <tr v-for="(article, index) in articles" :key="article.aid" @click="toggleArticleCheck(article)">
+            <td class="text-center">
+              <UCheckbox class="justify-center" v-model="article.checked" color="blue" />
+            </td>
             <td class="text-center font-mono">{{index+1}}</td>
             <td class="px-4 font-mono">{{maxLen(article.title)}}</td>
             <td class="text-center font-mono">{{formatTimeStamp(article.update_time)}}</td>
@@ -50,6 +56,9 @@ import {formatTimeStamp} from "~/utils";
 import {Loader} from "lucide-vue-next";
 import {sleep} from "@antfu/utils";
 
+interface Article extends AppMsgEx {
+  checked: boolean
+}
 
 useHead({
   title: '数据导出 | 微信公众号文章导出'
@@ -57,8 +66,11 @@ useHead({
 
 const infos = await getAllInfo()
 const selectedAccount = ref('')
-const articles = reactive<AppMsgEx[]>([])
+const articles = reactive<Article[]>([])
 const loading = ref(false)
+
+const checkAll = ref(false)
+const isIndeterminate = ref(false)
 
 async function selectAccount(info: Info) {
   selectedAccount.value = info.fakeid
@@ -68,7 +80,8 @@ async function selectAccount(info: Info) {
 async function switchTableData(fakeid: string) {
   loading.value = true
   articles.length = 0
-  articles.push(...await getArticleCache(fakeid, Date.now()))
+  const data = await getArticleCache(fakeid, Date.now())
+  articles.push(...data.map(article => ({...article, checked: false })))
   await sleep(500)
   loading.value = false
 }
@@ -78,6 +91,39 @@ function maxLen(text: string, max = 35): string {
     return text.slice(0, max) + '...'
   }
   return text
+}
+
+function toggleArticleCheck(article: Article) {
+  article.checked = !article.checked
+
+  if (articles.every(article => article.checked)) {
+    // 全部选中
+    checkAll.value = true
+    isIndeterminate.value = false
+  } else if (articles.every(article => !article.checked)) {
+    // 全部取消选中
+    checkAll.value = false
+    isIndeterminate.value = false
+  } else {
+    //
+    isIndeterminate.value = true
+    checkAll.value = false
+  }
+}
+function onCheckAllChange(evt: InputEvent) {
+  // checkAll.value = !checkAll.value
+  console.log(checkAll.value)
+  if (checkAll.value) {
+    articles.forEach(article => {
+      article.checked = true
+      isIndeterminate.value = false
+    })
+  } else {
+    articles.forEach(article => {
+      article.checked = false
+      isIndeterminate.value = false
+    })
+  }
 }
 </script>
 
@@ -92,5 +138,11 @@ table th,
 table td {
   border: 1px solid #00002d17;
   padding: 0.25rem 0.5rem;
+}
+tr:nth-child(even) {
+  background-color: #00005506;
+}
+tr:hover {
+  background-color: #00005506;
 }
 </style>

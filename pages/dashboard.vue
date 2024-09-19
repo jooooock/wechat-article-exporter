@@ -34,6 +34,10 @@
         <div id="title"></div>
 
         <div class="hidden md:flex items-center gap-4">
+          <a href="https://github.com/jooooock/wechat-article-exporter/blob/master/docs/faq.md" target="_blank" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
+<!--            <CircleHelp :size="18"/>-->
+            <span class="inline-flex items-center justify-center gap-1 truncate visible">FAQ</span>
+          </a>
           <a href="https://github.com/jooooock/wechat-article-exporter/issues/new" target="_blank" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
             <MessageCircleQuestion :size="18"/>
             <span class="inline-flex items-center justify-center gap-1 truncate visible">Feedback</span>
@@ -52,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { Newspaper, Download, ChartNoAxesCombined, Cookie, MessageCircleQuestion, Globe } from 'lucide-vue-next';
+import { Newspaper, Download, ChartNoAxesCombined, Cookie, MessageCircleQuestion, Globe, CircleHelp } from 'lucide-vue-next';
 
 definePageMeta({
   layout: false
