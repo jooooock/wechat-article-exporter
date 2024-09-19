@@ -4,14 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ['@vueuse/nuxt', "@nuxt/ui", "nuxt-gtag"],
   ssr: false,
-  nitro: {
-    vercel: {
-      functions: {
-        maxDuration: 60,
-      }
-    }
-  },
   gtag: {
     id: 'G-8V3EBLSR2X'
-  }
+  },
 })

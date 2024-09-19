@@ -23,7 +23,7 @@
     "dayjs": "^1.11.12",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
-    "lucide-vue-next": "^0.408.0",
+    "lucide-vue-next": "^0.441.0",
     "mime": "^4.0.4",
     "nuxt": "^3.12.3",
     "nuxt-gtag": "^2.1.0",

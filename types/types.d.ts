@@ -123,9 +123,17 @@ export interface RGB {
     b: number
 }
 
+export interface AppMsgAlbumInfo {
+    album_id: number
+    id: string
+    tagSource: number
+    title: string
+}
+
 export interface AppMsgEx {
     aid: string
     album_id: string
+    appmsg_album_infos: AppMsgAlbumInfo[]
     appmsgid: number
     author_name: string
     ban_flag: number

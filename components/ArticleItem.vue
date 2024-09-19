@@ -1,5 +1,5 @@
 <template>
-  <li class="group relative flex flex-col mb-4 bg-white w-full 2xl:w-[500px] xl:w-[400px] lg:w-[500px] shadow-md rounded-md overflow-hidden">
+  <li class="group relative flex flex-col flex-shrink mb-4 bg-white w-full 2xl:w-[500px] xl:w-[400px] lg:w-[500px] shadow-md rounded-md overflow-hidden">
     <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute z-10 size-[100px] right-0 top-64 translate-x-full drop-shadow-[-116px_0_red]">
     <div v-if="cover" class="h-60 overflow-hidden" :style="{backgroundColor: themeColor(coverTheme!)}">
       <img
@@ -8,11 +8,16 @@
           alt=""
           class="object-contain size-full group-hover:scale-110 ease-in-out transition duration-300">
     </div>
-    <div class="p-6 flex flex-col flex-1 space-y-2">
+    <div class="p-6 flex flex-col space-y-2">
       <span class="absolute top-0 right-0 rounded text-zinc-600 bg-[rgba(255,255,255,.8)] py-1 px-2 font-mono">#{{ index }}</span>
       <h3 class="text-xl text-blue-800 font-semibold" :class="isOriginal ? 'original' : ''" v-html="title"></h3>
-      <time class="hidden whitespace-nowrap text-sm text-gray-500 md:block">{{ formatTimeStamp(updatedAt) }}</time>
-      <p class="flex-1 text-zinc-400 text-sm pb-4">{{ digest }}</p>
+      <time class="hidden whitespace-nowrap text-sm text-gray-500 md:block pb-4">{{ formatTimeStamp(updatedAt) }}</time>
+<!--      <p class="flex-1 text-zinc-400 text-sm pb-4">{{ digest }}</p>-->
+      <ul class="flex flex-wrap space-x-2">
+        <li class="text-blue-500 text-sm" v-for="album in albumInfos" :key="album.id">
+          <a :href="getAlbumURL(album.id)" target="_blank">#{{album.title}}</a>
+        </li>
+      </ul>
       <div class="flex space-x-3 border-t pt-4 antialiased">
         <a :href="link" class="h-8 px-4 font-semibold rounded border border-slate-200 text-sm text-slate-900 hover:border-slate-400 flex items-center justify-center" target="_blank">查看原文</a>
         <button
@@ -39,7 +44,7 @@
 import {saveAs} from 'file-saver'
 import {Loader} from 'lucide-vue-next';
 import {formatTimeStamp, downloadArticleHTML, packHTMLAssets} from "~/utils";
-import type {RGB} from "~/types/types";
+import type {AppMsgAlbumInfo, RGB} from "~/types/types";
 import {uploadProxy} from "~/store/proxy";
 
 
@@ -53,9 +58,12 @@ interface Props {
   isDeleted: boolean
   coverTheme?: RGB
   isOriginal: boolean
+  albumInfos: AppMsgAlbumInfo[]
 }
 
 defineProps<Props>()
+
+const activeAccount = useActiveAccount()
 
 function themeColor(rgb?: RGB) {
   if (!rgb) {
@@ -96,6 +104,10 @@ function copyLink(link: string) {
     copyBtnText.value = '复制链接'
     copyBtnDisabled.value = false
   }, 1000)
+}
+
+function getAlbumURL(albumID: string | number) {
+  return `https://mp.weixin.qq.com/mp/appmsgalbum?__biz=${activeAccount.value?.fakeid}&action=getalbum&album_id=${albumID}`
 }
 </script>
 
