@@ -128,7 +128,7 @@ import {formatTimeStamp} from "~/utils";
 import {Loader} from "lucide-vue-next";
 import {sleep} from "@antfu/utils";
 import {type Duration, format, isSameDay, sub} from 'date-fns'
-import useBatchDownload from "~/composables/useBatchDownload";
+import {useBatchDownload} from "~/composables/useBatchDownload";
 
 
 interface Article extends AppMsgEx {

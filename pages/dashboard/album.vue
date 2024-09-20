@@ -37,7 +37,7 @@
           <div class="px-5 pt-7 pb-14 banner">
             <h2 class="text-2xl text-white font-bold"># {{ albumBaseInfo.title }}</h2>
           </div>
-          <div class="rounded-xl -mt-4 relative z-50 bg-white px-4 py-6">
+          <div class="relative rounded-xl -mt-4 z-50 bg-white px-4 py-6">
             <!-- 头部信息 -->
             <div class="pb-10">
               <p class="flex items-center space-x-2 mb-2">
@@ -53,6 +53,18 @@
                 <ArrowDownNarrowWide v-else />
                 <span>{{isReverse ? '倒序' : '正序'}}</span>
               </div>
+
+              <UButton color="black" variant="solid" class="absolute right-5 top-2 disabled:bg-slate-4 disabled:text-slate-12"
+                       :disabled="albumArticles.length === 0 || batchDownloadLoading" @click="batchDownload">
+                <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
+                <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
+                  <span
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedArticles.length }}/{{ albumArticles.length }}</span>
+                  <span
+                      v-if="batchDownloadPhase === '打包'">{{ batchPackedArticles.length }}/{{ batchDownloadedArticles.length }}</span>
+                </span>
+                <span v-else>批量下载</span>
+              </UButton>
             </div>
 
             <!-- 文章列表 -->
@@ -89,6 +101,7 @@ import {Loader} from "lucide-vue-next";
 import type {AppMsgAlbumResult, ArticleItem, BaseInfo} from "~/types/album";
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-vue-next';
 import {vElementVisibility} from "@vueuse/components"
+import {useDownloadAlbum} from '~/composables/useBatchDownload'
 
 
 useHead({
@@ -105,24 +118,33 @@ cachedAccountInfos.forEach(async accountInfo => {
   accountInfo.albums = await getAllAlbums(accountInfo.fakeid)
 })
 
+// 已选择的公众号
 const selectedAccount = ref<AccountInfo | null>(null)
+const downloadFileName = computed(() => {
+  return (selectedAccount.value!.nickname || selectedAccount.value!.fakeid) + '-' + selectedAlbum.value!.title
+})
 
+// 切换公众号
 async function toggleSelectedAccount(info: AccountInfo) {
   if (info.fakeid !== selectedAccount.value?.fakeid) {
     selectedAccount.value = info
   }
 }
 
+// 已选择的合集
 const selectedAlbum = ref<AppMsgAlbumInfo | null>(null)
 
+// 切换合集
 function toggleSelectedAlbum(album: AppMsgAlbumInfo) {
   if (album.id !== selectedAlbum.value?.id) {
     selectedAlbum.value = album
+
     isReverse.value = false
     getFirstPageAlbumData().catch(() => {})
   }
 }
 
+// 获取公众号下所有的合集数据（根据已缓存的文章数据）
 async function getAllAlbums(fakeid: string) {
   const articles = await getArticleCache(fakeid, Date.now())
   const albums: AppMsgAlbumInfo[] = []
@@ -144,6 +166,7 @@ const albumLoading = ref(false)
 const articleLoading = ref(false)
 
 
+// 加载合集第一页数据
 async function getFirstPageAlbumData() {
   albumLoading.value = true
   albumArticles.length = 0
@@ -164,6 +187,8 @@ async function getFirstPageAlbumData() {
     noMoreData.value = data.getalbum_resp.continue_flag === '0'
   }
 }
+
+// 切换正序/倒序
 function toggleReverse() {
   isReverse.value = !isReverse.value
 
@@ -174,6 +199,7 @@ function toggleReverse() {
   }
 }
 
+// 加载合集后续数据
 async function loadMoreData() {
   articleLoading.value = true
 
@@ -207,6 +233,13 @@ function onElementVisibility(visible: boolean) {
   }
 }
 
+const {
+  loading: batchDownloadLoading,
+  phase: batchDownloadPhase,
+  downloadedArticles: batchDownloadedArticles,
+  packedArticles: batchPackedArticles,
+  download: batchDownload,
+} = useDownloadAlbum(albumArticles, downloadFileName)
 </script>
 
 <style scoped>

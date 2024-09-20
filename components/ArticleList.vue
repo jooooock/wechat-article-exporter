@@ -30,7 +30,7 @@
 import type {AppMsgEx} from "~/types/types";
 import {Loader} from "lucide-vue-next";
 import {vElementVisibility} from "@vueuse/components"
-import {getArticleList} from '~/utils'
+import {getArticleList} from '~/apis'
 import {getArticleCache, hitCache} from "~/store/article";
 import {getInfoCache} from "~/store/info";
 import {ARTICLE_LIST_PAGE_SIZE} from "~/config";

@@ -165,3 +165,10 @@ export type AppMsgExWithHTML = AppMsgEx & {
     html?: string
     packed?: boolean
 };
+
+export interface DownloadableArticle {
+    title: string
+    url: string
+    html?: string
+    packed?: boolean
+}

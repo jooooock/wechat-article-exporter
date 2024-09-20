@@ -27,7 +27,7 @@ import {
 } from 'chart.js'
 import {Line} from 'vue-chartjs'
 import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm';
-import {getArticleList} from '~/utils'
+import {getArticleList} from '~/apis'
 import dayjs from "dayjs";
 
 

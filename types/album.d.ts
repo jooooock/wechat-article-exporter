@@ -46,6 +46,10 @@ export interface ArticleItem {
     url: string
     user_read_status: string
 }
+export interface ArticleItemWithHtml extends ArticleItem {
+    html?: string
+    packed?: boolean
+}
 
 export interface GetAlbumResp {
     article_list: ArticleItem[]

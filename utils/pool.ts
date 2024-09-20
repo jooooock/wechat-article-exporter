@@ -1,7 +1,7 @@
 import {sleep} from "@antfu/utils";
 import dayjs from "dayjs";
 import {AVAILABLE_PROXY_LIST} from '~/config'
-import type {AppMsgExWithHTML} from "~/types/types";
+import type {DownloadableArticle} from "~/types/types";
 import {updateProxiesCache} from "~/store/proxy";
 
 /**
@@ -31,7 +31,7 @@ export interface ProxyInstance {
 }
 
 // 代理下载的资源
-type DownloadResource = string | HTMLLinkElement | HTMLImageElement | AppMsgExWithHTML
+type DownloadResource = string | HTMLLinkElement | HTMLImageElement | DownloadableArticle
 
 // 资源下载函数，返回资源大小
 type DownloadFn<T extends DownloadResource> = (resource: T, proxy: string) => Promise<number>
@@ -199,7 +199,7 @@ async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, re
     } else if (typeof resource === 'string') {
         resourceURL = resource
     } else {
-        resourceURL = resource.link
+        resourceURL = resource.url
     }
 
     const startTime = Date.now()

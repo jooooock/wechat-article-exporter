@@ -74,9 +74,9 @@
 <script setup lang="ts">
 import type {AccountInfo, AuthorInfo} from "~/types/types";
 import {Loader, ArrowRightLeft} from "lucide-vue-next";
-import {getAccountList, packHTMLAssets} from "~/utils";
+import {packHTMLAssets} from "~/utils";
 import {ACCOUNT_LIST_PAGE_SIZE, ACCOUNT_TYPE} from "~/config";
-import {authorInfo} from "~/apis";
+import {authorInfo, getAccountList} from "~/apis";
 
 
 const loginAccount = useLoginAccount()

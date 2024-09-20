@@ -57,7 +57,10 @@ async function batchDownload() {
   }
 
   phase.value = '下载文章内容'
-  await downloadArticleHTMLs(validArticles.value)
+  await downloadArticleHTMLs(validArticles.value.map(article => ({
+    title: article.title,
+    url: article.link,
+  })))
 
   phase.value = '打包'
   const zip = new JSZip()

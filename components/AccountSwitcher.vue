@@ -46,7 +46,7 @@
 import {ACCOUNT_LIST_PAGE_SIZE, ACCOUNT_TYPE} from "~/config";
 import {Loader} from "lucide-vue-next";
 import type {AccountInfo, AuthorInfo} from "~/types/types";
-import {getAccountList} from "~/utils";
+import {getAccountList} from "~/apis";
 import {authorInfo} from "~/apis";
 
 const loginAccount = useLoginAccount()

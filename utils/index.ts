@@ -1,18 +1,9 @@
 import dayjs from "dayjs";
 import JSZip from "jszip";
 import type {
-    AccountInfo,
-    AppMsgEx,
-    AppMsgExWithHTML,
-    AppMsgPublishResponse,
-    PublishInfo,
-    PublishPage,
-    SearchBizResponse
+    AppMsgExWithHTML, DownloadableArticle,
 } from "~/types/types";
-import {updateArticleCache} from "~/store/article";
-import {ARTICLE_LIST_PAGE_SIZE, ACCOUNT_LIST_PAGE_SIZE} from "~/config";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
-import {updateAPICache} from "~/store/api";
 import * as pool from '~/utils/pool'
 import mime from "mime";
 import {sleep} from "@antfu/utils";
@@ -97,11 +88,11 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
  * 批量下载文章 html
  * @param articles
  */
-export async function downloadArticleHTMLs(articles: AppMsgExWithHTML[]) {
+export async function downloadArticleHTMLs(articles: DownloadableArticle[]) {
     const parser = new DOMParser()
 
-    const htmlDownloadFn = async (article: AppMsgExWithHTML, proxy: string) => {
-        const fullHTML = await downloadAssetWithProxy<string>(article.link, proxy)
+    const htmlDownloadFn = async (article: DownloadableArticle, proxy: string) => {
+        const fullHTML = await downloadAssetWithProxy<string>(article.url, proxy)
 
         // 验证是否下载完整
         const document = parser.parseFromString(fullHTML, 'text/html')
@@ -273,113 +264,4 @@ ${pageContentHTML}
     zip.file('index.html', indexHTML)
 
     return zip
-}
-
-const loginAccount = useLoginAccount()
-
-/**
- * 获取文章列表
- * @param fakeid
- * @param token
- * @param begin
- * @param keyword
- */
-export async function getArticleList(fakeid: string, token: string, begin = 0, keyword = ''): Promise<[AppMsgEx[], boolean, number]> {
-    const resp = await $fetch<AppMsgPublishResponse>('/api/appmsgpublish', {
-        method: 'GET',
-        query: {
-            id: fakeid,
-            token: token,
-            begin: begin,
-            size: ARTICLE_LIST_PAGE_SIZE,
-            keyword: keyword,
-        },
-        retry: 0,
-    })
-
-    // 记录 api 调用
-    await updateAPICache({
-        name: 'appmsgpublish',
-        account: loginAccount.value.nick_name!,
-        call_time: new Date().getTime(),
-        is_normal: resp.base_resp.ret === 0 || resp.base_resp.ret === 200003,
-        payload: {
-            id: fakeid,
-            begin: begin,
-            size: ARTICLE_LIST_PAGE_SIZE,
-            keyword: keyword,
-        }
-    })
-
-    if (resp.base_resp.ret === 0) {
-        const publish_page: PublishPage = JSON.parse(resp.publish_page)
-        const publish_list = publish_page.publish_list.filter(item => !!item.publish_info)
-
-        // 返回的文章数量与请求的文章数量不一致就说明已结束
-        const isCompleted = publish_list.length !== ARTICLE_LIST_PAGE_SIZE
-
-        // 更新缓存，注意搜索的结果不能写入缓存
-        if (!keyword) {
-            try {
-                await updateArticleCache(publish_list, isCompleted, fakeid)
-            } catch (e) {
-                console.info('缓存失败')
-                console.error(e)
-            }
-        }
-
-        const articles = publish_list.flatMap(item => {
-            const publish_info: PublishInfo = JSON.parse(item.publish_info)
-            return publish_info.appmsgex
-        })
-        return [articles, isCompleted, publish_page.total_count]
-    } else if (resp.base_resp.ret === 200003) {
-        throw new Error('session expired')
-    } else {
-        throw new Error(`${resp.base_resp.ret}:${resp.base_resp.err_msg}`)
-    }
-}
-
-/**
- * 获取公众号列表
- * @param token
- * @param begin
- * @param keyword
- */
-export async function getAccountList(token: string, begin = 0, keyword = ''): Promise<[AccountInfo[], boolean]> {
-    const resp = await $fetch<SearchBizResponse>('/api/searchbiz', {
-        method: 'GET',
-        query: {
-            keyword: keyword,
-            begin: begin,
-            size: ACCOUNT_LIST_PAGE_SIZE,
-            token: token,
-        },
-        retry: 0,
-    })
-
-    // 记录 api 调用
-    await updateAPICache({
-        name: 'searchbiz',
-        account: loginAccount.value.nick_name!,
-        call_time: new Date().getTime(),
-        is_normal: resp.base_resp.ret === 0 || resp.base_resp.ret === 200003,
-        payload: {
-            begin: begin,
-            size: ACCOUNT_LIST_PAGE_SIZE,
-            keyword: keyword,
-        }
-    })
-
-    if (resp.base_resp.ret === 0) {
-        // 公众号判断是否结束的逻辑与文章不太一样
-        // 当第一页的结果就少于5个则结束，否则只有当搜索结果为空才表示结束
-        const isCompleted = begin === 0 ? resp.total < ACCOUNT_LIST_PAGE_SIZE : resp.total === 0
-
-        return [resp.list, isCompleted]
-    } else if (resp.base_resp.ret === 200003) {
-        throw new Error('session expired')
-    } else {
-        throw new Error(`${resp.base_resp.ret}:${resp.base_resp.err_msg}`)
-    }
 }
