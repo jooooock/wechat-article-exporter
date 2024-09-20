@@ -5,16 +5,16 @@
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
       <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
-        <li v-for="info in infos" :key="info.fakeid" class="relative px-4 pr-16 py-4"
-            :class="{'bg-slate-3': selectedAccount === info.fakeid}" @click="selectAccount(info)">
+        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4"
+            :class="{'bg-slate-3': selectedAccount === accountInfo.fakeid}" @click="toggleSelectedAccount(accountInfo)">
           <p>公众号:
-            <span v-if="info.nickname" class="text-xl font-medium">{{ info.nickname }}</span>
-            <span v-else></span>
+            <span v-if="accountInfo.nickname" class="text-xl font-medium">{{ accountInfo.nickname }}</span>
           </p>
-          <p>ID: <span class="font-mono">{{ info.fakeid }}</span></p>
-          <UBadge variant="subtle" color="red" class="absolute top-4 right-2">{{info.articles}}</UBadge>
+          <p>ID: <span class="font-mono">{{ accountInfo.fakeid }}</span></p>
+          <UBadge variant="subtle" color="red" class="absolute top-4 right-2">{{ accountInfo.articles }}</UBadge>
         </li>
       </ul>
+
       <main class="flex-1 h-full overflow-y-scroll">
         <div v-if="loading" class="flex justify-center items-center mt-5">
           <Loader :size="28" class="animate-spin text-slate-500"/>
@@ -56,25 +56,38 @@
 
               <USelect v-model="query.isOriginal" :options="originalOptions" color="blue"/>
 
+              <USelectMenu class="w-40" color="blue" v-model="query.albums" :options="articleAlbums" multiple
+                           placeholder="选择合集"/>
+
               <UButton color="gray" variant="solid" @click="search">搜索</UButton>
             </div>
             <div>
-              <UButton color="black" variant="solid" :disabled="selectedArticles.length === 0" @click="download">批量下载
+              <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
+                       :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="batchDownload">
+                <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
+                <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
+                  <span
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedArticles.length }}/{{ selectedArticles.length }}</span>
+                  <span
+                      v-if="batchDownloadPhase === '打包'">{{ batchPackedArticles.length }}/{{ batchDownloadedArticles.length }}</span>
+                </span>
+                <span v-else>批量下载</span>
               </UButton>
             </div>
           </div>
-          <table class="w-full border-collapse border rounded-md">
-            <thead class="sticky top-[40px] z-10 bg-white">
+          <table class="w-full border-collapse">
+            <thead class="sticky top-[40px] z-10 h-[40px] bg-white">
             <tr>
               <th>
                 <UCheckbox class="justify-center" :indeterminate="isIndeterminate" v-model="checkAll"
                            @change="onCheckAllChange" color="blue"/>
               </th>
-              <th>序号</th>
+              <th class="w-14">序号</th>
               <th>标题</th>
-              <th>发布日期</th>
+              <th class="w-52">发布日期</th>
               <th>作者</th>
-              <th>是否原创</th>
+              <th class="w-24">是否原创</th>
+              <th class="w-36">所属合集</th>
             </tr>
             </thead>
             <tbody>
@@ -88,12 +101,18 @@
               <td class="text-center">{{ article.author_name }}</td>
               <td class="text-center">{{ article.copyright_stat === 1 && article.copyright_type === 1 ? '原创' : '' }}
               </td>
+              <td>
+                <p class="flex flex-wrap">
+                  <span v-for="album in article.appmsg_album_infos" :key="album.id"
+                        class="text-blue-600 mr-2">#{{ album.title }}</span>
+                </p>
+              </td>
             </tr>
             </tbody>
           </table>
           <!-- 状态栏 -->
           <div class="sticky bottom-0 h-[40px] bg-white text-rose-500 flex items-center px-4">
-            共 {{displayedArticles.length}} 条有效数据，已选中 {{selectedArticles.length}} 条数据
+            共 {{ displayedArticles.length }} 条有效数据，已选中 {{ selectedArticles.length }} 条数据
           </div>
         </div>
       </main>
@@ -109,33 +128,37 @@ import {formatTimeStamp} from "~/utils";
 import {Loader} from "lucide-vue-next";
 import {sleep} from "@antfu/utils";
 import {type Duration, format, isSameDay, sub} from 'date-fns'
+import useBatchDownload from "~/composables/useBatchDownload";
+
 
 interface Article extends AppMsgEx {
   checked: boolean
   display: boolean
 }
 
-const date = ref(new Date())
-
 useHead({
   title: '数据导出 | 微信公众号文章导出'
-});
+})
 
-const infos = await getAllInfo()
+// 已缓存的公众号信息
+const cachedAccountInfos = await getAllInfo()
 const selectedAccount = ref('')
+const selectedAccountName = ref('')
+
+async function toggleSelectedAccount(info: Info) {
+  if (info.fakeid !== selectedAccount.value) {
+    selectedAccount.value = info.fakeid
+    selectedAccountName.value = info.nickname || info.fakeid
+    switchTableData(info.fakeid).catch(() => {
+    })
+  }
+}
+
 const articles = reactive<Article[]>([])
 const loading = ref(false)
 
 const checkAll = ref(false)
 const isIndeterminate = ref(false)
-
-async function selectAccount(info: Info) {
-  if (info.fakeid !== selectedAccount.value) {
-    selectedAccount.value = info.fakeid
-    switchTableData(info.fakeid).catch(() => {
-    })
-  }
-}
 
 const displayedArticles = computed(() => {
   return articles.filter(article => article.display)
@@ -169,7 +192,7 @@ async function switchTableData(fakeid: string) {
   }
 }
 
-function maxLen(text: string, max = 35): string {
+function maxLen(text: string, max = 45): string {
   if (text.length > max) {
     return text.slice(0, max) + '...'
   }
@@ -194,7 +217,7 @@ function toggleArticleCheck(article: Article) {
   }
 }
 
-function onCheckAllChange(evt: InputEvent) {
+function onCheckAllChange() {
   if (checkAll.value) {
     articles.forEach(article => {
       article.checked = true
@@ -210,6 +233,9 @@ function onCheckAllChange(evt: InputEvent) {
 
 const articleAuthors = computed(() => {
   return [...new Set(articles.map(article => article.author_name).filter(author => !!author))]
+})
+const articleAlbums = computed(() => {
+  return [...new Set(articles.flatMap(article => article.appmsg_album_infos).map(album => album.title))]
 })
 
 function isRangeSelected(duration: Duration) {
@@ -238,6 +264,7 @@ interface ArticleQuery {
   dateRange: { start: Date, end: Date }
   authors: string[]
   isOriginal: '原创' | '非原创' | '所有'
+  albums: string[]
 }
 
 const query = reactive<ArticleQuery>({
@@ -245,6 +272,7 @@ const query = reactive<ArticleQuery>({
   dateRange: {start: sub(new Date(), {days: 14}), end: new Date()},
   authors: [],
   isOriginal: '所有',
+  albums: [],
 })
 
 function search() {
@@ -270,27 +298,45 @@ function search() {
     if (new Date(article.update_time * 1000) < query.dateRange.start || new Date(article.update_time * 1000) > query.dateRange.end) {
       article.display = false
     }
+    if (query.albums.length > 0 && article.appmsg_album_infos.every(album => !query.albums.includes(album.title))) {
+      article.display = false
+    }
   })
 }
 
-function download() {
-  alert('敬请期待')
-}
+const {
+  loading: batchDownloadLoading,
+  phase: batchDownloadPhase,
+  downloadedArticles: batchDownloadedArticles,
+  packedArticles: batchPackedArticles,
+  download: batchDownload,
+} = useBatchDownload(selectedArticles, selectedAccountName)
 </script>
 
 <style scoped>
-table {
-  border-collapse: collapse;
-}
-
 table th {
   padding: 0.5rem 0.25rem;
 }
 
-table th,
+
 table td {
   border: 1px solid #00002d17;
   padding: 0.25rem 0.5rem;
+}
+
+td:first-child,
+th:first-child {
+  border-left: none;
+}
+
+td:last-child,
+th:last-child {
+  border-right: none;
+}
+
+th {
+  border: 1px solid #00002d17;
+  border-top: none;
 }
 
 tr:nth-child(even) {
