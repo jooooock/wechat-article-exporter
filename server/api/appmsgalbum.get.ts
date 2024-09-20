@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     const isReverse = query.is_reverse || '0'
     const begin_msgid = query.begin_msgid
     const begin_itemidx = query.begin_itemidx
-    const count: number = query.count || 10
+    const count: number = query.count || 20
 
 
     const params: Record<string, string | number | undefined> = {

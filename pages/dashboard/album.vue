@@ -168,7 +168,8 @@ function toggleReverse() {
   isReverse.value = !isReverse.value
 
   albumArticles.length = 0
-  if (parseInt(albumBaseInfo.value!.article_count) <= 10) {
+  noMoreData.value = false
+  if (parseInt(albumBaseInfo.value!.article_count) <= 20) {
     loadMoreData()
   }
 }
