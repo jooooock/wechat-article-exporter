@@ -6,8 +6,8 @@ interface RequestOptions {
     event: H3Event
     endpoint: string
     method: Method
-    query?: Record<string, string | number>
-    body?: Record<string, string | number>
+    query?: Record<string, string | number | undefined>
+    body?: Record<string, string | number | undefined>
     parseJson?: boolean
     withCredentials?: boolean
 }

@@ -34,8 +34,8 @@
         <div id="title"></div>
 
         <div class="hidden md:flex items-center gap-4">
+          <NuxtLink to="/" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">旧版UI</NuxtLink>
           <a href="https://github.com/jooooock/wechat-article-exporter/blob/master/docs/faq.md" target="_blank" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
-<!--            <CircleHelp :size="18"/>-->
             <span class="inline-flex items-center justify-center gap-1 truncate visible">FAQ</span>
           </a>
           <a href="https://github.com/jooooock/wechat-article-exporter/issues/new" target="_blank" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
@@ -68,6 +68,6 @@ const items = ref([
   {name: '合集下载', icon: Album, href: '/dashboard/album'},
   {name: '缓存分析', icon: ChartNoAxesCombined, href: '/dashboard/analytics'},
   {name: 'Cookie设置', icon: Cookie, href: '/dashboard/cookie'},
-  {name: '代理使用量', icon: Globe, href: '/dashboard/proxy'},
+  {name: '代理使用额度', icon: Globe, href: '/dashboard/proxy'},
 ])
 </script>
