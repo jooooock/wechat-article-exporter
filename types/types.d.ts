@@ -169,6 +169,7 @@ export type AppMsgExWithHTML = AppMsgEx & {
 export interface DownloadableArticle {
     title: string
     url: string
+    date: number
     html?: string
     packed?: boolean
 }

@@ -63,13 +63,13 @@
             </div>
             <div>
               <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
-                       :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="batchDownload">
+                       :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="batchDownload(selectedArticles, selectedAccountName)">
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
-                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedArticles.length }}/{{ selectedArticles.length }}</span>
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ selectedArticles.length }}</span>
                   <span
-                      v-if="batchDownloadPhase === '打包'">{{ batchPackedArticles.length }}/{{ batchDownloadedArticles.length }}</span>
+                      v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
                 <span v-else>批量下载</span>
               </UButton>
@@ -112,7 +112,7 @@
           </table>
           <!-- 状态栏 -->
           <div class="sticky bottom-0 h-[40px] bg-white text-rose-500 flex items-center px-4">
-            共 {{ displayedArticles.length }} 条有效数据，已选中 {{ selectedArticles.length }} 条数据
+            共 {{ displayedArticles.length }} 条有效数据和 {{deletedArticlesCount}} 条删除数据(已隐藏)，已选中 {{ selectedArticles.length }} 条数据
           </div>
         </div>
       </main>
@@ -166,6 +166,7 @@ const displayedArticles = computed(() => {
 const selectedArticles = computed(() => {
   return articles.filter(article => article.checked && article.display)
 })
+const deletedArticlesCount = ref(0)
 
 async function switchTableData(fakeid: string) {
   checkAll.value = false
@@ -174,6 +175,7 @@ async function switchTableData(fakeid: string) {
   loading.value = true
   articles.length = 0
   const data = await getArticleCache(fakeid, Date.now())
+  deletedArticlesCount.value = data.filter(article => article.is_deleted).length
   articles.push(...data.filter(article => !article.is_deleted).map(article => ({
     ...article,
     checked: false,
@@ -307,10 +309,10 @@ function search() {
 const {
   loading: batchDownloadLoading,
   phase: batchDownloadPhase,
-  downloadedArticles: batchDownloadedArticles,
-  packedArticles: batchPackedArticles,
+  downloadedCount: batchDownloadedCount,
+  packedCount: batchPackedCount,
   download: batchDownload,
-} = useBatchDownload(selectedArticles, selectedAccountName)
+} = useBatchDownload()
 </script>
 
 <style scoped>

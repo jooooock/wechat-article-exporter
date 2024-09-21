@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { Newspaper, Download, ChartNoAxesCombined, Cookie, MessageCircleQuestion, Globe, Album } from 'lucide-vue-next';
+import { Newspaper, Download, ChartNoAxesCombined, Cookie, MessageCircleQuestion, Globe, Album, Settings } from 'lucide-vue-next';
 
 definePageMeta({
   layout: false
@@ -67,7 +67,7 @@ const items = ref([
   {name: '数据导出', icon: Download, href: '/dashboard/download'},
   {name: '合集下载', icon: Album, href: '/dashboard/album'},
   {name: '缓存分析', icon: ChartNoAxesCombined, href: '/dashboard/analytics'},
-  {name: 'Cookie设置', icon: Cookie, href: '/dashboard/cookie'},
   {name: '代理使用额度', icon: Globe, href: '/dashboard/proxy'},
+  {name: '设置', icon: Settings, href: '/dashboard/settings'},
 ])
 </script>

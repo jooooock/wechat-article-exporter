@@ -55,13 +55,13 @@
               </div>
 
               <UButton color="black" variant="solid" class="absolute right-5 top-2 disabled:bg-slate-4 disabled:text-slate-12"
-                       :disabled="albumArticles.length === 0 || batchDownloadLoading" @click="batchDownload">
+                       :disabled="albumArticles.length === 0 || batchDownloadLoading" @click="batchDownload(albumArticles, downloadFileName)">
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
-                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedArticles.length }}/{{ albumArticles.length }}</span>
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ albumArticles.length }}</span>
                   <span
-                      v-if="batchDownloadPhase === '打包'">{{ batchPackedArticles.length }}/{{ batchDownloadedArticles.length }}</span>
+                      v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
                 <span v-else>批量下载</span>
               </UButton>
@@ -236,10 +236,10 @@ function onElementVisibility(visible: boolean) {
 const {
   loading: batchDownloadLoading,
   phase: batchDownloadPhase,
-  downloadedArticles: batchDownloadedArticles,
-  packedArticles: batchPackedArticles,
+  downloadedCount: batchDownloadedCount,
+  packedCount: batchPackedCount,
   download: batchDownload,
-} = useDownloadAlbum(albumArticles, downloadFileName)
+} = useDownloadAlbum()
 </script>
 
 <style scoped>

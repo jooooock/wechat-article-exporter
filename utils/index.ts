@@ -87,9 +87,11 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
 /**
  * 批量下载文章 html
  * @param articles
+ * @param callback
  */
-export async function downloadArticleHTMLs(articles: DownloadableArticle[]) {
+export async function downloadArticleHTMLs(articles: DownloadableArticle[], callback: (count: number) => void) {
     const parser = new DOMParser()
+    const results: DownloadableArticle[] = []
 
     const htmlDownloadFn = async (article: DownloadableArticle, proxy: string) => {
         const fullHTML = await downloadAssetWithProxy<string>(article.url, proxy)
@@ -105,6 +107,8 @@ export async function downloadArticleHTMLs(articles: DownloadableArticle[]) {
         }
 
         article.html = fullHTML
+        results.push(article)
+        callback(results.length)
         await sleep(2000)
 
         return new Blob([fullHTML]).size
@@ -113,6 +117,8 @@ export async function downloadArticleHTMLs(articles: DownloadableArticle[]) {
     await measureExecutionTime('html下载结果:', async () => {
         return  await pool.downloads(articles, htmlDownloadFn)
     })
+
+    return results
 }
 
 /**
