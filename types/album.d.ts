@@ -32,7 +32,7 @@ export interface BaseInfo {
 
 export interface ArticleItem {
     cover_img_1_1: string
-    cover_theme_color: RGB
+    cover_theme_color?: RGB
     create_time: string
     is_pay_subscribe: BooleanString
     is_read: BooleanString
@@ -46,13 +46,9 @@ export interface ArticleItem {
     url: string
     user_read_status: string
 }
-export interface ArticleItemWithHtml extends ArticleItem {
-    html?: string
-    packed?: boolean
-}
 
 export interface GetAlbumResp {
-    article_list: ArticleItem[]
+    article_list: ArticleItem[] | ArticleItem
     base_info: BaseInfo
     continue_flag: BooleanString
     is_pay_subscribe: BooleanString

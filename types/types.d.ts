@@ -161,11 +161,6 @@ export interface AppMsgEx {
     update_time: number
 }
 
-export type AppMsgExWithHTML = AppMsgEx & {
-    html?: string
-    packed?: boolean
-};
-
 export interface DownloadableArticle {
     title: string
     url: string

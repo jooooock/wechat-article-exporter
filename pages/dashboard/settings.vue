@@ -3,8 +3,16 @@
     <Teleport defer to="#title">
       <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">设置</h1>
     </Teleport>
-    <div class="px-6 py-4 flex-1 overflow-scroll">
-      <UCard>
+    <div class="flex-1 overflow-scroll">
+      <div class="sticky top-0 z-50 pt-4 px-4 mb-4 bg-white">
+        <UAlert
+            icon="i-heroicons-shield-check"
+            description="为了保护您的安全，所有设置均保存在本地，不会上传给后台及任何第三方，请放心使用。"
+            class="flex-shrink-0 text-green-500"
+        />
+      </div>
+
+      <UCard class="mx-4">
         <template #header>
           <h3 class="text-2xl font-semibold">Cookie</h3>
         </template>

@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-col h-full">
     <Teleport defer to="#title">
-      <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">合集下载 <span class="text-sm text-slate-10">合集数据来自于已缓存文章</span>
-      </h1>
+      <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">合集下载</h1>
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
 
@@ -21,12 +20,19 @@
         </li>
       </ul>
 
-      <ul v-if="selectedAccount" class="flex flex-col h-full w-72 overflow-y-scroll divide-y">
-        <li v-for="(album, index) in selectedAccount.albums" :key="album.id" class="p-4"
-            :class="{'bg-slate-3': selectedAlbum?.id === album.id}" @click="toggleSelectedAlbum(album)">
-          {{ index + 1 }}. {{ album.title }}
-        </li>
-      </ul>
+      <div class="flex flex-col h-full w-72 overflow-y-scroll">
+        <UAlert
+            icon="i-heroicons-bell"
+            description="此数据来自于已缓存文章，如果没有想要的合集，请至少缓存一篇该合集下的文章。"
+            class="sticky top-0 flex-shrink-0 text-rose-500"
+        />
+        <ul v-if="selectedAccount" class="divide-y">
+          <li v-for="(album, index) in selectedAccount.albums" :key="album.id" class="p-4"
+              :class="{'bg-slate-3': selectedAlbum?.id === album.id}" @click="toggleSelectedAlbum(album)">
+            {{ index + 1 }}. {{ album.title }}
+          </li>
+        </ul>
+      </div>
 
       <main class="flex-1 h-full overflow-y-scroll bg-[#ededed]" v-if="selectedAccount && selectedAlbum">
         <div v-if="albumLoading" class="flex justify-center items-center mt-5">
@@ -37,25 +43,13 @@
           <div class="px-5 pt-7 pb-14 banner">
             <h2 class="text-2xl text-white font-bold"># {{ albumBaseInfo.title }}</h2>
           </div>
+          <!-- 内容区 -->
           <div class="relative rounded-xl -mt-4 z-50 bg-white px-4 py-6">
-            <!-- 头部信息 -->
-            <div class="pb-10">
-              <p class="flex items-center space-x-2 mb-2">
-                <img class="size-5" :src="albumBaseInfo.brand_icon" alt="">
-                <span>{{ albumBaseInfo.nickname }}</span>
-              </p>
-              <p class="text-sm text-slate-10">
-                <span>{{ albumBaseInfo.article_count }}篇内容</span>
-                <span v-if="albumBaseInfo.description"> · {{ albumBaseInfo.description }}</span>
-              </p>
-              <div class="flex mt-8 space-x-2 w-fit" @click="toggleReverse">
-                <ArrowUpNarrowWide v-if="isReverse" />
-                <ArrowDownNarrowWide v-else />
-                <span>{{isReverse ? '倒序' : '正序'}}</span>
-              </div>
-
-              <UButton color="black" variant="solid" class="absolute right-5 top-2 disabled:bg-slate-4 disabled:text-slate-12"
-                       :disabled="albumArticles.length === 0 || batchDownloadLoading" @click="batchDownload(albumArticles, downloadFileName)">
+            <!-- 按钮操作区 -->
+            <div class="absolute right-5 top-2 flex justify-end space-x-2">
+              <NuxtLink :to="originalAlbumURL" target="_blank" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">跳转到原始链接</NuxtLink>
+              <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
+                       :disabled="albumArticles.length === 0 || batchDownloadLoading" @click="doBatchDownload">
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
@@ -67,6 +61,27 @@
               </UButton>
             </div>
 
+            <!-- 头部信息 -->
+            <div>
+              <p class="flex items-center space-x-2 mb-2">
+                <img class="size-5" :src="albumBaseInfo.brand_icon" alt="">
+                <span>{{ albumBaseInfo.nickname }}</span>
+              </p>
+              <p class="text-sm text-slate-10">
+                <span>{{ albumBaseInfo.article_count }}篇内容</span>
+                <span v-if="albumBaseInfo.description"> · {{ albumBaseInfo.description }}</span>
+              </p>
+
+              <div class="pt-8 pb-6">
+                <Loader v-if="switchSortLoading" :size="24" class="animate-spin text-slate-500"/>
+                <div v-else class="flex space-x-2 w-fit" @click="toggleReverse">
+                  <ArrowUpNarrowWide v-if="isReverse" />
+                  <ArrowDownNarrowWide v-else />
+                  <span>{{isReverse ? '倒序' : '正序'}}</span>
+                </div>
+              </div>
+            </div>
+
             <!-- 文章列表 -->
             <ul class="divide-y">
               <li class="flex justify-between items-center py-5 px-1" v-for="article in albumArticles"
@@ -76,7 +91,7 @@
                     <span v-if="article.pos_num">{{ article.pos_num }}. </span>
                     <span>{{ article.title }}</span>
                   </h3>
-                  <time class="text-sm text-slate-10">{{ article.create_time }}</time>
+                  <time class="text-sm text-slate-10">{{ formatAlbumTime(+article.create_time) }}</time>
                 </div>
                 <img class="size-16 ml-4 flex-shrink-0" :src="article.cover_img_1_1" alt="">
               </li>
@@ -96,12 +111,13 @@
 <script setup lang="ts">
 import {getAllInfo, type Info} from "~/store/info";
 import {getArticleCache} from "~/store/article";
-import type {AppMsgAlbumInfo} from "~/types/types";
+import type {AppMsgAlbumInfo, DownloadableArticle} from "~/types/types";
 import {Loader} from "lucide-vue-next";
 import type {AppMsgAlbumResult, ArticleItem, BaseInfo} from "~/types/album";
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-vue-next';
 import {vElementVisibility} from "@vueuse/components"
 import {useDownloadAlbum} from '~/composables/useBatchDownload'
+import {formatAlbumTime} from "~/utils/album";
 
 
 useHead({
@@ -157,6 +173,13 @@ async function getAllAlbums(fakeid: string) {
   return albums
 }
 
+// 合集的原始地址
+const originalAlbumURL = computed(() => {
+  if (selectedAccount.value && selectedAlbum.value) {
+    return `https://mp.weixin.qq.com/mp/appmsgalbum?__biz=${selectedAccount.value.fakeid}&action=getalbum&album_id=${selectedAlbum.value.id}`
+  }
+  return ''
+})
 
 const albumArticles: ArticleItem[] = reactive([])
 const albumBaseInfo = ref<BaseInfo | null>(null)
@@ -164,12 +187,15 @@ const albumBaseInfo = ref<BaseInfo | null>(null)
 const isReverse = ref(false)
 const albumLoading = ref(false)
 const articleLoading = ref(false)
-
+const switchSortLoading = ref(false)
 
 // 加载合集第一页数据
-async function getFirstPageAlbumData() {
-  albumLoading.value = true
-  albumArticles.length = 0
+async function getFirstPageAlbumData(refreshPage = true) {
+  if (refreshPage) {
+    albumLoading.value = true
+  } else {
+    switchSortLoading.value = true
+  }
 
   const data = await $fetch<AppMsgAlbumResult>('/api/appmsgalbum', {
     method: 'GET',
@@ -179,11 +205,21 @@ async function getFirstPageAlbumData() {
       is_reverse: isReverse.value ? '1' : '0',
     }
   })
-  albumLoading.value = false
 
+  if (refreshPage) {
+    albumLoading.value = false
+  } else {
+    switchSortLoading.value = false
+  }
+
+  albumArticles.length = 0
   if (data.base_resp.ret === 0) {
     albumBaseInfo.value = data.getalbum_resp.base_info
-    albumArticles.push(...data.getalbum_resp.article_list)
+    if (Array.isArray(data.getalbum_resp.article_list)) {
+      albumArticles.push(...data.getalbum_resp.article_list)
+    } else {
+      albumArticles.push(data.getalbum_resp.article_list)
+    }
     noMoreData.value = data.getalbum_resp.continue_flag === '0'
   }
 }
@@ -192,11 +228,7 @@ async function getFirstPageAlbumData() {
 function toggleReverse() {
   isReverse.value = !isReverse.value
 
-  albumArticles.length = 0
-  noMoreData.value = false
-  if (parseInt(albumBaseInfo.value!.article_count) <= 20) {
-    loadMoreData()
-  }
+  getFirstPageAlbumData(false)
 }
 
 // 加载合集后续数据
@@ -217,7 +249,11 @@ async function loadMoreData() {
   articleLoading.value = false
 
   if (data.base_resp.ret === 0) {
-    albumArticles.push(...data.getalbum_resp.article_list)
+    if (Array.isArray(data.getalbum_resp.article_list)) {
+      albumArticles.push(...data.getalbum_resp.article_list)
+    } else {
+      albumArticles.push(data.getalbum_resp.article_list)
+    }
     noMoreData.value = data.getalbum_resp.continue_flag === '0'
   }
 }
@@ -240,6 +276,15 @@ const {
   packedCount: batchPackedCount,
   download: batchDownload,
 } = useDownloadAlbum()
+function doBatchDownload() {
+  const articles: DownloadableArticle[] = albumArticles.map(article => ({
+    title: article.title,
+    url: article.url,
+    date: +article.create_time,
+  }))
+  const filename = downloadFileName.value
+  batchDownload(articles, filename)
+}
 </script>
 
 <style scoped>

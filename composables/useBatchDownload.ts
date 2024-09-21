@@ -1,10 +1,9 @@
-import type {AppMsgExWithHTML} from "~/types/types";
-import {downloadArticleHTMLs, packHTMLAssets} from "~/utils";
 import JSZip from "jszip";
 import {saveAs} from "file-saver";
+import {format} from 'date-fns';
+import {downloadArticleHTMLs, packHTMLAssets} from "~/utils";
 import {uploadProxy} from "~/store/proxy";
-import {format} from 'date-fns'
-import type {ArticleItemWithHtml} from "~/types/album";
+import type {DownloadableArticle} from "~/types/types";
 
 
 /**
@@ -18,15 +17,11 @@ export function useBatchDownload() {
     const downloadedCount = ref(0)
     const packedCount = ref(0)
 
-    async function download(articles: AppMsgExWithHTML[], filename: string) {
+    async function download(articles: DownloadableArticle[], filename: string) {
         loading.value = true
 
         phase.value = '下载文章内容'
-        const results = await downloadArticleHTMLs(articles.map(article => ({
-            title: article.title,
-            url: article.link,
-            date: +article.update_time,
-        })), (count: number) => {
+        const results = await downloadArticleHTMLs(articles, (count: number) => {
             downloadedCount.value = count
         })
 
@@ -68,15 +63,11 @@ export function useDownloadAlbum() {
     const downloadedCount = ref(0)
     const packedCount = ref(0)
 
-    async function download(articles: ArticleItemWithHtml[], filename: string) {
+    async function download(articles: DownloadableArticle[], filename: string) {
         loading.value = true
 
         phase.value = '下载文章内容'
-        const results = await downloadArticleHTMLs(articles.map(article => ({
-            title: article.title,
-            url: article.url,
-            date: +article.create_time,
-        })), (count: number) => {
+        const results = await downloadArticleHTMLs(articles, (count: number) => {
             downloadedCount.value = count
         })
 

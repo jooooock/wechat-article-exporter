@@ -63,7 +63,7 @@
             </div>
             <div>
               <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
-                       :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="batchDownload(selectedArticles, selectedAccountName)">
+                       :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="doBatchDownload">
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
@@ -123,7 +123,7 @@
 <script setup lang="ts">
 import {getAllInfo, type Info} from '~/store/info'
 import {getArticleCache} from "~/store/article";
-import type {AppMsgEx} from "~/types/types";
+import type {AppMsgEx, DownloadableArticle} from "~/types/types";
 import {formatTimeStamp} from "~/utils";
 import {Loader} from "lucide-vue-next";
 import {sleep} from "@antfu/utils";
@@ -313,6 +313,15 @@ const {
   packedCount: batchPackedCount,
   download: batchDownload,
 } = useBatchDownload()
+function doBatchDownload() {
+  const articles: DownloadableArticle[] = selectedArticles.value.map(article => ({
+    title: article.title,
+    url: article.link,
+    date: +article.update_time,
+  }))
+  const filename = selectedAccountName.value
+  batchDownload(articles, filename)
+}
 </script>
 
 <style scoped>
