@@ -53,7 +53,7 @@
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
-                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ albumArticles.length }}</span>
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ selectedArticleCount }}</span>
                   <span
                       v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
@@ -276,12 +276,14 @@ const {
   packedCount: batchPackedCount,
   download: batchDownload,
 } = useDownloadAlbum()
+const selectedArticleCount = ref(0)
 function doBatchDownload() {
   const articles: DownloadableArticle[] = albumArticles.map(article => ({
     title: article.title,
     url: article.url,
     date: +article.create_time,
   }))
+  selectedArticleCount.value = articles.length
   const filename = downloadFileName.value
   batchDownload(articles, filename)
 }

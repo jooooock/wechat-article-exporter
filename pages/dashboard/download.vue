@@ -67,7 +67,7 @@
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
-                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ selectedArticles.length }}</span>
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ selectedArticleCount }}</span>
                   <span
                       v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
@@ -111,8 +111,9 @@
             </tbody>
           </table>
           <!-- 状态栏 -->
-          <div class="sticky bottom-0 h-[40px] bg-white text-rose-500 flex items-center px-4">
-            共 {{ displayedArticles.length }} 条有效数据和 {{deletedArticlesCount}} 条删除数据(已隐藏)，已选中 {{ selectedArticles.length }} 条数据
+          <div class="sticky bottom-0 h-[40px] bg-white flex items-center px-4 space-x-10 border-t-2 font-mono">
+            <span class="text-green-500">已选 {{ selectedArticles.length }} / {{ displayedArticles.length }}</span>
+            <span class="text-rose-300" v-if="deletedArticlesCount > 0">已隐藏 {{deletedArticlesCount}} 条删除文章</span>
           </div>
         </div>
       </main>
@@ -313,12 +314,14 @@ const {
   packedCount: batchPackedCount,
   download: batchDownload,
 } = useBatchDownload()
+const selectedArticleCount = ref(0)
 function doBatchDownload() {
   const articles: DownloadableArticle[] = selectedArticles.value.map(article => ({
     title: article.title,
     url: article.link,
     date: +article.update_time,
   }))
+  selectedArticleCount.value = articles.length
   const filename = selectedAccountName.value
   batchDownload(articles, filename)
 }
