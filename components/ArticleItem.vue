@@ -77,6 +77,10 @@ async function download(link: string, title: string) {
   try {
     downloading.value = true
 
+    // 去掉 title 中的高亮html
+    const re = /<em class="highlight">(?<content>.+?)<\/em>/g
+    title = title.replace(re, '$<content>')
+
     const fullHTML = await downloadArticleHTML(link)
     const zip = await packHTMLAssets(fullHTML, title)
 
