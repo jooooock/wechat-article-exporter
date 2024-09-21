@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import type {BizLoginResult, LoginInfoResult, ScanLoginResult, StartLoginResult} from "~/types/types";
+import type {BizLoginResult, ScanLoginResult, StartLoginResult} from "~/types/types";
 
 
 const qrcodeSrc = ref('')
@@ -236,6 +236,12 @@ async function bizLogin() {
   const result = await $fetch<BizLoginResult>('/api/login/bizlogin', {
     method: 'POST'
   })
+  const cookie = document.cookie.split(';').map(v => v.trim()).find(cookie => cookie.startsWith('token-expire='))
+  if (cookie) {
+    const expire = cookie.split('=')[1]
+    localStorage.setItem('token-expire', expire)
+  }
+
   // /cgi-bin/home?t=home/index&lang=zh_CN&token=1416430543
   const _token = new URL(`http://localhost${result.redirect_url}`).searchParams.get('token')
   if (_token) {

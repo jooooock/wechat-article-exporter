@@ -24,6 +24,10 @@
             </li>
           </ul>
         </nav>
+        <div class="mb-4 text-sm">
+          <p>token过期时间还剩:</p>
+          <p class="font-mono" :class="warning ? 'text-rose-500' : 'text-green-500'">{{distance}}</p>
+        </div>
         <button class="font-semibold inline-flex items-center border select-none text-slate-11 hover:bg-slate-5 text-sm h-8 px-3 rounded-md">
           <span>jock</span>
         </button>
@@ -57,6 +61,8 @@
 
 <script setup lang="ts">
 import { Newspaper, Download, ChartNoAxesCombined, Cookie, MessageCircleQuestion, Globe, Album, Settings } from 'lucide-vue-next';
+import { formatDistance } from "date-fns";
+
 
 definePageMeta({
   layout: false
@@ -70,4 +76,71 @@ const items = ref([
   {name: '代理使用额度', icon: Globe, href: '/dashboard/proxy'},
   {name: '设置', icon: Settings, href: '/dashboard/settings'},
 ])
+
+const expire = localStorage.getItem('token-expire')!
+const now = ref(new Date())
+const distance = computed(() => {
+  return formatDistance(new Date(expire), now.value, {
+    includeSeconds: true,
+    locale: {
+      formatDistance: function (token, count, options) {
+        if (now.value >= new Date(expire)) {
+          window.clearInterval(timer)
+          return '已过期'
+        }
+
+        switch (token) {
+          case "aboutXHours":
+            return '大约' + count + '个小时'
+          case "aboutXMonths":
+            return '大约' + count + '个月'
+          case "aboutXWeeks":
+            return '大约' + count + '周'
+          case "aboutXYears":
+            return '大约' + count + '年'
+          case "lessThanXMinutes":
+            return '小于' + count + '分钟'
+          case "almostXYears":
+            return '接近' + count + '年'
+          case "halfAMinute":
+            return '半分钟'
+          case "lessThanXSeconds":
+            return '小于' + count + '秒'
+          case "overXYears":
+            return '超过' + count + '年'
+          case "xDays":
+            return count + '天'
+          case "xHours":
+            return count + '个小时'
+          case "xMinutes":
+            return count + '分钟'
+          case "xMonths":
+            return count + '个月'
+          case "xSeconds":
+            return count + '秒'
+          case "xWeeks":
+            return count + '周'
+          case "xYears":
+            return count + '年'
+          default:
+            return 'unknown'
+        }
+      }
+    },
+  })
+})
+const warning = computed(() => {
+  const value = distance.value
+  return value === '已过期' || value.includes('分钟') || value.includes('秒')
+})
+
+let timer: number
+onMounted(() => {
+  timer = window.setInterval(() => {
+    now.value = new Date()
+  }, 1000)
+})
+onUnmounted(() => {
+  window.clearInterval(timer)
+})
 </script>

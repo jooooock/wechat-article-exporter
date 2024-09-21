@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         ajax: 1,
     }
 
-    return proxyMpRequest({
+    const response: Response = await proxyMpRequest({
         event: event,
         method: 'POST',
         endpoint: 'https://mp.weixin.qq.com/cgi-bin/bizlogin',
@@ -23,4 +23,19 @@ export default defineEventHandler(async (event) => {
         },
         body: body,
     })
+
+    const headers = new Headers(response.headers)
+
+    const cookies = response.headers.getSetCookie()
+    const cookie = cookies.find(cookie => cookie.includes('slave_sid='))
+    if (cookie) {
+        const parts = cookie.split(';').map(v => v.trim())
+        const expirePart = parts.find(part => part.startsWith('Expires='))
+        if (expirePart) {
+            const expire = expirePart.split('=')[1]
+            headers.append('Set-Cookie', `token-expire=${expire};path=/`)
+        }
+    }
+
+    return new Response(response.body, {headers: headers})
 })
