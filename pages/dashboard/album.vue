@@ -6,7 +6,7 @@
     <div class="flex flex-1 overflow-hidden">
 
       <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
-        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4"
+        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
             :class="{'bg-slate-3': selectedAccount?.fakeid === accountInfo.fakeid}"
             @click="toggleSelectedAccount(accountInfo)">
           <p>公众号:
@@ -14,7 +14,7 @@
           </p>
           <p>ID: <span class="font-mono">{{ accountInfo.fakeid }}</span></p>
           <UBadge variant="subtle" color="red" class="absolute top-4 right-2">
-            <Loader v-if="!accountInfo.albums" :size="28" class="animate-spin text-slate-500"/>
+            <Loader v-if="!accountInfo.albums" :size="16" class="animate-spin text-slate-500"/>
             <span v-else>{{ accountInfo.albums.length }}</span>
           </UBadge>
         </li>
@@ -27,7 +27,7 @@
             class="sticky top-0 flex-shrink-0 text-rose-500"
         />
         <ul v-if="selectedAccount" class="divide-y">
-          <li v-for="(album, index) in selectedAccount.albums" :key="album.id" class="p-4"
+          <li v-for="(album, index) in selectedAccount.albums" :key="album.id" class="p-4 hover:bg-slate-3 hover:cursor-pointer transition"
               :class="{'bg-slate-3': selectedAlbum?.id === album.id}" @click="toggleSelectedAlbum(album)">
             {{ index + 1 }}. {{ album.title }}
           </li>
@@ -264,7 +264,7 @@ const bottomElementIsVisible = ref(false)
 
 function onElementVisibility(visible: boolean) {
   bottomElementIsVisible.value = visible
-  if (visible && !noMoreData.value) {
+  if (visible && !noMoreData.value && !articleLoading.value) {
     loadMoreData()
   }
 }
