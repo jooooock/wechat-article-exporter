@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import type {BizLoginResult, ScanLoginResult, StartLoginResult} from "~/types/types";
+import type {LoginAccount, ScanLoginResult, StartLoginResult} from "~/types/types";
 
 
 const qrcodeSrc = ref('')
@@ -117,6 +117,7 @@ const sessionid = new Date().getTime().toString() + Math.floor(Math.random() * 1
 const hasStartLogin = ref(false)
 
 const loginAccount = useLoginAccount()
+const activeAccount = useActiveAccount()
 
 
 useHead({
@@ -233,21 +234,24 @@ async function checkQrcode() {
 }
 
 async function bizLogin() {
-  const result = await $fetch<BizLoginResult>('/api/login/bizlogin', {
+  const result = await $fetch<LoginAccount>('/api/login/bizlogin', {
     method: 'POST'
   })
-  const cookie = document.cookie.split(';').map(v => v.trim()).find(cookie => cookie.startsWith('token-expire='))
-  if (cookie) {
-    const expire = cookie.split('=')[1]
-    localStorage.setItem('token-expire', expire)
-  }
 
-  // /cgi-bin/home?t=home/index&lang=zh_CN&token=1416430543
-  const _token = new URL(`http://localhost${result.redirect_url}`).searchParams.get('token')
-  if (_token) {
+  if (result.token) {
     console.log('登录成功')
-    loginAccount.value = {
-      token: _token,
+    loginAccount.value = result
+
+    if (!activeAccount.value) {
+      activeAccount.value = {
+        type: 'account',
+        fakeid: result.fakeid,
+        nickname: result.nickname,
+        round_head_img: result.avatar,
+        service_type: 1,
+        alias: '',
+        signature: '',
+      }
     }
 
     navigateTo('/', {replace: true})

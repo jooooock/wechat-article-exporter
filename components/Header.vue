@@ -22,8 +22,8 @@
       </a>
     </div>
     <div v-if="loginAccount" class="flex flex-col sm:flex-row items-center sm:space-x-2 ml-5">
-      <img v-if="loginAccount.head_img" :src="loginAccount.head_img" alt="" class="rounded-full size-10">
-      <span v-if="loginAccount.nick_name">{{loginAccount.nick_name}}</span>
+      <img v-if="loginAccount.avatar" :src="loginAccount.avatar" alt="" class="rounded-full size-10">
+      <span v-if="loginAccount.nickname">{{loginAccount.nickname}}</span>
     </div>
   </header>
 

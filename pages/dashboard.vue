@@ -31,13 +31,13 @@
         <!-- footer -->
         <footer v-if="loginAccount" class="flex flex-col space-y-2 pt-3 border-t">
           <div class="flex items-center space-x-2">
-            <img v-if="loginAccount.head_img" :src="loginAccount.head_img" alt="" class="rounded-full size-10">
-            <UTooltip v-if="loginAccount.nick_name" class="flex-1 overflow-hidden"
+            <img v-if="loginAccount.avatar" :src="loginAccount.avatar" alt="" class="rounded-full size-10">
+            <UTooltip v-if="loginAccount.nickname" class="flex-1 overflow-hidden"
                       :popper="{ placement: 'top-start', offsetDistance: 16 }">
               <template #text>
-                <span>{{ loginAccount.nick_name }}</span>
+                <span>{{ loginAccount.nickname }}</span>
               </template>
-              <span class="whitespace-nowrap text-ellipsis overflow-hidden">{{ loginAccount.nick_name }}</span>
+              <span class="whitespace-nowrap text-ellipsis overflow-hidden">{{ loginAccount.nickname }}</span>
             </UTooltip>
 
             <UButton icon="i-heroicons-arrow-left-start-on-rectangle-16-solid" :loading="logoutBtnLoading"
@@ -110,7 +110,7 @@ const items = ref([
   {name: '设置', icon: Settings, href: '/dashboard/settings'},
 ])
 
-const expire = localStorage.getItem('token-expire')!
+const expire = loginAccount.value.expires
 const now = ref(new Date())
 const distance = computed(() => {
   return formatDistance(new Date(expire), now.value, {
