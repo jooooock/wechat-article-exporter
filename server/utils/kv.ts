@@ -27,6 +27,7 @@ export interface User {
  * @param user
  */
 export async function createUser(user: User): Promise<boolean> {
+    console.log(user)
     const primaryKey = ["users", user.originalID]
     const byFakeIDKey = ["users_by_fakeid", user.fakeid]
     const byUuidKey = ["users_by_uuid", user.uuid]
