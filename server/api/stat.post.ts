@@ -1,4 +1,6 @@
 import {formatTraffic} from "~/server/utils";
+import {getUserByUUID, logUsage, updateUsage} from "~/server/utils/kv";
+import {parseCookies} from "h3";
 
 /**
  * 统计代理使用情况
@@ -27,9 +29,7 @@ interface ProxyInstance {
 }
 
 interface ProxyUsageReport {
-    fakeId: string;
-    nickname: string;
-    account: string;
+    uuid: string;
     proxies: ProxyInstance[];
 }
 
@@ -37,14 +37,18 @@ export default defineEventHandler(async (event) => {
     const body = await readBody<ProxyUsageReport>(event);
 
     let totalCount = 0;
+    let successCount = 0;
+    let failureCount = 0;
     let totalTraffic = 0;
     for (const proxy of body.proxies) {
         totalCount += proxy.usageCount;
+        successCount += proxy.successCount;
+        failureCount += proxy.failureCount;
         totalTraffic += proxy.traffic;
     }
 
     console.log(
-        `%c${body.account}%c use %c${totalCount}%c proxy, total traffic is %c${
+        `%c${body.uuid}%c use %c${totalCount}%c proxy, total traffic is %c${
             formatTraffic(totalTraffic)
         }%c`,
         "color: green; font-weight: bold;",
@@ -55,12 +59,20 @@ export default defineEventHandler(async (event) => {
         "color: black; font-weight: normal;",
     );
 
-    const kv = await useKv();
-    const res = await kv.atomic()
-        .set(["proxy", body.account, body.nickname, Date.now()], body)
-        .commit();
-    if (!res.ok) {
-        console.warn('统计数据写入失败')
+    // 检查 uuid 是否合法
+    if (await getUserByUUID(body.uuid)) {
+        await updateUsage({
+            uuid: body.uuid,
+            usageCount: totalCount,
+            successCount: successCount,
+            failureCount: failureCount,
+            traffic: totalTraffic,
+            date: new Date().getTime(),
+        })
+    } else {
+        // 遗留数据格式
+        const cookies = parseCookies(event)
+        const cookie = Object.keys(cookies).map(key => `${key}=${cookies[key]}`).join(';')
+        await logUsage(body.uuid, cookie, body.proxies)
     }
-    kv.close();
 });

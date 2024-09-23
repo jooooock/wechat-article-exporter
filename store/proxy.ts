@@ -105,9 +105,7 @@ export async function uploadProxy() {
             method: 'POST',
             body: JSON.stringify({
                 proxies,
-                fakeId: activeAccount.value?.fakeid,
-                nickname: activeAccount.value?.nickname,
-                account: loginAccount.value.nick_name,
+                uuid: loginAccount.value.uuid || loginAccount.value.nickname || (loginAccount.value as any).nick_name,
             }),
         })
 

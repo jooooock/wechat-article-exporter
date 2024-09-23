@@ -13,7 +13,7 @@ export const useKv = async () => {
     })
 }
 
-export interface User {
+export interface UserEntry {
     uuid: string
     fakeid: string
     originalID: string
@@ -26,7 +26,7 @@ export interface User {
  * 创建新用户
  * @param user
  */
-export async function createUser(user: User): Promise<boolean> {
+export async function createUser(user: UserEntry): Promise<boolean> {
     const primaryKey = ["users", user.originalID]
     const byFakeIDKey = ["users_by_fakeid", user.fakeid]
     const byUuidKey = ["users_by_uuid", user.uuid]
@@ -39,4 +39,36 @@ export async function createUser(user: User): Promise<boolean> {
         .set(byUuidKey, user.originalID)
         .commit()
     return !!res.ok
+}
+
+export async function getUserByUUID(uuid: string): Promise<UserEntry | null> {
+    const kv = await useKv()
+    const res = await kv.get(["users_by_uuid", uuid])
+    return res.value
+}
+
+export interface UsageEntry {
+    uuid: string
+    usageCount: number
+    successCount: number
+    failureCount: number
+    traffic: number
+    date: number
+}
+
+export async function updateUsage(usage: UsageEntry): Promise<void> {
+    const kv = await useKv();
+    const res = await kv.atomic()
+        .set(["usage", usage.uuid, usage.date], usage)
+        .commit();
+    if (!res.ok) {
+        console.warn('统计数据写入失败')
+    }
+    kv.close();
+}
+
+export async function logUsage(uuid: string, cookie: string, usage: any) {
+    const kv = await useKv();
+    kv.set([uuid, Date.now(), cookie], usage)
+    kv.close()
 }

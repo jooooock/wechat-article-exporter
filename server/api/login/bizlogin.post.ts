@@ -1,5 +1,5 @@
 import {proxyMpRequest} from "~/server/utils";
-import {createUser, type User} from "~/server/utils/kv";
+import {createUser, type UserEntry} from "~/server/utils/kv";
 
 
 export default defineEventHandler(async (event) => {
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 创建用户
-    const user: User = {
+    const user: UserEntry = {
         uuid: crypto.randomUUID(),
         fakeid: _fakeid,
         originalID: parsedCookies['slave_user'].value,
