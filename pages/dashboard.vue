@@ -4,7 +4,7 @@
       <aside
           class="hidden md:flex flex-col h-screen w-[250px] flex-shrink-0 justify-between border-r border-slate-4 bg-slate-1 px-4 pb-6">
         <div class="flex items-center h-[60px]">
-          <NuxtLink to="/dashboard" class="px-2">微信公众号文章导出</NuxtLink>
+          <NuxtLink to="/dashboard" class="px-2 font-bold text-xl">微信公众号文章导出</NuxtLink>
         </div>
 
         <!-- 导航菜单 -->
@@ -15,8 +15,8 @@
                   :to="item.href"
                   class="flex h-8 items-center gap-2 rounded-md px-2 text-sm"
                   :class="{
-                    'text-slate-11 hover:bg-slate-4 hover:text-slate-12': item.href !== $route.fullPath,
-                    'text-slate-12 bg-slate-3': item.href === $route.fullPath,
+                    'text-slate-11 hover:bg-slate-4 hover:text-slate-12': item.href !== route.fullPath,
+                    'text-slate-12 bg-slate-3 font-bold': item.href === route.fullPath,
                   }"
               >
                 <div class="text-slate-11 opacity-80 w-[18px] h-[18px]">
@@ -92,6 +92,8 @@ import {Album, ChartNoAxesCombined, Download, Globe, MessageCircleQuestion, News
 import {formatDistance} from "date-fns";
 import type {LogoutResponse} from "~/types/types";
 
+
+const route = useRoute()
 
 definePageMeta({
   layout: false

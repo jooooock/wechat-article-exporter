@@ -13,7 +13,7 @@
             <span v-if="accountInfo.nickname" class="text-xl font-medium">{{ accountInfo.nickname }}</span>
           </p>
           <p>ID: <span class="font-mono">{{ accountInfo.fakeid }}</span></p>
-          <UBadge variant="subtle" color="red" class="absolute top-4 right-2">
+          <UBadge variant="subtle" color="green" class="absolute top-4 right-2">
             <Loader v-if="!accountInfo.albums" :size="16" class="animate-spin text-slate-500"/>
             <span v-else>{{ accountInfo.albums.length }}</span>
           </UBadge>

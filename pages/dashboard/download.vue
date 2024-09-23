@@ -5,13 +5,13 @@
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
       <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
-        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4"
+        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
             :class="{'bg-slate-3': selectedAccount === accountInfo.fakeid}" @click="toggleSelectedAccount(accountInfo)">
           <p>公众号:
             <span v-if="accountInfo.nickname" class="text-xl font-medium">{{ accountInfo.nickname }}</span>
           </p>
           <p>ID: <span class="font-mono">{{ accountInfo.fakeid }}</span></p>
-          <UBadge variant="subtle" color="red" class="absolute top-4 right-2">{{ accountInfo.articles }}</UBadge>
+          <UBadge variant="subtle" color="green" class="absolute top-4 right-2">{{ accountInfo.articles }}</UBadge>
         </li>
       </ul>
 
