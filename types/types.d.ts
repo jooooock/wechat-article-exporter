@@ -168,3 +168,8 @@ export interface DownloadableArticle {
     html?: string
     packed?: boolean
 }
+
+export interface LogoutResponse {
+    statusCode: number
+    statusText: string
+}

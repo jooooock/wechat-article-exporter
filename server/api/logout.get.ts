@@ -21,12 +21,8 @@ export default defineEventHandler(async (event) => {
             lang: 'zh_CN',
         },
     })
-    if (response.status === 200) {
-        await sendRedirect(event, '/login', 302)
-    } else {
-        return {
-            statusCode: response.status,
-            statusText: response.statusText,
-        }
+    return {
+        statusCode: response.status,
+        statusText: response.statusText,
     }
 })
