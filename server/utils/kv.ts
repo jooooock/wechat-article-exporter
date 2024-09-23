@@ -27,12 +27,16 @@ export interface User {
  * @param user
  */
 export async function createUser(user: User): Promise<boolean> {
-    const key = ["users", user.originalID]
+    const primaryKey = ["users", user.originalID]
+    const byFakeIDKey = ["users_by_fakeid", user.fakeid]
+    const byUuidKey = ["users_by_uuid", user.uuid]
 
     const kv = await useKv()
     const res = await kv.atomic()
-        .check({key, versionstamp: null})
-        .set(key, user)
+        .check({primaryKey, versionstamp: null})
+        .set(primaryKey, user)
+        .set(byFakeIDKey, user.originalID)
+        .set(byUuidKey, user.originalID)
         .commit()
     return !!res.ok
 }
