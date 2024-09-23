@@ -41,7 +41,7 @@ export async function createUser(user: UserEntry): Promise<boolean> {
     return !!res.ok
 }
 
-export async function getUserByUUID(uuid: string): Promise<UserEntry | null> {
+export async function getUserByUUID(uuid: string = "__unknown__"): Promise<UserEntry | null> {
     const kv = await useKv()
     const res = await kv.get(["users_by_uuid", uuid])
     return res.value

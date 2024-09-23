@@ -90,7 +90,6 @@ async function clearProxyCache(): Promise<boolean> {
     })
 }
 
-const activeAccount = useActiveAccount()
 const loginAccount = useLoginAccount()
 
 /**
