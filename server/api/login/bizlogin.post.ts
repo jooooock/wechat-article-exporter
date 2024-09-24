@@ -1,5 +1,5 @@
 import {proxyMpRequest} from "~/server/utils";
-import {createUser, type UserEntry} from "~/server/utils/kv";
+import {createUser, getUser, type UserEntry} from "~/server/kv/user";
 
 
 export default defineEventHandler(async (event) => {
@@ -56,19 +56,30 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    // 创建用户
-    const user: UserEntry = {
-        uuid: crypto.randomUUID(),
-        fakeid: _fakeid,
-        originalID: parsedCookies['slave_user'].value,
-        nickname: nick_name,
-        avatar: _avatar,
-        createdAt: new Date().getTime(),
-    }
-    if (await createUser(user)) {
-        console.log(`新用户(${user.nickname}:${user.uuid})创建成功`)
+    const slave_user_cookie = parsedCookies['slave_user']
+    if (!slave_user_cookie) {
+        return {
+            err: '登录失败，请稍后重试'
+        }
     }
 
+    let user: UserEntry | null = await getUser(slave_user_cookie.value)
+    if (!user) {
+        // 创建用户
+        user = {
+            uuid: crypto.randomUUID(),
+            fakeid: _fakeid,
+            originalID: slave_user_cookie.value,
+            nickname: nick_name,
+            avatar: _avatar,
+            createdAt: Date.now(),
+        }
+        if (await createUser(user)) {
+            console.log(`新用户(${user.nickname}:${user.uuid})创建成功`)
+        } else {
+            console.warn(`新用户(${user.nickname}:${user.uuid})创建失败`)
+        }
+    }
 
     const newBody = JSON.stringify({
         uuid: user.uuid,
@@ -76,7 +87,7 @@ export default defineEventHandler(async (event) => {
         avatar: user.avatar,
         fakeid: user.fakeid,
         token: _token,
-        expires: parsedCookies['slave_sid'].expires,
+        expires: slave_user_cookie.expires,
     })
 
     const headers = new Headers(response.headers)

@@ -1,6 +1,8 @@
 import {formatTraffic} from "~/server/utils";
-import {getUserByUUID, logUsage, updateUsage} from "~/server/utils/kv";
+import {logUsage, updateUsage} from "~/server/kv/usage";
+import {getUserByUUID} from "~/server/kv/user"
 import {parseCookies} from "h3";
+
 
 /**
  * 统计代理使用情况
@@ -67,7 +69,7 @@ export default defineEventHandler(async (event) => {
             successCount: successCount,
             failureCount: failureCount,
             traffic: totalTraffic,
-            date: new Date().getTime(),
+            time: Date.now(),
         })
     } else {
         // 遗留数据格式
