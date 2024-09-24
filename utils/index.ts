@@ -119,6 +119,7 @@ export async function downloadArticleHTMLs(articles: DownloadableArticle[], call
     return results
 }
 
+
 /**
  * 打包 html 中的资源
  * @param html
@@ -144,6 +145,29 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     $jsArticleContent.querySelectorAll('script').forEach(el => {
         el.remove()
     })
+
+    // 渲染ip属地
+    function getIpWoridng(ipConfig: any) {
+        let ipWording = '';
+        if (parseInt(ipConfig.countryId, 10) === 156) {
+            ipWording = ipConfig.provinceName;
+        } else if (ipConfig.countryId) {
+            ipWording = ipConfig.countryName;
+        }
+        return ipWording;
+    }
+    const ipWrp = document.getElementById('js_ip_wording_wrp')!
+    const ipWording = document.getElementById('js_ip_wording')!
+    const ipWordingMatchResult = html.match(/window\.ip_wording = (?<data>{\s+countryName: '[^']+',[^}]+})/s)
+    if (ipWordingMatchResult && ipWordingMatchResult.groups && ipWordingMatchResult.groups.data) {
+        const json = ipWordingMatchResult.groups.data
+        eval('window.ip_wording = ' + json)
+        const ipWordingDisplay = getIpWoridng((window as any).ip_wording)
+        if (ipWordingDisplay !== '') {
+            ipWording.innerHTML = ipWordingDisplay;
+            ipWrp.style.display = 'inline-block';
+        }
+    }
 
 
     zip.folder('assets')

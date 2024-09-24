@@ -85,7 +85,7 @@ async function download(link: string, title: string) {
     const zip = await packHTMLAssets(fullHTML, title)
 
     const blob = await zip.generateAsync({type: 'blob'})
-    saveAs(blob, title)
+    saveAs(blob, title + '.zip')
 
     await uploadProxy()
   } catch (e: any) {
