@@ -146,6 +146,31 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         el.remove()
     })
 
+
+    // 渲染发布时间
+    function __setPubTime(oriTimestamp: number, dom: HTMLElement) {
+        const dateObj = new Date(oriTimestamp * 1000);
+        const padStart = function padStart(v: number) {
+            return "0".concat(v.toString()).slice(-2);
+        };
+        const year = dateObj.getFullYear().toString();
+        const month = padStart(dateObj.getMonth() + 1);
+        const date = padStart(dateObj.getDate());
+        const hour = padStart(dateObj.getHours());
+        const minute = padStart(dateObj.getMinutes());
+        const timeString = "".concat(hour, ":").concat(minute);
+        const dateString = "".concat(year, "年").concat(month, "月").concat(date, "日");
+        const showDate = "".concat(dateString, " ").concat(timeString);
+
+        if (dom) {
+            dom.innerText = showDate;
+        }
+    }
+    const pubTimeMatchResult = html.match(/var oriCreateTime = '(?<date>\d+)'/)
+    if (pubTimeMatchResult && pubTimeMatchResult.groups && pubTimeMatchResult.groups.date) {
+        __setPubTime(parseInt(pubTimeMatchResult.groups.date), document.getElementById('publish_time')!)
+    }
+
     // 渲染ip属地
     function getIpWoridng(ipConfig: any) {
         let ipWording = '';
@@ -167,6 +192,23 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             ipWording.innerHTML = ipWordingDisplay;
             ipWrp.style.display = 'inline-block';
         }
+    }
+
+    // 渲染 标题已修改
+    function __setTitleModify(isTitleModified: boolean) {
+        const wrp = document.getElementById('js_title_modify_wrp')!
+        const titleModifyNode = document.getElementById('js_title_modify')!
+        if (!wrp) return;
+        if (isTitleModified) {
+            titleModifyNode.innerHTML = '标题已修改';
+            wrp.style.display = 'inline-block';
+        } else {
+            wrp.parentNode?.removeChild(wrp);
+        }
+    }
+    const titleModifiedMatchResult = html.match(/window\.isTitleModified = "(?<data>\d*)" \* 1;/)
+    if (titleModifiedMatchResult && titleModifiedMatchResult.groups && titleModifiedMatchResult.groups.data) {
+        __setTitleModify(titleModifiedMatchResult.groups.data === '1')
     }
 
 
