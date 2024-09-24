@@ -74,7 +74,6 @@ export default defineEventHandler(async (event) => {
     } else {
         // 遗留数据格式
         const cookies = parseCookies(event)
-        const cookie = Object.keys(cookies).map(key => `${key}=${cookies[key]}`).join(';')
-        await logUsage(body.uuid, cookie, body.proxies)
+        await logUsage(body.uuid, cookies['slave_user'], body.proxies)
     }
 });

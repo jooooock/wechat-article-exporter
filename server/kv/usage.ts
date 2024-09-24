@@ -21,8 +21,8 @@ export async function updateUsage(usage: UsageEntry): Promise<void> {
     kv.close();
 }
 
-export async function logUsage(uuid: string, cookie: string, usage: any) {
+export async function logUsage(uuid: string, originalID: string, usage: any) {
     const kv = await useKv();
-    kv.set(['old', uuid, Date.now(), cookie], usage)
+    kv.set(['old', uuid, originalID, Date.now()], usage)
     kv.close()
 }
