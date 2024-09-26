@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import {AVAILABLE_PROXY_LIST} from '~/config'
 import type {DownloadableArticle} from "~/types/types";
 import {updateProxiesCache} from "~/store/proxy";
+import type {AudioResource} from "~/types/video";
 
 /**
  * 代理实例
@@ -31,7 +32,7 @@ export interface ProxyInstance {
 }
 
 // 代理下载的资源
-type DownloadResource = string | HTMLLinkElement | HTMLImageElement | DownloadableArticle
+type DownloadResource = string | HTMLLinkElement | HTMLImageElement | DownloadableArticle | AudioResource
 
 // 资源下载函数，返回资源大小
 type DownloadFn<T extends DownloadResource> = (resource: T, proxy: string) => Promise<number>
@@ -174,6 +175,7 @@ async function downloadResource<T extends DownloadResource>(proxy: ProxyInstance
         const size = await downloadFn(resource, proxy.address)
         return [true, size];
     } catch (error) {
+        console.warn(error)
         return [false, 0];
     }
 }

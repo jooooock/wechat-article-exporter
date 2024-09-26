@@ -6,6 +6,7 @@ import {getAssetCache, updateAssetCache} from "~/store/assetes";
 import * as pool from '~/utils/pool';
 import type {DownloadableArticle} from "~/types/types";
 import type {DownloadResult} from "~/utils/pool";
+import type {AudioResource, VideoPageInfo} from "~/types/video";
 
 
 export function formatTimeStamp(timestamp: number) {
@@ -130,6 +131,8 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     if (!zip) {
         zip = new JSZip();
     }
+    zip.folder('assets')
+
 
     const parser = new DOMParser()
     const document = parser.parseFromString(html, 'text/html')
@@ -214,8 +217,101 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         __setTitleModify(titleModifiedMatchResult.groups.data === '1')
     }
 
+    // 下载内嵌音频
+    const mpAudioEls = $jsArticleContent.querySelectorAll<HTMLElement>('mp-common-mpaudio')
+    if (mpAudioEls.length > 0) {
+        const audioResourceDownloadFn = async (asset: AudioResource, proxy: string) => {
+            const audioData = await downloadAssetWithProxy<Blob>(asset.url, proxy, 10)
+            const uuid = asset.uuid
+            const ext = mime.getExtension(audioData.type)
+            zip.file(`assets/${uuid}.${ext}`, audioData)
 
-    zip.folder('assets')
+            let targetEl: HTMLElement | null = null
+            mpAudioEls.forEach(el => {
+                const id = el.getAttribute('data-uuid')
+                if (id === uuid) {
+                    targetEl = el
+                }
+            })
+            if (!targetEl) {
+                throw new Error('下载失败')
+            }
+
+            if (asset.type === 'cover') {
+                (targetEl as HTMLElement).setAttribute('cover', `./assets/${uuid}.${ext}`)
+            } else if (asset.type === 'audio') {
+                (targetEl as HTMLElement).setAttribute('src', `./assets/${uuid}.${ext}`)
+            }
+
+            return audioData.size
+        }
+        await measureExecutionTime('音频资源下载结果:', async () => {
+            const assets: AudioResource[] = []
+            mpAudioEls.forEach(mpAudioEl => {
+                const uuid = new Date().getTime() + Math.random().toString()
+                mpAudioEl.setAttribute('data-uuid', uuid)
+                const cover = mpAudioEl.getAttribute('cover')!
+                const voice_encode_fileid = mpAudioEl.getAttribute('voice_encode_fileid')!
+                assets.push({
+                    uuid: uuid,
+                    type: 'cover',
+                    url: cover,
+                })
+                assets.push({
+                    uuid: uuid,
+                    type: 'audio',
+                    url: 'https://res.wx.qq.com/voice/getvoice?mediaid=' + voice_encode_fileid,
+                })
+            })
+
+            return await pool.downloads<AudioResource>(assets, audioResourceDownloadFn)
+        })
+    }
+
+    // 下载内嵌视频
+    const videoPageInfosMatchResult = html.match(/(?<code>var videoPageInfos = \[.+?window.__videoPageInfos = videoPageInfos;)/s)
+    if (videoPageInfosMatchResult && videoPageInfosMatchResult.groups && videoPageInfosMatchResult.groups.code) {
+        const code = videoPageInfosMatchResult.groups.code
+        eval(code)
+        const videoPageInfos: VideoPageInfo[] = (window as any).__videoPageInfos
+        videoPageInfos.forEach(videoPageInfo => {
+            videoPageInfo.mp_video_trans_info.forEach(trans => {
+                trans.url = trans.url.replace(/&amp;/g, '&')
+            })
+        })
+
+        // 下载资源
+        const videoURLMap = new Map<string, string>()
+        const resourceDownloadFn = async (url: string, proxy: string) => {
+            const videoData = await downloadAssetWithProxy<Blob>(url, proxy, 10)
+            const uuid = new Date().getTime() + Math.random().toString()
+            const ext = mime.getExtension(videoData.type)
+            zip.file(`assets/${uuid}.${ext}`, videoData)
+
+            videoURLMap.set(url, `./assets/${uuid}.${ext}`)
+            return videoData.size
+        }
+        await measureExecutionTime('视频资源下载结果:', async () => {
+            const urls: string[] = []
+            videoPageInfos.forEach(videoPageInfo => {
+                urls.push(videoPageInfo.cover_url)
+                urls.push(videoPageInfo.mp_video_trans_info[0].url)
+            })
+            return await pool.downloads<string>(urls, resourceDownloadFn)
+        })
+
+        const videoIframes = $jsArticleContent.querySelectorAll('iframe[data-mpvid]')
+        videoIframes.forEach(videoIframe => {
+            const vid = videoIframe.getAttribute('data-mpvid')
+            const videoInfo = videoPageInfos.find(info => info.video_id === vid)
+            if (videoInfo) {
+                const div = document.createElement('div')
+                div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0].url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%"></video>`
+                videoIframe.replaceWith(div)
+            }
+        })
+    }
+
 
     // 下载所有的图片
     const imgDownloadFn = async (img: HTMLImageElement, proxy: string) => {
@@ -399,14 +495,14 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         <!---->
     </div>
 
-    <audio style="height:0;width:0;display:none" autoplay="" src=""></audio>
+    <audio style="height:0;width:0;display:none" src=""></audio>
 </template>
     `
     let customElementTemplate = ''
     if (hasMpAudio) {
         customElementTemplate += mpAudioTemplate
         customElementTemplate += '<script type="text/javascript" src="./assets/mp-common-mpaudio.js"></script>'
-        const url = '/custom-elements/mp-common-mpaudio.js?v=1'
+        const url = '/custom-elements/mp-common-mpaudio.js?v=2'
         let scriptFile: Blob | null
         const mpCommonMpAudioJsCache = await getAssetCache(url)
         if (mpCommonMpAudioJsCache) {

@@ -203,10 +203,10 @@ class MpCommonMpaudio extends HTMLElement {
 
         this.shadow.querySelector('.audio_card_title').textContent = this.name
         this.shadow.querySelector('.audio_card_nickname_inner').textContent = this.author
-        this.shadow.querySelector('.audio_card_thumb').src = 'https://vproxy-01.deno.dev?url=' + this.cover
+        this.shadow.querySelector('.audio_card_thumb').src = this.cover
 
         const audio = this.shadow.querySelector('audio')
-        audio.src = 'https://res.wx.qq.com/voice/getvoice?mediaid=' + this.fileid
+        audio.src = this.src
 
         audio.addEventListener('play', () => {
             this.shadow.querySelector('#audio_progress_bar').style.display = 'block'
