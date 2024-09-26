@@ -1,8 +1,10 @@
 <p align="center">
-  <img src="./assets/logo.svg" alt="Logo" style="max-width: 400px">
+  <img src="./assets/logo.svg" alt="Logo" style="max-width: 300px">
 </p>
 
-<h3 align="center">在线批量导出微信公众号文章，支持内嵌的音视频导出，无需搭建任何环境，可100%还原文章样式</h3>
+<h3 align="center" style="line-height:1.5;margin-bottom:50px;">在线批量导出微信公众号文章，支持内嵌的音视频导出
+<br/>
+无需搭建任何环境，可100%还原文章样式</h3>
 
 
 [![Deploy][deploy-badge]][deploy]
