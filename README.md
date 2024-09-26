@@ -2,20 +2,16 @@
   <img src="./assets/logo.svg" alt="Logo">
 </p>
 
-<h3 align="center">
-在线批量导出微信公众号文章，支持内嵌的音视频导出
-<br/>
-无需搭建任何环境，可100%还原文章样式，支持私有部署
-</h3>
-
+# wechat-article-exporter
 
 [![Deploy][deploy-badge]][deploy]
 ![GitHub stars]
 ![GitHub forks]
 ![GitHub License]
-![Website]
 ![GitHub commit activity]
 ![GitHub last commit]
+
+在线批量导出微信公众号文章，支持内嵌的音视频导出，无需搭建任何环境，可100%还原文章样式，支持私有部署。
 
 
 ## :dart: 特性
@@ -295,8 +291,6 @@ MIT
 [Github forks]: https://img.shields.io/github/forks/jooooock/wechat-article-exporter?style=social&label=Fork&style=plastic
 
 [Github License]: https://img.shields.io/github/license/jooooock/wechat-article-exporter?label=License
-
-[Website]: https://img.shields.io/website?url=https%3A%2F%2Fwechat-article-exporter.deno.dev%2F&label=Website
 
 [Github commit activity]: https://img.shields.io/github/commit-activity/w/jooooock/wechat-article-exporter
 
