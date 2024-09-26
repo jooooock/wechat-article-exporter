@@ -2,7 +2,7 @@
   <img src="./public/favicon.ico" alt="Logo" width="100">
 </p>
 
-<h3 align="center">微信公众号文章导出工具，100%还原文章样式。</h3>
+<h3 align="center">在线批量导出微信公众号文章，支持内嵌的音视频导出，无需搭建任何环境，可100%还原文章样式</h3>
 
 [![Deploy][deploy-badge]][deploy]
 ![GitHub stars]
