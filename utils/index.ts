@@ -13,6 +13,27 @@ export function formatTimeStamp(timestamp: number) {
     return dayjs.unix(timestamp).format('YYYY-MM-DD HH:mm')
 }
 
+export function formatItemShowType(type: number) {
+    switch (type) {
+        case 0:
+            return '普通图文'
+        case 5:
+            return '视频分享'
+        case 6:
+            return '音乐分享'
+        case 7:
+            return '音频分享'
+        case 8:
+            return '图片分享'
+        case 10:
+            return '文本分享'
+        case 17:
+            return '短文'
+        default:
+            return '未识别'
+    }
+}
+
 /**
  * 使用代理下载资源
  * @param url 资源地址

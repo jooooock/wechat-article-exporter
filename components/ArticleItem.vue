@@ -11,8 +11,9 @@
     <div class="p-6 flex flex-col space-y-2">
       <span class="absolute top-0 right-0 rounded text-zinc-600 bg-[rgba(255,255,255,.8)] py-1 px-2 font-mono">#{{ index }}</span>
       <h3 class="text-xl text-blue-800 font-semibold" :class="isOriginal ? 'original' : ''" v-html="title"></h3>
-      <time class="hidden whitespace-nowrap text-sm text-gray-500 md:block pb-4">{{ formatTimeStamp(updatedAt) }}</time>
+      <time class="hidden whitespace-nowrap text-sm text-gray-500 md:block">{{ formatTimeStamp(updatedAt) }}</time>
 <!--      <p class="flex-1 text-zinc-400 text-sm pb-4">{{ digest }}</p>-->
+      <p class="text-sm text-gray-500 pb-4">类型: <span>{{formatItemShowType(itemShowType)}}</span></p>
       <ul class="flex flex-wrap space-x-2">
         <li class="text-blue-500 text-sm" v-for="album in albumInfos" :key="album.id">
           <a :href="getAlbumURL(album.id)" target="_blank">#{{album.title}}</a>
@@ -43,7 +44,7 @@
 <script setup lang="ts">
 import {saveAs} from 'file-saver'
 import {Loader} from 'lucide-vue-next';
-import {formatTimeStamp, downloadArticleHTML, packHTMLAssets} from "~/utils";
+import {formatTimeStamp, downloadArticleHTML, packHTMLAssets, formatItemShowType} from "~/utils";
 import type {AppMsgAlbumInfo, RGB} from "~/types/types";
 import {uploadProxy} from "~/store/proxy";
 
@@ -59,6 +60,7 @@ interface Props {
   coverTheme?: RGB
   isOriginal: boolean
   albumInfos: AppMsgAlbumInfo[]
+  itemShowType: number
 }
 
 defineProps<Props>()
