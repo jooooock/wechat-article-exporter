@@ -413,6 +413,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             scriptFile = mpCommonMpAudioJsCache.file
         } else {
             scriptFile = await $fetch<Blob>(url, {retryDelay: 500})
+            await updateAssetCache({url: url, file: scriptFile})
         }
         zip.file(`assets/mp-common-mpaudio.js`, scriptFile)
     }
