@@ -295,7 +295,9 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             const urls: string[] = []
             videoPageInfos.forEach(videoPageInfo => {
                 urls.push(videoPageInfo.cover_url)
-                urls.push(videoPageInfo.mp_video_trans_info[0].url)
+                if (videoPageInfo.mp_video_trans_info.length > 0) {
+                    urls.push(videoPageInfo.mp_video_trans_info[0].url)
+                }
             })
             return await pool.downloads<string>(urls, resourceDownloadFn)
         })

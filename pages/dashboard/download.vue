@@ -88,6 +88,7 @@
               <th>作者</th>
               <th class="w-24">是否原创</th>
               <th class="w-36">所属合集</th>
+              <th class="w-12">原文</th>
             </tr>
             </thead>
             <tbody>
@@ -106,6 +107,11 @@
                   <span v-for="album in article.appmsg_album_infos" :key="album.id"
                         class="text-blue-600 mr-2">#{{ album.title }}</span>
                 </p>
+              </td>
+              <td class="text-center">
+                <a class="text-blue-500 underline" :href="article.link" target="_blank">
+                  <UIcon name="i-heroicons-link-16-solid" class="w-5 h-5" />
+                </a>
               </td>
             </tr>
             </tbody>
