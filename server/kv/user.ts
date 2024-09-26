@@ -16,6 +16,8 @@ export interface UserEntry {
  */
 export async function createUser(user: UserEntry): Promise<boolean> {
     const primaryKey = ["users", user.originalID]
+
+    // 注意: fakeid 可能是空
     const byFakeIDKey = ["users_by_fakeid", user.fakeid]
     const byUuidKey = ["users_by_uuid", user.uuid]
 
@@ -39,6 +41,11 @@ export async function getUserByUUID(uuid: string = "__unknown__"): Promise<UserE
     return null
 }
 
+/**
+ * 由于 fakeid 可能为空，所以此方法被废弃，不推荐使用
+ * @param fakeid
+ * @deprecated
+ */
 export async function getUserByFakeID(fakeid: string): Promise<UserEntry | null> {
     const kv = await useKv()
     const {value: originalID} = await kv.get(["users_by_fakeid", fakeid])

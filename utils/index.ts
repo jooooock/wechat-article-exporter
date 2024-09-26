@@ -153,6 +153,50 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     $jsArticleContent.querySelector('#wx_stream_article_slide_tip')?.remove()
 
 
+    let bodyCls = ''
+    const $js_image_desc = $jsArticleContent.querySelector('#js_image_desc')
+    if ($js_image_desc) {
+        // 图片消息
+        bodyCls += 'pages_skin_pc page_share_img'
+
+        function decode_html(data: string, encode: boolean) {
+            const replace = ["&#39;", "'", "&quot;", '"', "&nbsp;", " ", "&gt;", ">", "&lt;", "<", "&yen;", "¥", "&amp;", "&"];
+            const replaceReverse = ["&", "&amp;", "¥", "&yen;", "<", "&lt;", ">", "&gt;", " ", "&nbsp;", '"', "&quot;", "'", "&#39;"];
+
+            let target = encode ? replaceReverse : replace
+            let str = data
+            for (let i = 0; i < target.length; i += 2) {
+                str = str.replace(new RegExp(target[i], 'g'), target[i + 1])
+            }
+            return str
+        }
+
+        const qmtplMatchResult = html.match(/(?<code>window\.__QMTPL_SSR_DATA__\s*=\s*\{.+?)<\/script>/s)
+        if (qmtplMatchResult && qmtplMatchResult.groups && qmtplMatchResult.groups.code) {
+            const code = qmtplMatchResult.groups.code
+            eval(code)
+            const data = (window as any).__QMTPL_SSR_DATA__
+            let desc = data.desc.replace(/\r/g, '').replace(/\n/g, '<br>').replace(/\s/g, '&nbsp;')
+            desc = decode_html(desc, false)
+            $js_image_desc.innerHTML = desc
+
+            $jsArticleContent.querySelector('#js_top_profile')!.classList.remove('profile_area_hide')
+        }
+        const pictureMatchResult = html.match(/(?<code>window\.picture_page_info_list\s*=.+\.slice\(0,\s*20\);)/s)
+        if (pictureMatchResult && pictureMatchResult.groups && pictureMatchResult.groups.code) {
+            const code = pictureMatchResult.groups.code
+            eval(code)
+            const picture_page_info_list = (window as any).picture_page_info_list
+            const containerEl = $jsArticleContent.querySelector('#js_share_content_page_hd')!
+            let innerHTML = '<div style="display: flex;flex-direction: column;align-items: center;gap: 10px;padding-block: 20px;">'
+            for (const picture of picture_page_info_list) {
+                innerHTML += `<img src="${picture.cdn_url}" alt="" style="display: block;border: 1px solid gray;border-radius: 5px;max-width: 90%;" onclick="window.open(this.src, '_blank', 'popup')" />`
+            }
+            innerHTML += '</div>'
+            containerEl.innerHTML = innerHTML
+        }
+    }
+
     // 渲染发布时间
     function __setPubTime(oriTimestamp: number, dom: HTMLElement) {
         const dateObj = new Date(oriTimestamp * 1000);
@@ -545,7 +589,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         }
     </style>
 </head>
-<body>
+<body class="${bodyCls}">
 ${customElementTemplate}
 
 ${pageContentHTML}
