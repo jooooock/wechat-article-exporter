@@ -208,9 +208,17 @@ class MpCommonMpaudio extends HTMLElement {
         const audio = this.shadow.querySelector('audio')
         audio.src = 'https://res.wx.qq.com/voice/getvoice?mediaid=' + this.fileid
 
+        audio.addEventListener('play', () => {
+            this.shadow.querySelector('#audio_progress_bar').style.display = 'block'
+            this.shadow.querySelector('.js_duration1').style.display = 'none'
+            this.shadow.querySelector('.js_duration2').style.display = 'block'
+        })
         audio.addEventListener('ended', () => {
             this.stopped = true
             this.playing = false
+            this.shadow.querySelector('#audio_progress_bar').style.display = 'none'
+            this.shadow.querySelector('.js_duration1').style.display = 'block'
+            this.shadow.querySelector('.js_duration2').style.display = 'none'
         })
         audio.addEventListener('timeupdate', () => {
             this.shadow.querySelector('.js_duration2 .start').textContent = formatTimeGap(Math.round(audio.currentTime))
