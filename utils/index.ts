@@ -176,8 +176,8 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
     let bodyCls = ''
     const $js_image_desc = $jsArticleContent.querySelector('#js_image_desc')
+    // 图片分享消息
     if ($js_image_desc) {
-        // 图片消息
         bodyCls += 'pages_skin_pc page_share_img'
 
         function decode_html(data: string, encode: boolean) {
@@ -374,7 +374,8 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 const videoInfo = videoPageInfos.find(info => info.video_id === mpvid)
                 if (videoInfo) {
                     const div = document.createElement('div')
-                    div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0].url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%"></video>`
+                    div.style.cssText = 'height: 508px;background: #000;border-radius: 4px; overflow: hidden;margin-bottom: 12px;'
+                    div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0].url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%;height: 100%;"></video>`
                     videoIframe.replaceWith(div)
                 }
             } else {
