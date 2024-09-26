@@ -3,9 +3,9 @@ import JSZip from "jszip";
 import mime from "mime";
 import {sleep} from "@antfu/utils";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
+import type {DownloadResult} from "~/utils/pool";
 import * as pool from '~/utils/pool';
 import type {DownloadableArticle} from "~/types/types";
-import type {DownloadResult} from "~/utils/pool";
 import type {AudioResource, VideoPageInfo} from "~/types/video";
 
 
@@ -295,21 +295,31 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             const urls: string[] = []
             videoPageInfos.forEach(videoPageInfo => {
                 urls.push(videoPageInfo.cover_url)
-                if (videoPageInfo.mp_video_trans_info.length > 0) {
+                if (videoPageInfo.is_mp_video === 1 && videoPageInfo.mp_video_trans_info.length > 0) {
                     urls.push(videoPageInfo.mp_video_trans_info[0].url)
                 }
             })
             return await pool.downloads<string>(urls, resourceDownloadFn)
         })
 
-        const videoIframes = $jsArticleContent.querySelectorAll('iframe[data-mpvid]')
+        const videoIframes = $jsArticleContent.querySelectorAll('iframe.video_iframe')
         videoIframes.forEach(videoIframe => {
-            const vid = videoIframe.getAttribute('data-mpvid')
-            const videoInfo = videoPageInfos.find(info => info.video_id === vid)
-            if (videoInfo) {
-                const div = document.createElement('div')
-                div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0].url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%"></video>`
-                videoIframe.replaceWith(div)
+            const mpvid = videoIframe.getAttribute('data-mpvid')
+            if (mpvid) {
+                const videoInfo = videoPageInfos.find(info => info.video_id === mpvid)
+                if (videoInfo) {
+                    const div = document.createElement('div')
+                    div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0].url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%"></video>`
+                    videoIframe.replaceWith(div)
+                }
+            } else {
+                const src = videoIframe.getAttribute('data-src')!
+                const vidMatchResult = src.match(/v\.qq\.com\/iframe\/preview\.html\?vid=(?<vid>[\da-z]+)/i)
+                if (vidMatchResult && vidMatchResult.groups && vidMatchResult.groups.vid) {
+                    const vid = vidMatchResult.groups.vid
+                    videoIframe.setAttribute('src', 'https://v.qq.com/txp/iframe/player.html?vid=' + vid)
+                    videoIframe.setAttribute('width', '100%')
+                }
             }
         })
     }

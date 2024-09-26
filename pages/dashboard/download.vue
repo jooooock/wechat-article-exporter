@@ -201,7 +201,7 @@ async function switchTableData(fakeid: string) {
   }
 }
 
-function maxLen(text: string, max = 45): string {
+function maxLen(text: string, max = 35): string {
   if (text.length > max) {
     return text.slice(0, max) + '...'
   }

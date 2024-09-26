@@ -1,6 +1,10 @@
 export interface VideoPageInfo {
     video_id: string
+
+    // 是否为内嵌视频
     is_mp_video: number
+
+    // 内嵌视频是否删除
     is_mp_video_delete: number
     cover_url: string
     cover_url_1_1: string
