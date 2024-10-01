@@ -5,21 +5,26 @@
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
 
+      <!-- 公众号列表 -->
       <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
-        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
+        <li v-for="accountInfo in sortedAccountInfos"
+            :key="accountInfo.fakeid"
+            class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
             :class="{'bg-slate-3': selectedAccount?.fakeid === accountInfo.fakeid}"
             @click="toggleSelectedAccount(accountInfo)">
-          <p>公众号:
+          <p>
+            公众号:
             <span v-if="accountInfo.nickname" class="text-xl font-medium">{{ accountInfo.nickname }}</span>
           </p>
           <p>ID: <span class="font-mono">{{ accountInfo.fakeid }}</span></p>
-          <UBadge variant="subtle" color="green" class="absolute top-4 right-2">
+          <UBadge variant="subtle" :color="accountInfo.albums && accountInfo.albums.length > 0 ? 'green' : 'red'" class="absolute top-4 right-2">
             <Loader v-if="!accountInfo.albums" :size="16" class="animate-spin text-slate-500"/>
             <span v-else>{{ accountInfo.albums.length }}</span>
           </UBadge>
         </li>
       </ul>
 
+      <!-- 合集列表 -->
       <div class="flex flex-col h-full w-72 overflow-y-scroll">
         <UAlert
             icon="i-heroicons-bell"
@@ -27,13 +32,17 @@
             class="sticky top-0 flex-shrink-0 text-rose-500"
         />
         <ul v-if="selectedAccount" class="divide-y">
-          <li v-for="(album, index) in selectedAccount.albums" :key="album.id" class="p-4 hover:bg-slate-3 hover:cursor-pointer transition"
-              :class="{'bg-slate-3': selectedAlbum?.id === album.id}" @click="toggleSelectedAlbum(album)">
+          <li v-for="(album, index) in selectedAccount.albums"
+              :key="album.id"
+              class="p-4 hover:bg-slate-3 hover:cursor-pointer transition"
+              :class="{'bg-slate-3': selectedAlbum?.id === album.id}"
+              @click="toggleSelectedAlbum(album)">
             {{ index + 1 }}. {{ album.title }}
           </li>
         </ul>
       </div>
 
+      <!-- 合集文章列表 -->
       <main class="flex-1 h-full overflow-y-scroll bg-[#ededed]" v-if="selectedAccount && selectedAlbum">
         <div v-if="albumLoading" class="flex justify-center items-center mt-5">
           <Loader :size="28" class="animate-spin text-slate-500"/>
@@ -47,13 +56,18 @@
           <div class="relative rounded-xl -mt-4 z-50 bg-white px-4 py-6">
             <!-- 按钮操作区 -->
             <div class="absolute right-5 top-2 flex justify-end space-x-2">
-              <NuxtLink :to="originalAlbumURL" target="_blank" class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">跳转到原始链接</NuxtLink>
+              <NuxtLink :to="originalAlbumURL" target="_blank"
+                        class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
+                跳转到原始链接
+              </NuxtLink>
               <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
                        :disabled="albumArticles.length === 0 || batchDownloadLoading" @click="doBatchDownload">
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
-                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ selectedArticleCount }}</span>
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{
+                      selectedArticleCount
+                    }}</span>
                   <span
                       v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
@@ -75,9 +89,9 @@
               <div class="pt-8 pb-6">
                 <Loader v-if="switchSortLoading" :size="24" class="animate-spin text-slate-500"/>
                 <div v-else class="flex space-x-2 w-fit" @click="toggleReverse">
-                  <ArrowUpNarrowWide v-if="isReverse" />
-                  <ArrowDownNarrowWide v-else />
-                  <span>{{isReverse ? '倒序' : '正序'}}</span>
+                  <ArrowUpNarrowWide v-if="isReverse"/>
+                  <ArrowDownNarrowWide v-else/>
+                  <span>{{ isReverse ? '倒序' : '正序' }}</span>
                 </div>
               </div>
             </div>
@@ -112,9 +126,8 @@
 import {getAllInfo, type Info} from "~/store/info";
 import {getArticleCache} from "~/store/article";
 import type {AppMsgAlbumInfo, DownloadableArticle} from "~/types/types";
-import {Loader} from "lucide-vue-next";
+import {ArrowDownNarrowWide, ArrowUpNarrowWide, Loader} from "lucide-vue-next";
 import type {AppMsgAlbumResult, ArticleItem, BaseInfo} from "~/types/album";
-import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-vue-next';
 import {vElementVisibility} from "@vueuse/components"
 import {useDownloadAlbum} from '~/composables/useBatchDownload'
 import {formatAlbumTime} from "~/utils/album";
@@ -132,6 +145,16 @@ interface AccountInfo extends Info {
 const cachedAccountInfos: AccountInfo[] = reactive(await getAllInfo())
 cachedAccountInfos.forEach(async accountInfo => {
   accountInfo.albums = await getAllAlbums(accountInfo.fakeid)
+})
+const sortedAccountInfos = computed(() => {
+  cachedAccountInfos.sort((a, b) => {
+    if (a.albums && b.albums) {
+      return a.albums.length > b.albums.length ? -1 : 1
+    } else {
+      return 0
+    }
+  })
+  return cachedAccountInfos
 })
 
 // 已选择的公众号
@@ -156,7 +179,11 @@ function toggleSelectedAlbum(album: AppMsgAlbumInfo) {
     selectedAlbum.value = album
 
     isReverse.value = false
-    getFirstPageAlbumData().catch(() => {})
+    articleLoading.value = false
+    switchSortLoading.value = false
+    getFirstPageAlbumData().catch((e) => {
+      console.warn(e)
+    })
   }
 }
 
@@ -189,6 +216,8 @@ const albumLoading = ref(false)
 const articleLoading = ref(false)
 const switchSortLoading = ref(false)
 
+const controller = ref<AbortController | null>(null)
+
 // 加载合集第一页数据
 async function getFirstPageAlbumData(refreshPage = true) {
   if (refreshPage) {
@@ -197,14 +226,21 @@ async function getFirstPageAlbumData(refreshPage = true) {
     switchSortLoading.value = true
   }
 
+  if (controller.value) {
+    (controller.value as AbortController).abort('切换tab，取消pending中的请求')
+  }
+  controller.value = new AbortController()
   const data = await $fetch<AppMsgAlbumResult>('/api/appmsgalbum', {
     method: 'GET',
     query: {
       fakeid: selectedAccount.value!.fakeid,
       album_id: selectedAlbum.value!.id,
       is_reverse: isReverse.value ? '1' : '0',
-    }
+    },
+    signal: controller.value.signal,
   })
+
+  controller.value = null
 
   if (refreshPage) {
     albumLoading.value = false
@@ -228,12 +264,19 @@ async function getFirstPageAlbumData(refreshPage = true) {
 function toggleReverse() {
   isReverse.value = !isReverse.value
 
-  getFirstPageAlbumData(false)
+  getFirstPageAlbumData(false).catch((e) => {
+    console.warn(e)
+  })
 }
 
 // 加载合集后续数据
 async function loadMoreData() {
   articleLoading.value = true
+
+  if (controller.value) {
+    (controller.value as AbortController).abort('加载更多数据，取消pending中的请求')
+  }
+  controller.value = new AbortController()
 
   const lastArticle = albumArticles[albumArticles.length - 1]
   const data = await $fetch<AppMsgAlbumResult>('/api/appmsgalbum', {
@@ -244,8 +287,10 @@ async function loadMoreData() {
       is_reverse: isReverse.value ? '1' : '0',
       begin_msgid: lastArticle?.msgid,
       begin_itemidx: lastArticle?.itemidx,
-    }
+    },
+    signal: controller.value.signal,
   })
+  controller.value = null
   articleLoading.value = false
 
   if (data.base_resp.ret === 0) {
@@ -265,7 +310,9 @@ const bottomElementIsVisible = ref(false)
 function onElementVisibility(visible: boolean) {
   bottomElementIsVisible.value = visible
   if (visible && !noMoreData.value && !articleLoading.value) {
-    loadMoreData()
+    loadMoreData().catch(e => {
+      console.warn(e)
+    })
   }
 }
 
@@ -277,6 +324,7 @@ const {
   download: batchDownload,
 } = useDownloadAlbum()
 const selectedArticleCount = ref(0)
+
 function doBatchDownload() {
   const articles: DownloadableArticle[] = albumArticles.map(article => ({
     title: article.title,

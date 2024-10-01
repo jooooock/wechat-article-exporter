@@ -4,8 +4,10 @@
       <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">数据导出 <span class="text-sm text-slate-10">导出本地已缓存的文章</span></h1>
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
+
+      <!-- 公众号列表 -->
       <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
-        <li v-for="accountInfo in cachedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
+        <li v-for="accountInfo in sortedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
             :class="{'bg-slate-3': selectedAccount === accountInfo.fakeid}" @click="toggleSelectedAccount(accountInfo)">
           <p>公众号:
             <span v-if="accountInfo.nickname" class="text-xl font-medium">{{ accountInfo.nickname }}</span>
@@ -15,6 +17,7 @@
         </li>
       </ul>
 
+      <!-- 文章列表 -->
       <main class="flex-1 h-full overflow-y-scroll">
         <div v-if="loading" class="flex justify-center items-center mt-5">
           <Loader :size="28" class="animate-spin text-slate-500"/>
@@ -149,6 +152,13 @@ useHead({
 
 // 已缓存的公众号信息
 const cachedAccountInfos = await getAllInfo()
+const sortedAccountInfos = computed(() => {
+  cachedAccountInfos.sort((a, b) => {
+    return a.articles > b.articles ? -1 : 1
+  })
+  return cachedAccountInfos
+})
+
 const selectedAccount = ref('')
 const selectedAccountName = ref('')
 
