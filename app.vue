@@ -16,6 +16,12 @@ if (!useLoginAccount().value) {
 }
 
 useHead({
+  meta: [
+    {
+      name: 'referrer',
+      content: 'no-referrer'
+    }
+  ],
   script: [
     {
       src: '/register.js'
