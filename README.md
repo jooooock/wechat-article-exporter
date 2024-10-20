@@ -8,8 +8,7 @@
 ![GitHub stars]
 ![GitHub forks]
 ![GitHub License]
-![GitHub commit activity]
-![GitHub last commit]
+
 
 在线批量导出微信公众号文章，支持内嵌的音视频导出，无需搭建任何环境，可100%还原文章样式，支持私有部署。
 
@@ -297,10 +296,6 @@ MIT
 [Github forks]: https://img.shields.io/github/forks/jooooock/wechat-article-exporter?style=social&label=Fork&style=plastic
 
 [Github License]: https://img.shields.io/github/license/jooooock/wechat-article-exporter?label=License
-
-[Github commit activity]: https://img.shields.io/github/commit-activity/w/jooooock/wechat-article-exporter
-
-[Github last commit]: https://img.shields.io/github/last-commit/jooooock/wechat-article-exporter
 
 [微信公众平台]: https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN
 
