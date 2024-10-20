@@ -256,8 +256,8 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                     trans.url = trans.url.replace(/&amp;/g, '&')
                 })
 
-                // todo: 这里为了节省流量需要控制清晰度
-                videoUrl = mpVideoTransInfo[0].url
+                // 这里为了节省流量需要控制清晰度
+                videoUrl = mpVideoTransInfo[mpVideoTransInfo.length - 1].url
 
                 // 下载资源
                 const videoURLMap = new Map<string, string>()
