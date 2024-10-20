@@ -255,10 +255,33 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 mpVideoTransInfo.forEach((trans: any) => {
                     trans.url = trans.url.replace(/&amp;/g, '&')
                 })
+
+                // todo: 这里为了节省流量需要控制清晰度
                 videoUrl = mpVideoTransInfo[0].url
+
+                // 下载资源
+                const videoURLMap = new Map<string, string>()
+                const resourceDownloadFn = async (url: string, proxy: string) => {
+                    const videoData = await downloadAssetWithProxy<Blob>(url, proxy, 10)
+                    const uuid = new Date().getTime() + Math.random().toString()
+                    const ext = mime.getExtension(videoData.type)
+                    zip.file(`assets/${uuid}.${ext}`, videoData)
+
+                    videoURLMap.set(url, `./assets/${uuid}.${ext}`)
+                    return videoData.size
+                }
+                await measureExecutionTime('视频资源下载结果:', async () => {
+                    const urls: string[] = []
+                    if (poster) {
+                        urls.push(poster)
+                    }
+                    urls.push(videoUrl)
+                    return await pool.downloads<string>(urls, resourceDownloadFn)
+                })
+
                 const div = document.createElement('div')
                 div.style.cssText = 'height: 381px;background: #000;border-radius: 4px; overflow: hidden;margin-bottom: 12px;'
-                div.innerHTML = `<video src="${videoUrl}" poster="${poster}" controls style="width: 100%;height: 100%;"></video>`
+                div.innerHTML = `<video src="${videoURLMap.get(videoUrl)}" poster="${videoURLMap.get(poster)}" controls style="width: 100%;height: 100%;"></video>`
                 $js_mpvedio.appendChild(div)
             }
         }

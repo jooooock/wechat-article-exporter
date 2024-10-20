@@ -24,6 +24,7 @@
 - [x] 支持合集下载
 - [x] 支持内嵌的音视频下载
 - [x] 支持图片分享消息
+- [x] 支持视频分享消息
 - [ ] 支持导出评论(需要获取目标公众号的key)
 - [ ] 支持订阅机制，根据指定规则自动下载文章
 
@@ -104,8 +105,8 @@
 
 目前有以下代理节点:
 ```
-https://vproxy-01.deno.dev
-https://vproxy-02.deno.dev
+https://vproxy-01.deno.dev (已失效)
+https://vproxy-02.deno.dev (已失效)
 https://vproxy-03.deno.dev
 https://vproxy-04.deno.dev
 https://vproxy-05.deno.dev
