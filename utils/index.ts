@@ -41,9 +41,8 @@ export function formatItemShowType(type: number) {
  * @param timeout 超时时间(单位: 秒)，默认 30
  */
 async function downloadAssetWithProxy<T extends Blob | string>(url: string, proxy: string | undefined, timeout = 30) {
-    // 客户端并不使用真正的代理，只是用于并发控制
     let targetURL = proxy ? `${proxy}?url=${encodeURIComponent(url)}` : url
-    // let targetURL = url
+    targetURL = targetURL.replace(/^http:\/\//, 'https://')
     const result = await $fetch<T>(targetURL, {
         retry: 0,
         timeout: timeout * 1000,
