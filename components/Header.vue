@@ -13,6 +13,10 @@
 <!--      <input type="file" @change="fileChange">-->
     </div>
     <div class="hidden space-x-5 lg:flex lg:items-center">
+      <NuxtLink to="/dashboard/download"
+                class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
+        数据导出
+      </NuxtLink>
       <span class="text-slate-500 text-sm font-medium">隐藏已删除文章: </span>
       <UToggle v-model="hideDeleted" @change="toggleHideDeleted" />
       <BaseSearch v-model="articleQuery" @search="searchArticle" placeholder="搜索文章标题"/>

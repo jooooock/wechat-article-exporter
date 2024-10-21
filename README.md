@@ -15,6 +15,59 @@
 交流群(QQ): `991482155`
 
 
+## ⚠️⚠️⚠️ 注意
+从 2024-10-21 开始，下载机制进行了调整，所有资源的下载不再经由代理服务器处理，而改为需要配合浏览器插件解决跨域、图片防盗链等问题。
+
+这里推荐用 [ModHeader插件](https://modheader.com/)，插件的配置如下:
+![img.png](img.png)
+
+<details>
+<summary>配置说明</summary>
+
+请求头中添加`Referer`，值为`https://mp.weixin.qq.com/`, 解决页面上图片显示及视频资源下载问题。
+
+响应头中添加`Access-Control-Allow-Origin`，值为`*`, 解决下载资源接口跨域问题。
+
+过滤器添加2个域名：`wechat-article-exporter.deno.dev`和`localhost`，表示只有这些域名发起的请求才会应用这些配置。`localhost`用于本地开发调试。
+
+可复制以下配置直接导入到 ModHeader 插件中:
+```json
+[
+  {
+    "headers": [
+      {
+        "appendMode": false,
+        "enabled": true,
+        "name": "Referer",
+        "value": "https://mp.weixin.qq.com/"
+      }
+    ],
+    "initiatorDomainFilters": [
+      {
+        "domain": "wechat-article-exporter.deno.dev",
+        "enabled": true
+      },
+      {
+        "domain": "localhost",
+        "enabled": true
+      }
+    ],
+    "respHeaders": [
+      {
+        "appendMode": false,
+        "enabled": true,
+        "name": "Access-Control-Allow-Origin",
+        "value": "*"
+      }
+    ],
+    "shortTitle": "1",
+    "title": "公众号文章导出",
+    "version": 2
+  }
+]
+```
+</details>
+
 ## :dart: 特性
 
 - [x] 搜索公众号，支持关键字和biz搜索
@@ -98,161 +151,6 @@
 ## :bulb: 原理
 
 在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的。
-
-
-
-## :earth_americas: 关于代理池
-
-数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
-
-目前有以下代理节点:
-```
-https://vproxy-01.deno.dev (已失效)
-https://vproxy-02.deno.dev (已失效)
-https://vproxy-03.deno.dev (本月额度已用完，刷新时间: 2024-11-02 at 19:59:12)
-https://vproxy-04.deno.dev (本月额度已用完，刷新时间: 2024-11-02 at 19:59:12)
-https://vproxy-05.deno.dev
-https://vproxy-06.deno.dev
-https://vproxy-07.deno.dev
-https://vproxy-08.deno.dev
-https://vproxy-09.deno.dev
-https://vproxy-10.deno.dev
-https://vproxy-11.deno.dev
-https://vproxy-12.deno.dev
-https://vproxy-13.deno.dev
-https://vproxy-14.deno.dev
-https://vproxy-15.deno.dev
-https://vproxy-16.deno.dev
-https://vproxy-01.jooooock.workers.dev
-https://vproxy-02.jooooock.workers.dev
-```
-
-> 以上节点都是部署在 Deno Deploy / Cloudflare Workers 上面的免费账户中，算是白嫖了这些托管平台的流量。
->
-> 目前这些节点都是公开的，后续打算加入签名验证机制，防止被恶意盗刷。
-
-代理节点代码 (未进行签名验证，请酌情使用):
-
-<details>
-<summary>Deno Deploy</summary>
-
-```ts
-function error(msg: Error | string) {
-    return new Response(msg instanceof Error ? msg.message : msg, {
-        status: 403,
-    });
-}
-
-async function wfetch(url: string, opt: Record<string, string> = {}) {
-    if (!opt) {
-        opt = {};
-    }
-    const options: Record<string, any> = {
-        method: "GET",
-        headers: {
-            "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
-        },
-    };
-    if (opt.referer) {
-        options.headers["Referer"] = opt.referer;
-    }
-
-    return await fetch(url, options);
-}
-
-Deno.serve(async (req: Request) => {
-    if (req.method.toLowerCase() !== "get") {
-        return error("Method not allowed");
-    }
-
-    const origin = req.headers.get("origin")!;
-    const { searchParams } = new URL(req.url);
-    let url = searchParams.get("url");
-    if (!url) {
-        return error("url cannot empty");
-    }
-
-    url = decodeURIComponent(url);
-    console.log("proxy url:", url);
-
-    if (!/^https?:\/\//.test(url)) {
-        return error("url not valid");
-    }
-
-    const response = await wfetch(url);
-
-    return new Response(response.body, {
-        headers: {
-            "Access-Control-Allow-Origin": origin,
-            "Content-Type": response.headers.get("Content-Type")!,
-        },
-    });
-});
-```
-</details>
-
-<details>
-<summary>Cloudflare Worker</summary>
-
-```js
-function error(msg) {
-    return new Response(msg instanceof Error ? msg.message : msg, {
-        status: 403,
-    });
-}
-
-async function wfetch(url, opt = {}) {
-    if (!opt) {
-        opt = {};
-    }
-    const options = {
-        method: "GET",
-        headers: {
-            "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
-        },
-    };
-    if (opt.referer) {
-        options.headers["Referer"] = opt.referer;
-    }
-
-    return await fetch(url, options);
-}
-
-
-export default {
-  async fetch(req, env, ctx) {
-    if (req.method.toLowerCase() !== "get") {
-        return error("Method not allowed");
-    }
-
-    const origin = req.headers.get("origin");
-    const { searchParams } = new URL(req.url);
-    let url = searchParams.get("url");
-    if (!url) {
-        return error("url cannot empty");
-    }
-
-    url = decodeURIComponent(url);
-    console.log("proxy url:", url);
-
-    if (!/^https?:\/\//.test(url)) {
-        return error("url not valid");
-    }
-
-    const response = await wfetch(url);
-
-    return new Response(response.body, {
-        headers: {
-            "Access-Control-Allow-Origin": origin,
-            "Content-Type": response.headers.get("Content-Type"),
-        },
-    });
-  },
-};
-```
-</details>
 
 
 ## 关于导出其他格式

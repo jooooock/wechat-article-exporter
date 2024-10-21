@@ -28,3 +28,9 @@ export interface AudioResource {
     uuid: string
     url: string
 }
+
+export interface VideoResource {
+    type: 'cover' | 'video'
+    uuid: string
+    url: string
+}
