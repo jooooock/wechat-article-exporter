@@ -281,7 +281,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                         urls.push(poster)
                     }
                     urls.push(videoUrl)
-                    return await pool.downloads<string>(urls, resourceDownloadFn)
+                    return await pool.downloads<string>(urls, resourceDownloadFn, false)
                 })
 
                 const div = document.createElement('div')
@@ -403,7 +403,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 })
             })
 
-            return await pool.downloads<AudioResource>(assets, audioResourceDownloadFn)
+            return await pool.downloads<AudioResource>(assets, audioResourceDownloadFn, false)
         })
     }
 
@@ -438,7 +438,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                     urls.push(videoPageInfo.mp_video_trans_info[0].url)
                 }
             })
-            return await pool.downloads<string>(urls, resourceDownloadFn)
+            return await pool.downloads<string>(urls, resourceDownloadFn, false)
         })
 
         const videoIframes = $jsArticleContent.querySelectorAll('iframe.video_iframe')
