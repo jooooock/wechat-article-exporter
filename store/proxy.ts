@@ -96,19 +96,19 @@ const loginAccount = useLoginAccount()
  * 上报 proxy 数据
  */
 export async function uploadProxy() {
-    // const proxies = await getProxyCache()
-    //
-    // // 上报统计数据
-    // if (proxies && proxies.length > 0) {
-    //     await $fetch('/api/stat', {
-    //         method: 'POST',
-    //         body: JSON.stringify({
-    //             proxies,
-    //             uuid: loginAccount.value.uuid || loginAccount.value.nickname || (loginAccount.value as any).nick_name,
-    //         }),
-    //     })
-    //
-    //     // 清空缓存
-    //     await clearProxyCache()
-    // }
+    const proxies = await getProxyCache()
+
+    // 上报统计数据
+    if (proxies && proxies.length > 0) {
+        await $fetch('/api/stat', {
+            method: 'POST',
+            body: JSON.stringify({
+                proxies,
+                uuid: loginAccount.value.uuid || loginAccount.value.nickname || (loginAccount.value as any).nick_name,
+            }),
+        })
+
+        // 清空缓存
+        await clearProxyCache()
+    }
 }

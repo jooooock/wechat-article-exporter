@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import {AVAILABLE_PROXY_LIST} from '~/config'
 import type {DownloadableArticle} from "~/types/types"
 import type {AudioResource, VideoResource} from "~/types/video"
+import {updateProxiesCache} from "~/store/proxy"
 
 /**
  * 代理实例
@@ -277,7 +278,7 @@ export async function downloads<T extends DownloadResource>(resources: T[], down
     const result = await Promise.all(tasks)
 
     // 保存代理使用数据
-    // await updateProxiesCache(pool.proxies)
+    await updateProxiesCache(pool.proxies)
 
     return result
 }
@@ -290,20 +291,20 @@ export function usage() {
 }
 
 export function formatDownloadResult(label: string, results: DownloadResult | DownloadResult[], total: number) {
-    // if (!Array.isArray(results)) {
-    //     results = [results]
-    // }
+    if (!Array.isArray(results)) {
+        results = [results]
+    }
 
-    // console.debug(label)
-    // console.debug(`总耗时: ${total.toFixed(2)}s`);
+    console.debug(label)
+    console.debug(`总耗时: ${total.toFixed(2)}s`);
 
     // 打印下载耗时明细
-    // const downloadResults = results.map(result => ({
-    //     URL: result.url,
-    //     size: result.size,
-    //     '耗时': result.totalTime,
-    //     '重试次数': result.attempts,
-    //     '是否下载成功': result.success,
-    // }))
-    // console.table(downloadResults)
+    const downloadResults = results.map(result => ({
+        URL: result.url,
+        size: result.size,
+        '耗时': result.totalTime,
+        '重试次数': result.attempts,
+        '是否下载成功': result.success,
+    }))
+    console.table(downloadResults)
 }

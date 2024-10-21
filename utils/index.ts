@@ -42,22 +42,21 @@ export function formatItemShowType(type: number) {
  */
 async function downloadAssetWithProxy<T extends Blob | string>(url: string, proxy: string | undefined, timeout = 30) {
     // 客户端并不使用真正的代理，只是用于并发控制
-    // let targetURL = proxy ? `${proxy}?url=${encodeURIComponent(url)}` : url
-    let targetURL = url
-    targetURL = targetURL.replace(/^http:\/\//, 'https://')
+    let targetURL = proxy ? `${proxy}?url=${encodeURIComponent(url)}` : url
+    // let targetURL = url
     const result = await $fetch<T>(targetURL, {
         retry: 0,
         timeout: timeout * 1000,
     })
 
     // 统计代理下载资源流量
-    // if (proxy) {
-    //     if (result instanceof Blob) {
-    //         pool.pool.incrementTraffic(proxy, result.size)
-    //     } else {
-    //         pool.pool.incrementTraffic(proxy, new Blob([result]).size)
-    //     }
-    // }
+    if (proxy) {
+        if (result instanceof Blob) {
+            pool.pool.incrementTraffic(proxy, result.size)
+        } else {
+            pool.pool.incrementTraffic(proxy, new Blob([result]).size)
+        }
+    }
 
     return result
 }
@@ -263,7 +262,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 })
 
                 // 这里为了节省流量需要控制清晰度
-                videoUrl = mpVideoTransInfo[0].url
+                videoUrl = mpVideoTransInfo[mpVideoTransInfo.length - 1].url
 
                 // 下载资源
                 const videoURLMap = new Map<string, string>()
