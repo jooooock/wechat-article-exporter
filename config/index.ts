@@ -23,8 +23,8 @@ export const ACCOUNT_TYPE: Record<number, string> = {
 export const AVAILABLE_PROXY_LIST: string[] = [
     // 'https://vproxy-01.deno.dev/',
     // 'https://vproxy-02.deno.dev/',
-    'https://vproxy-03.deno.dev/',
-    'https://vproxy-04.deno.dev/',
+    // 'https://vproxy-03.deno.dev/',
+    // 'https://vproxy-04.deno.dev/',
     'https://vproxy-05.deno.dev/',
     'https://vproxy-06.deno.dev/',
     'https://vproxy-07.deno.dev/',

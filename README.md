@@ -109,8 +109,8 @@
 ```
 https://vproxy-01.deno.dev (已失效)
 https://vproxy-02.deno.dev (已失效)
-https://vproxy-03.deno.dev
-https://vproxy-04.deno.dev
+https://vproxy-03.deno.dev (本月额度已用完，刷新时间: 2024-11-02 at 19:59:12)
+https://vproxy-04.deno.dev (本月额度已用完，刷新时间: 2024-11-02 at 19:59:12)
 https://vproxy-05.deno.dev
 https://vproxy-06.deno.dev
 https://vproxy-07.deno.dev
