@@ -319,17 +319,26 @@ export default {
 - 感谢 [WeChat_Article] 项目提供原理思路
 
 
-## :coffee: 捐赠与支持
+## :coffee: 支持
 
-如果你觉得本项目帮助到了你，请给作者一个免费的 Star，也可以请作者喝杯咖啡，感谢你的支持！
+如果你觉得本项目帮助到了你，请给作者一个免费的 Star，感谢你的支持！
 
-<table>
-<tr>
-<td><a href="https://ko-fi.com/Y8Y3VBAML"><img src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="400" alt="buy me a coffee"></a></td>
-<td><img src="assets/wechat-reward-code.png" height="400" width="400" alt="微信赞赏码" /></td>
-</tr>
-</table>
 
+## 关于后续更新计划
+
+后续会区分出免费版和Pro版，区别如下:
+
+### 免费版
+- 所有现有功能
+- 所有现有的代理节点
+- 现有功能的bug修复
+
+### Pro版
+- 阅读量、评论数据导出
+- 订阅自动下载服务
+- 更多代理节点
+
+> 目前只是有这个计划，并没有开始实施。对于之前有赞赏行为的用户，可提供优惠服务。
 
 ## :star: Star 历史
 
