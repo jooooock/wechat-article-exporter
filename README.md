@@ -16,10 +16,10 @@
 
 
 ## ⚠️⚠️⚠️ 注意
-从 2024-10-21 开始，下载机制进行了调整，**音视频的下载** 不再经由代理服务器处理，而改为需要配合浏览器插件解决跨域问题。
+从 2024-10-21 开始，下载机制进行了调整，文章内嵌的 **音视频下载** 需要配合浏览器插件才能下载。
 
 这里推荐用 [ModHeader插件](https://modheader.com/)，插件的配置如下:
-![img.png](img.png)
+![modheader插件设置](assets/modheader-plugin-config.png)
 
 <details>
 <summary>配置说明</summary>
@@ -312,6 +312,9 @@ export default {
 
 > PDF格式可参考: https://github.com/colin4k/wechat-article-dl
 
+
+## 常见问题
+请参考 [faq](docs/faq.md) 文档，如果遇到其他使用问题，欢迎在 Issue 中说明。
 
 ## :heart: 感谢
 
