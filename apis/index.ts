@@ -71,7 +71,7 @@ export async function getArticleList(fakeid: string, token: string, begin = 0, k
         const publish_list = publish_page.publish_list.filter(item => !!item.publish_info)
 
         // 返回的文章数量与请求的文章数量不一致就说明已结束
-        const isCompleted = publish_list.length !== ARTICLE_LIST_PAGE_SIZE
+        const isCompleted = publish_list.length === 0
 
         // 更新缓存，注意搜索的结果不能写入缓存
         if (!keyword) {
