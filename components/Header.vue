@@ -79,7 +79,7 @@ import type {AccountInfo, AuthorInfo} from "~/types/types";
 import {Loader, ArrowRightLeft} from "lucide-vue-next";
 import {packHTMLAssets} from "~/utils";
 import {ACCOUNT_LIST_PAGE_SIZE, ACCOUNT_TYPE} from "~/config";
-import {authorInfo, getAccountList} from "~/apis";
+import {getAccountList} from "~/apis";
 
 
 const loginAccount = useLoginAccount()
@@ -111,12 +111,7 @@ async function searchAccount() {
   accountList.length = 0
   noMoreData.value = false
 
-  if (/^[a-z0-9]+==$/i.test(accountQuery.value)) {
-    // 直接输入的bizNo
-    await loadAuthorInfo(accountQuery.value)
-  } else {
-    await loadData()
-  }
+  await loadData()
 }
 
 const loading = ref(false)
@@ -144,26 +139,6 @@ async function loadData() {
   }
 }
 
-async function loadAuthorInfo(biz: string) {
-  loading.value = true
-
-  try {
-    const result = await authorInfo(accountQuery.value)
-    if (result.base_resp.ret === 0) {
-      accountList.push({
-        type: 'author',
-        fakeid: biz,
-        nickname: result.identity_name,
-      })
-    }
-    noMoreData.value = true
-  } catch (e: any) {
-    alert(e.message)
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
 
 /**
  * 选择公众号

@@ -3,11 +3,12 @@
   "version": "0.0.3",
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
     "dev": "nuxt dev",
+    "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "add:biz": "deno run -A --unstable-kv scripts/biz.ts"
   },
   "dependencies": {
     "@deno/kv": "^0.8.2",
@@ -38,6 +39,6 @@
     "typescript": "^5.5.3"
   },
   "engines": {
-    "node": "20"
+    "node": ">=20"
   }
 }

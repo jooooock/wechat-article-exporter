@@ -3,6 +3,7 @@
  */
 
 import {proxyMpRequest} from "~/server/utils";
+import {getBizEntry} from "~/server/kv/biz";
 
 interface SearchBizQuery {
     begin?: number
@@ -17,6 +18,23 @@ export default defineEventHandler(async (event) => {
     const token = query.token
     const begin: number = query.begin || 0
     const size: number = query.size || 5
+
+    if (/^[a-z0-9]+==$/i.test(keyword)) {
+        // 直接输入的bizNo, 检查kv数据
+        console.log(keyword)
+        const bizEntry = await getBizEntry(keyword)
+        console.log(bizEntry)
+        if (bizEntry) {
+            return {
+                base_resp: {
+                    ret: 0,
+                    err_msg: 'ok'
+                },
+                list: [bizEntry],
+                total: 1,
+            }
+        }
+    }
 
     const params: Record<string, string | number> = {
         action: 'search_biz',
