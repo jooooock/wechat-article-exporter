@@ -72,7 +72,8 @@ async function loadData() {
     const [articles, completed, totalCount] = await getArticleList(fakeid, loginAccount.value.token, begin.value, keyword.value)
     articleList.push(...articles)
     noMoreData.value = completed
-    begin.value += articles.length
+    const count = articles.filter(article => article.itemidx === 1).length
+    begin.value += count
 
     totalPages.value = Math.ceil(totalCount / ARTICLE_LIST_PAGE_SIZE)
 
