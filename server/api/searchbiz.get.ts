@@ -21,9 +21,7 @@ export default defineEventHandler(async (event) => {
 
     if (/^[a-z0-9]+==$/i.test(keyword)) {
         // 直接输入的bizNo, 检查kv数据
-        console.log(keyword)
         const bizEntry = await getBizEntry(keyword)
-        console.log(bizEntry)
         if (bizEntry) {
             return {
                 base_resp: {
