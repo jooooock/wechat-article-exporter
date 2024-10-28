@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="text-2xl font-semibold">当前账号(<span
-        class="text-sky-500 font-serif">{{ loginAccount.nick_name }}</span>)的接口调用情况:</h1>
+        class="text-sky-500 font-serif">{{ loginAccount.nickname }}</span>)的接口调用情况:</h1>
     <div class="container mx-auto">
       <Line :data="chartData" :options="chartOptions" role="img" aria-label="接口调用图表"/>
     </div>
@@ -145,7 +145,7 @@ async function callApi() {
  */
 async function getApiCallData(name: ApiName) {
   const start = dayjs(new Date()).subtract(4, 'hours').toDate().getTime()
-  const records = await queryAPICall(loginAccount.value.nick_name!, start)
+  const records = await queryAPICall(loginAccount.value.nickname!, start)
   const dataset = records.filter(record => record.name === name && record.payload.keyword)
 
   const data: APICallWithValue[] = []

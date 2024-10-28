@@ -55,7 +55,7 @@ export async function getArticleList(fakeid: string, token: string, begin = 0, k
     // 记录 api 调用
     await updateAPICache({
         name: 'appmsgpublish',
-        account: loginAccount.value.nick_name!,
+        account: loginAccount.value.nickname!,
         call_time: new Date().getTime(),
         is_normal: resp.base_resp.ret === 0 || resp.base_resp.ret === 200003,
         payload: {
@@ -116,7 +116,7 @@ export async function getAccountList(token: string, begin = 0, keyword = ''): Pr
     // 记录 api 调用
     await updateAPICache({
         name: 'searchbiz',
-        account: loginAccount.value.nick_name!,
+        account: loginAccount.value.nickname!,
         call_time: new Date().getTime(),
         is_normal: resp.base_resp.ret === 0 || resp.base_resp.ret === 200003,
         payload: {
