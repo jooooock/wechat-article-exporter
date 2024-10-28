@@ -23,6 +23,7 @@
     "chartjs-adapter-dayjs-4": "^1.0.4",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.12",
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "lucide-vue-next": "^0.441.0",

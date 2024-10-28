@@ -1,13 +1,15 @@
 <template>
   <div class="flex flex-col h-full">
     <Teleport defer to="#title">
-      <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">数据导出 <span class="text-sm text-slate-10">导出本地已缓存的文章</span></h1>
+      <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">数据导出 <span class="text-sm text-slate-10">导出本地已缓存的文章</span>
+      </h1>
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
 
       <!-- 公众号列表 -->
       <ul class="flex flex-col h-full w-fit overflow-y-scroll divide-y">
-        <li v-for="accountInfo in sortedAccountInfos" :key="accountInfo.fakeid" class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
+        <li v-for="accountInfo in sortedAccountInfos" :key="accountInfo.fakeid"
+            class="relative px-4 pr-16 py-4 hover:bg-slate-3 hover:cursor-pointer transition"
             :class="{'bg-slate-3': selectedAccount === accountInfo.fakeid}" @click="toggleSelectedAccount(accountInfo)">
           <p>公众号:
             <span v-if="accountInfo.nickname" class="text-xl font-medium">{{ accountInfo.nickname }}</span>
@@ -64,13 +66,18 @@
 
               <UButton color="gray" variant="solid" @click="search">搜索</UButton>
             </div>
-            <div>
+            <div class="space-x-2">
+              <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
+                       :disabled="selectedArticles.length === 0 || excelBtnLoading" @click="excelExport">Excel导出
+              </UButton>
               <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
                        :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="doBatchDownload">
                 <Loader v-if="batchDownloadLoading" :size="20" class="animate-spin"/>
                 <span v-if="batchDownloadLoading">{{ batchDownloadPhase }}:
                   <span
-                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{ selectedArticleCount }}</span>
+                      v-if="batchDownloadPhase === '下载文章内容'">{{ batchDownloadedCount }}/{{
+                      selectedArticleCount
+                    }}</span>
                   <span
                       v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
@@ -113,7 +120,7 @@
               </td>
               <td class="text-center">
                 <a class="text-blue-500 underline" :href="article.link" target="_blank">
-                  <UIcon name="i-heroicons-link-16-solid" class="w-5 h-5" />
+                  <UIcon name="i-heroicons-link-16-solid" class="w-5 h-5"/>
                 </a>
               </td>
             </tr>
@@ -122,7 +129,8 @@
           <!-- 状态栏 -->
           <div class="sticky bottom-0 h-[40px] bg-white flex items-center px-4 space-x-10 border-t-2 font-mono">
             <span class="text-green-500">已选 {{ selectedArticles.length }} / {{ displayedArticles.length }}</span>
-            <span class="text-rose-300" v-if="deletedArticlesCount > 0">已隐藏 {{deletedArticlesCount}} 条删除文章</span>
+            <span class="text-rose-300"
+                  v-if="deletedArticlesCount > 0">已隐藏 {{ deletedArticlesCount }} 条删除文章</span>
           </div>
         </div>
       </main>
@@ -139,6 +147,8 @@ import {Loader} from "lucide-vue-next";
 import {sleep} from "@antfu/utils";
 import {type Duration, format, isSameDay, sub} from 'date-fns'
 import {useBatchDownload} from "~/composables/useBatchDownload";
+import ExcelJS from "exceljs";
+import {saveAs} from 'file-saver'
 
 
 interface Article extends AppMsgEx {
@@ -331,6 +341,7 @@ const {
   download: batchDownload,
 } = useBatchDownload()
 const selectedArticleCount = ref(0)
+
 function doBatchDownload() {
   const articles: DownloadableArticle[] = selectedArticles.value.map(article => ({
     title: article.title,
@@ -340,6 +351,53 @@ function doBatchDownload() {
   selectedArticleCount.value = articles.length
   const filename = selectedAccountName.value
   batchDownload(articles, filename)
+}
+
+const excelBtnLoading = ref(false)
+
+function excelExport() {
+  excelBtnLoading.value = true
+
+  const articles = selectedArticles.value.map(article => ({...article}))
+  setTimeout(() => {
+    exportToExcel(articles)
+    excelBtnLoading.value = false
+  }, 0)
+}
+
+async function exportToExcel(data: AppMsgEx[]) {
+  // 创建工作簿和工作表
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Sheet1');
+
+  // 设置表头
+  worksheet.columns = [
+    {header: '标题', key: 'title', width: 80},
+    {header: '发布日期', key: 'update_time', width: 20},
+    {header: '作者', key: 'author_name', width: 20},
+    {header: '是否原创', key: 'copyright', width: 10},
+    {header: '所属合集', key: 'album', width: 50},
+    {header: '摘要', key: 'digest', width: 100},
+    {header: '原文链接', key: 'link', width: 200},
+  ];
+
+  // 添加数据
+  data.forEach(item => {
+    worksheet.addRow({
+      title: item.title,
+      update_time: formatTimeStamp(item.update_time),
+      author_name: item.author_name,
+      copyright: item.copyright_stat === 1 && item.copyright_type === 1 ? '原创' : '',
+      album: item.appmsg_album_infos.map(album => '#'+album.title).join(' '),
+      digest: item.digest,
+      link: item.link,
+    });
+  });
+
+  // 导出为 Excel 文件
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {type: 'application/octet-stream'});
+  saveAs(blob, `${selectedAccountName.value}.xlsx`);
 }
 </script>
 
