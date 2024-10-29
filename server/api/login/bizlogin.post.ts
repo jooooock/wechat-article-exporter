@@ -41,6 +41,13 @@ export default defineEventHandler(async (event) => {
             Cookie: _cookie.join(';')
         }
     })
+    if (!nick_name) {
+        // 登录的非公众号
+        return {
+            err: '请选择公众号登录'
+        }
+    }
+
     const searchResult = await $fetch(`/api/searchbiz?token=${_token}&keyword=${nick_name}`, {
         headers: {
             Cookie: _cookie.join(';')

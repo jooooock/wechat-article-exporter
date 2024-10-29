@@ -238,7 +238,9 @@ async function bizLogin() {
     method: 'POST'
   })
 
-  if (result.token) {
+  if (result.err) {
+    alert(result.err)
+  } else if (result.token) {
     console.log('登录成功')
     loginAccount.value = result
 

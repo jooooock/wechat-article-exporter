@@ -5,6 +5,7 @@ export interface LoginAccount {
     avatar: string
     fakeid: string
     expires: string
+    err?: string
 }
 
 export interface LoginInfoResult {
