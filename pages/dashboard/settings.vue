@@ -4,17 +4,10 @@
       <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">设置</h1>
     </Teleport>
     <div class="flex-1 overflow-scroll">
-      <div class="sticky top-0 z-50 pt-4 px-4 mb-4 bg-white">
-        <UAlert
-            icon="i-heroicons-shield-check"
-            description="为了保护您的安全，所有设置均保存在本地，不会上传给后台及任何第三方，请放心使用。"
-            class="flex-shrink-0 text-green-500"
-        />
-      </div>
-
-      <UCard class="mx-4">
+      <UCard class="mx-4 mt-4">
         <template #header>
           <h3 class="text-2xl font-semibold">Credentials</h3>
+          <p class="text-sm text-slate-10">Credentials 属于您的个人隐私，请勿告诉任何人。本网站也承诺不会泄露给除微信外的任何第三方，且仅用于获取文章评论及阅读量、点赞量数据。</p>
         </template>
 
         <UForm :schema="schema" :state="state" class="space-y-4 max-w-lg" @submit="onSubmit">

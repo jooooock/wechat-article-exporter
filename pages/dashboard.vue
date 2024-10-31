@@ -64,11 +64,6 @@
              class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
             <span class="inline-flex items-center justify-center gap-1 truncate visible">FAQ</span>
           </a>
-          <a href="https://github.com/jooooock/wechat-article-exporter/issues/new" target="_blank"
-             class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
-            <MessageCircleQuestion :size="18"/>
-            <span class="inline-flex items-center justify-center gap-1 truncate visible">Feedback</span>
-          </a>
           <a href="https://github.com/jooooock/wechat-article-exporter" target="_blank"
              class="font-semibold inline-flex items-center justify-center border select-none border-slate-6 bg-slate-2 text-slate-12 hover:bg-slate-4 text-sm h-8 px-3 rounded-md gap-1">
             <svg class="w-[18px] h-[18px]" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>
@@ -88,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import {Album, ChartNoAxesCombined, Download, Globe, MessageCircleQuestion, Newspaper, Settings} from 'lucide-vue-next';
+import {Album, ChartNoAxesCombined, Download, Globe, Settings} from 'lucide-vue-next';
 import {formatDistance} from "date-fns";
 import type {LogoutResponse} from "~/types/types";
 
