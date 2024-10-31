@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "add:biz": "deno run -A --unstable-kv scripts/biz.ts"
+    "add:biz": "deno run -A --unstable-kv scripts/biz.ts",
+    "stat": "deno run -A --unstable-kv scripts/stat.ts"
   },
   "dependencies": {
     "@deno/kv": "^0.8.2",
