@@ -14,59 +14,10 @@
 
 交流群(QQ): `991482155`
 
+## 注意
 
-## ⚠️⚠️⚠️ 注意
-从 2024-10-21 开始，下载机制进行了调整，文章内嵌的 **音视频下载** 需要配合浏览器插件才能下载。
+由于免费的代理资源有限，因此推荐 **私有部署 + 搭建私有代理节点** 服用，部署教程在下方。
 
-这里推荐用 [ModHeader插件](https://modheader.com/)，插件的配置如下:
-![modheader插件设置](assets/modheader-plugin-config.png)
-
-<details>
-<summary>配置说明</summary>
-
-请求头中添加`Referer`，值为`https://mp.weixin.qq.com/`, 解决页面上图片显示及视频资源下载问题。
-
-响应头中添加`Access-Control-Allow-Origin`，值为`*`, 解决下载资源接口跨域问题。
-
-过滤器添加2个域名：`wechat-article-exporter.deno.dev`和`localhost`，表示只有这些域名发起的请求才会应用这些配置。`localhost`用于本地开发调试。
-
-可复制以下配置直接导入到 ModHeader 插件中:
-```json
-[
-  {
-    "headers": [
-      {
-        "appendMode": false,
-        "enabled": true,
-        "name": "Referer",
-        "value": "https://mp.weixin.qq.com/"
-      }
-    ],
-    "initiatorDomainFilters": [
-      {
-        "domain": "wechat-article-exporter.deno.dev",
-        "enabled": true
-      },
-      {
-        "domain": "localhost",
-        "enabled": true
-      }
-    ],
-    "respHeaders": [
-      {
-        "appendMode": false,
-        "enabled": true,
-        "name": "Access-Control-Allow-Origin",
-        "value": "*"
-      }
-    ],
-    "shortTitle": "1",
-    "title": "公众号文章导出",
-    "version": 2
-  }
-]
-```
-</details>
 
 ## :dart: 特性
 
@@ -80,7 +31,7 @@
 - [x] 支持内嵌的音视频下载
 - [x] 支持图片分享消息
 - [x] 支持视频分享消息
-- [ ] 支持导出评论、阅读量等数据 (需要获取目标公众号的key)
+- [x] 支持导出评论、阅读量等数据 (需要抓包获取 credentials 信息，[查看操作步骤](docs/credentials.md))
 - [ ] 支持订阅机制，根据指定规则自动下载文章
 
 
@@ -146,6 +97,59 @@
 ![finally website][finally-website]
 </details>
 
+
+## 内嵌音视频下载
+从 2024-10-21 开始，下载机制进行了调整，文章内嵌的 **音视频下载** 需要配合浏览器插件才能下载。
+
+这里推荐用 [ModHeader插件](https://modheader.com/)，插件的配置如下:
+![modheader插件设置](assets/modheader-plugin-config.png)
+
+<details>
+<summary>配置说明</summary>
+
+请求头中添加`Referer`，值为`https://mp.weixin.qq.com/`, 解决页面上图片显示及视频资源下载问题。
+
+响应头中添加`Access-Control-Allow-Origin`，值为`*`, 解决下载资源接口跨域问题。
+
+过滤器添加2个域名：`wechat-article-exporter.deno.dev`和`localhost`，表示只有这些域名发起的请求才会应用这些配置。`localhost`用于本地开发调试。
+
+可复制以下配置直接导入到 ModHeader 插件中:
+```json
+[
+  {
+    "headers": [
+      {
+        "appendMode": false,
+        "enabled": true,
+        "name": "Referer",
+        "value": "https://mp.weixin.qq.com/"
+      }
+    ],
+    "initiatorDomainFilters": [
+      {
+        "domain": "wechat-article-exporter.deno.dev",
+        "enabled": true
+      },
+      {
+        "domain": "localhost",
+        "enabled": true
+      }
+    ],
+    "respHeaders": [
+      {
+        "appendMode": false,
+        "enabled": true,
+        "name": "Access-Control-Allow-Origin",
+        "value": "*"
+      }
+    ],
+    "shortTitle": "1",
+    "title": "公众号文章导出",
+    "version": 2
+  }
+]
+```
+</details>
 
 
 ## :bulb: 原理

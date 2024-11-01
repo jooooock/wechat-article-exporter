@@ -3,12 +3,13 @@
   "version": "0.0.3",
   "type": "module",
   "scripts": {
-    "dev": "nuxt dev",
+    "dev": "node -e \"const version = process.version.slice(1);if (parseInt(version.split('.')[0]) < 20) throw new Error('Expected node version >= 20, Got ' + version)\" && nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "add:biz": "deno run -A --unstable-kv scripts/biz.ts"
+    "add:biz": "deno run -A --unstable-kv scripts/biz.ts",
+    "stat": "deno run -A --unstable-kv scripts/stat.ts"
   },
   "dependencies": {
     "@deno/kv": "^0.8.2",
@@ -32,14 +33,12 @@
     "nuxt-gtag": "^2.1.0",
     "v-calendar": "^3.1.2",
     "vue": "latest",
-    "vue-chartjs": "^5.3.1"
+    "vue-chartjs": "^5.3.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
     "tailwindcss-debug-screens": "^2.2.1",
     "typescript": "^5.5.3"
-  },
-  "engines": {
-    "node": ">=20"
   }
 }

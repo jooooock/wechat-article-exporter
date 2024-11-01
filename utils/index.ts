@@ -7,6 +7,7 @@ import type {DownloadResult} from "~/utils/pool";
 import * as pool from '~/utils/pool';
 import type {DownloadableArticle} from "~/types/types";
 import type {AudioResource, VideoPageInfo} from "~/types/video";
+import {getComment} from "~/apis/index";
 
 
 export function formatTimeStamp(timestamp: number) {
@@ -463,6 +464,78 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         })
     }
 
+    // 下载留言数据
+    let commentHTML = ''
+    const commentIdMatchResult = html.match(/var comment_id = '(?<comment_id>\d+)' \|\| '0';/)
+    if (commentIdMatchResult && commentIdMatchResult.groups && commentIdMatchResult.groups.comment_id) {
+        const comment_id = commentIdMatchResult.groups.comment_id
+        const commentResponse = await getComment(comment_id)
+        // 抓到了留言数据
+        if (commentResponse) {
+            // 留言总数
+            const totalCount = commentResponse.elected_comment.length + commentResponse.elected_comment.reduce((total, item) => {
+                return total + item.reply_new.reply_total_cnt
+            }, 0)
+            const likeIcon = '<svg style="margin-right: 5px;" width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56162 1.16952C7.66569 1.09661 7.78195 1.06124 7.88247 1.0912C7.97653 1.11923 8.23851 1.25916 8.50988 1.96799C8.64419 2.31881 8.9356 3.2424 8.42155 5.05431C8.29751 5.49152 8.61394 5.95303 9.09259 5.95971L12.492 6.00716L12.492 6.00721H12.4991C12.6049 6.00721 12.7228 6.01986 12.8134 6.05898C12.8544 6.07671 12.8815 6.09639 12.8999 6.116C12.9166 6.13375 12.9368 6.16247 12.9515 6.21636C12.9848 6.33784 13.0228 6.74712 12.9473 7.42262C12.874 8.07857 12.698 8.94479 12.341 9.9598C12.0424 10.8088 11.6601 11.5292 11.0684 12.4879C11.0558 12.5052 11.0462 12.5197 11.0418 12.5265L11.0404 12.5285C11.0292 12.5454 11.0242 12.5531 11.018 12.5618C11.0076 12.5764 11.0018 12.582 10.9983 12.585C10.996 12.587 10.9908 12.5912 10.9777 12.5959C10.9638 12.6009 10.9311 12.61 10.8706 12.61H4.56278L4.56373 5.58489C4.87126 5.41901 5.19881 5.20128 5.54112 4.84059C5.93883 4.42152 6.33789 3.8294 6.76254 2.94183C6.84974 2.75957 6.91745 2.55962 6.97574 2.37762C6.99264 2.32486 7.0087 2.27379 7.02438 2.22393L7.02439 2.22389C7.066 2.09158 7.10495 1.96776 7.14985 1.84312C7.2758 1.49352 7.40247 1.28101 7.56162 1.16952ZM9.45205 1.60729C9.13229 0.772086 8.70208 0.282772 8.17063 0.124374C7.64564 -0.0320981 7.20308 0.188912 6.98278 0.343248C6.55169 0.64525 6.33837 1.11908 6.20071 1.5012C6.14817 1.64705 6.10002 1.80016 6.05661 1.93824C6.0422 1.98405 6.02832 2.02821 6.01496 2.0699C5.95791 2.24804 5.90763 2.39115 5.85248 2.50643C5.45683 3.3334 5.1121 3.8271 4.80935 4.14611C4.51322 4.45815 4.23983 4.6219 3.9473 4.76821C3.71095 4.88641 3.55494 5.12906 3.55491 5.40159L3.55388 12.9125C3.55383 13.3026 3.87002 13.6188 4.26008 13.6188H10.8706C11.2097 13.6188 11.4663 13.5113 11.6519 13.3535C11.7387 13.2797 11.7988 13.2043 11.8387 13.1484C11.8556 13.1248 11.8704 13.1025 11.8786 13.09L11.8813 13.0859L11.8826 13.0839L11.8955 13.0685L11.9142 13.0382C12.5304 12.0414 12.9578 11.247 13.2927 10.2945C13.6745 9.20895 13.8679 8.26811 13.9499 7.5347C14.0297 6.82084 14.009 6.25845 13.9246 5.95014C13.805 5.51285 13.5104 5.26112 13.2134 5.13284C12.9385 5.01407 12.661 4.99859 12.5028 4.99836L9.49071 4.95631C9.92962 3.15791 9.64796 2.11902 9.45205 1.60729ZM0.000800636 5.46783C-0.0181914 5.0652 0.303128 4.72836 0.706212 4.72836H1.75264C2.14266 4.72836 2.45883 5.04454 2.45883 5.43456V12.9442C2.45883 13.3342 2.14266 13.6504 1.75264 13.6504H1.06044C0.68335 13.6504 0.372791 13.3541 0.355024 12.9775L0.000800636 5.46783Z" fill="#b5b5b5"></path></svg>'
+
+            commentHTML += '<div style="max-width: 667px;margin: 0 auto;padding: 10px 10px 80px;">'
+            commentHTML += `<p style="font-size: 15px;color: #949494;">留言 ${totalCount}</p>`
+            commentHTML += '<div style="margin-top: -10px;">'
+            commentResponse.elected_comment.forEach((comment) => {
+                commentHTML += '<div style="margin-top: 25px;"><div style="display: flex;">'
+                if ([1, 2].includes(comment.identity_type)) {
+                    commentHTML += `<img src="${comment.logo_url}" style="display: block;width: 30px;height: 30px;border-radius: 50%;margin-right: 8px;" alt="">`
+                } else {
+                    commentHTML += `<img src="${comment.logo_url}" style="display: block;width: 30px;height: 30px;border-radius: 2px;margin-right: 8px;" alt="">`
+                }
+                commentHTML += '<div style="flex: 1;"><p style="display: flex;line-height: 16px;margin-bottom: 5px;">'
+                commentHTML += `<span style="margin-right: 5px;font-size: 15px;color: #949494;">${comment.nick_name}</span>`
+                commentHTML += `<span style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">${comment.ip_wording.province_name}</span>`
+                commentHTML += `<span style="font-size: 12px;color: #b5b5b5;">${formatAlbumTime(comment.create_time)}</span>`
+                commentHTML += '<span style="flex: 1;"></span><span style="display: inline-flex;align-items: center; font-size: 12px;color: #b5b5b5;">'
+                commentHTML += likeIcon
+                if (comment.like_num) {
+                    commentHTML += `<span>${comment.like_num}</span>`
+                }
+                commentHTML += '</span></p>'
+                commentHTML += `<p style="font-size: 15px;color: #333;white-space: pre-line;">${comment.content}</p>`
+                commentHTML += '</div></div>'
+
+                if (comment.reply_new && comment.reply_new.reply_list.length > 0) {
+                    commentHTML += '<div style="padding-left: 38px;">'
+                    comment.reply_new.reply_list.forEach((reply) => {
+                        commentHTML += '<div style="display: flex;margin-top: 15px;">'
+                        if ([1, 2].includes(reply.identity_type)) {
+                            commentHTML += `<img src="${reply.logo_url}" style="display: block;width: 23px;height: 23px;border-radius: 50%;margin-right: 8px;" alt="">`
+                        } else {
+                            commentHTML += `<img src="${reply.logo_url}" style="display: block;width: 23px;height: 23px;border-radius: 2px;margin-right: 8px;" alt="">`
+                        }
+                        commentHTML += '<div style="flex: 1;"><p style="display: flex;line-height: 16px;margin-bottom: 5px;">'
+                        commentHTML += `<span style="margin-right: 5px;font-size: 15px;color: #949494;">${reply.nick_name}</span>`
+                        commentHTML += `<span style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">${reply.ip_wording.province_name}</span>`
+                        commentHTML += `<span style="font-size: 12px;color: #b5b5b5;">${formatAlbumTime(reply.create_time)}</span>`
+                        commentHTML += '<span style="flex: 1;"></span><span style="display: inline-flex;align-items: center; font-size: 12px;color: #b5b5b5;">'
+                        commentHTML += likeIcon
+                        if (reply.reply_like_num) {
+                            commentHTML += `<span>${reply.reply_like_num}</span>`
+                        }
+                        commentHTML += '</span></p>'
+                        commentHTML += `<p style="font-size: 15px;color: #333;white-space: pre-line;">${reply.content}</p>`
+                        commentHTML += '</div></div>'
+                    })
+                    commentHTML += '</div>'
+                }
+                if (comment.reply_new.reply_total_cnt - comment.reply_new.reply_list.length > 0) {
+                    commentHTML += '<p style="display: flex;align-items: center; font-size: 14px;color: #a3a0a0;padding-left: 38px;padding-top: 5px;">'
+                    commentHTML += `<span>${comment.reply_new.reply_total_cnt - comment.reply_new.reply_list.length}条回复</span>`
+                    commentHTML += '<img src="https://wxa.wxs.qq.com/images/wxapp/feedback_icon.png" alt="" style="filter: invert(1);width: 10px;height: 6px;margin-left: 5px;">'
+                    commentHTML += '</p>'
+                }
+                commentHTML += '</div>'
+            })
+            commentHTML += '</div></div>'
+        }
+    }
 
     // 下载所有的图片
     const imgDownloadFn = async (img: HTMLImageElement, proxy: string) => {
@@ -688,6 +761,9 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 ${customElementTemplate}
 
 ${pageContentHTML}
+
+<!-- 评论数据 -->
+${commentHTML}
 </body>
 </html>`
 
