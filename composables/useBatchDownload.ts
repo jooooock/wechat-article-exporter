@@ -2,7 +2,6 @@ import JSZip from "jszip";
 import {saveAs} from "file-saver";
 import {format} from 'date-fns';
 import {downloadArticleHTMLs, packHTMLAssets} from "~/utils";
-import {uploadProxy} from "~/store/proxy";
 import type {DownloadableArticle} from "~/types/types";
 
 
@@ -39,8 +38,6 @@ export function useBatchDownload() {
 
         const blob = await zip.generateAsync({type: 'blob'})
         saveAs(blob, `${filename}.zip`)
-
-        await uploadProxy()
 
         loading.value = false
     }
@@ -85,8 +82,6 @@ export function useDownloadAlbum() {
 
         const blob = await zip.generateAsync({type: 'blob'})
         saveAs(blob, `${filename}.zip`)
-
-        await uploadProxy()
 
         loading.value = false
     }

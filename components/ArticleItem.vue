@@ -46,7 +46,6 @@ import {saveAs} from 'file-saver'
 import {Loader} from 'lucide-vue-next';
 import {formatTimeStamp, downloadArticleHTML, packHTMLAssets, formatItemShowType} from "~/utils";
 import type {AppMsgAlbumInfo, RGB} from "~/types/types";
-import {uploadProxy} from "~/store/proxy";
 
 
 interface Props {
@@ -88,8 +87,6 @@ async function download(link: string, title: string) {
 
     const blob = await zip.generateAsync({type: 'blob'})
     saveAs(blob, title + '.zip')
-
-    await uploadProxy()
   } catch (e: any) {
     console.warn(e.message)
     alert(e.message)

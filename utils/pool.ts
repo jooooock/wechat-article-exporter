@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import {AVAILABLE_PROXY_LIST} from '~/config'
 import type {DownloadableArticle} from "~/types/types"
 import type {AudioResource, VideoResource} from "~/types/video"
-import {updateProxiesCache} from "~/store/proxy"
 
 /**
  * 代理实例
@@ -275,12 +274,7 @@ export async function downloads<T extends DownloadResource>(resources: T[], down
     pool.init()
 
     const tasks = resources.map(resource => download<T>(resource, downloadFn, useProxy));
-    const result = await Promise.all(tasks)
-
-    // 保存代理使用数据
-    await updateProxiesCache(pool.proxies)
-
-    return result
+    return await Promise.all(tasks)
 }
 
 /**

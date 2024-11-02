@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-full">
     <Teleport defer to="#title">
-      <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">数据导出 <span class="text-sm text-slate-10">导出本地已缓存的文章</span>
+      <h1 class="text-[28px] leading-[34px] text-slate-12 font-bold">文章导出 <span class="text-sm text-slate-10">导出本地已缓存的文章</span>
       </h1>
     </Teleport>
     <div class="flex flex-1 overflow-hidden">
@@ -68,7 +68,7 @@
             </div>
             <div class="space-x-2">
               <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
-                       :disabled="selectedArticles.length === 0 || excelBtnLoading" @click="excelExport">Excel导出
+                       :disabled="selectedArticles.length === 0 || excelBtnLoading" @click="excelExport">导出Excel
               </UButton>
               <UButton color="black" variant="solid" class="disabled:bg-slate-4 disabled:text-slate-12"
                        :disabled="selectedArticles.length === 0 || batchDownloadLoading" @click="doBatchDownload">
@@ -81,7 +81,7 @@
                   <span
                       v-if="batchDownloadPhase === '打包'">{{ batchPackedCount }}/{{ batchDownloadedCount }}</span>
                 </span>
-                <span v-else>批量下载</span>
+                <span v-else>打包下载</span>
               </UButton>
             </div>
           </div>
