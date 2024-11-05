@@ -12,17 +12,20 @@
 
 在控制台启动`mitmweb`，如下所示:
 
-![启动 mitmweb](../assets/mitmweb.png)
+![启动 mitmweb](https://github.com/user-attachments/assets/99bd08a4-5b5e-44a9-86f4-ffe0a7d82fc0)
+
 
 可以看到`mitmproxy`的代理服务监听端口为`8080`，将浏览器或系统的代理设置为`127.0.0.1:8080`，然后浏览器访问 http://mitm.it/
 
 如果显示的是下面的界面，则说明系统代理设置有误:
 
-![代理设置不正确](../assets/mitm-proxy-setting-not-correct.png)
+![mitm-proxy-setting-not-correct](https://github.com/user-attachments/assets/2d28f133-da7d-48ee-b5b8-17f1e272eac2)
+
 
 如果系统的代理设置正确，则会出现下面的界面(提示安装证书):
 
-![安装证书](../assets/mitm-cert.png)
+![mitm-cert](https://github.com/user-attachments/assets/dc4fec08-4c08-4379-83ed-883da4ede561)
+
 
 下载对应系统的证书文件并安装进系统中。证书安装之后，`mitmproxy`的配置就完成了。
 
@@ -30,7 +33,8 @@
 
 重启`mitmweb`，然后浏览器打开抓包页面:
 
-![mitm抓包页面](../assets/mitm-flow-list.png)
+![mitm-flow-list](https://github.com/user-attachments/assets/d1f01370-d54f-4703-a87c-119cc200c60c)
+
 
 搜索过滤器设置为:
 
@@ -38,12 +42,13 @@
 
 用电脑端微信打开目标公众号的任意一篇文章，如下图所示:
 
-![open in wechat](../assets/open-in-wechat.png)
+![open-in-wechat](https://github.com/user-attachments/assets/aa479405-a178-42f5-92c6-1d3e9b83f25f)
+
 
 然后从`mitmproxy`拦截的请求中找到该请求，复制请求路径并粘贴进系统中:
 
-![请求URL](../assets/mitm-flow-list-request-url.png)
+![mitm-flow-list-request-url](https://github.com/user-attachments/assets/f1fa12f3-4692-406d-a67c-9e7f0a1ac35c)
 
-![设置credential](../assets/credential-setting.png)
+![credential-setting](https://github.com/user-attachments/assets/8b74da47-df3b-47b1-a31e-284d4d4b2b26)
 
 这样在下载文章的时候就可以同时拉取留言数据和阅读量、转发量、点赞量、在看量数据啦。
