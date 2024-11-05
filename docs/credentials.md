@@ -14,24 +14,36 @@
 
 ![启动 mitmweb](../assets/mitmweb.png)
 
-可以看到`mitmproxy`的代理地址为`127.0.0.1:8080`，将浏览器或系统的代理设置为该地址，然后浏览器访问 http://mitm.it/ ,按照提示安装证书:
+可以看到`mitmproxy`的代理服务监听端口为`8080`，将浏览器或系统的代理设置为`127.0.0.1:8080`，然后浏览器访问 http://mitm.it/
+
+如果显示的是下面的界面，则说明系统代理设置有误:
+
+![代理设置不正确](../assets/mitm-proxy-setting-not-correct.png)
+
+如果系统的代理设置正确，则会出现下面的界面(提示安装证书):
 
 ![安装证书](../assets/mitm-cert.png)
 
-证书安装之后，`mitmproxy`的配置就完成了。
+下载对应系统的证书文件并安装进系统中。证书安装之后，`mitmproxy`的配置就完成了。
 
 ## 第三步 抓取 Credentials
 
-用电脑端微信打开任意一个公众号的文章，如下图所示:
+重启`mitmweb`，然后浏览器打开抓包页面:
+
+![mitm抓包页面](../assets/mitm-flow-list.png)
+
+搜索过滤器设置为:
+
+`~u ^https:\/\/mp\.weixin\.qq\.com\/s\?__biz=`
+
+用电脑端微信打开目标公众号的任意一篇文章，如下图所示:
 
 ![open in wechat](../assets/open-in-wechat.png)
 
-然后从`mitmproxy`拦截的请求中找到该请求，从`Request`中找到`__biz`参数，如下图所示:
+然后从`mitmproxy`拦截的请求中找到该请求，复制请求路径并粘贴进系统中:
 
-![mitm request](../assets/mitm-request.png)
+![请求URL](../assets/mitm-flow-list-request-url.png)
 
-从`Response`中找到`uin`、`key`、`pass_ticket`、`wap_sid2`参数，如下图所示:
+![设置credential](../assets/credential-setting.png)
 
-![mitm response](../assets/mitm-response.png)
-
-将对应的值设置进系统中，在下载文章的时候就可以同时拉取评论数据啦。
+这样在下载文章的时候就可以同时拉取留言数据和阅读量、转发量、点赞量、在看量数据啦。
