@@ -40,7 +40,7 @@
 
 `~u ^https:\/\/mp\.weixin\.qq\.com\/s\?__biz=`
 
-用电脑端微信打开目标公众号的任意一篇文章，如下图所示:
+用电脑端微信打开 **目标公众号** 的任意一篇文章，如下图所示:
 
 ![open-in-wechat](https://github.com/user-attachments/assets/aa479405-a178-42f5-92c6-1d3e9b83f25f)
 
@@ -50,5 +50,7 @@
 ![mitm-flow-list-request-url](https://github.com/user-attachments/assets/f1fa12f3-4692-406d-a67c-9e7f0a1ac35c)
 
 ![credential-setting](https://github.com/user-attachments/assets/8b74da47-df3b-47b1-a31e-284d4d4b2b26)
+
+然后从响应中复制`wap_sid2`的值并保存。
 
 这样在下载文章的时候就可以同时拉取留言数据和阅读量、转发量、点赞量、在看量数据啦。
