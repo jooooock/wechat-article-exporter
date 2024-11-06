@@ -27,6 +27,9 @@
             <UFormGroup label="pass_ticket" name="pass_ticket">
               <UInput v-model="state.pass_ticket" placeholder="根据左边的URL自动解析 pass_ticket" disabled/>
             </UFormGroup>
+            <UFormGroup label="wap_sid2" name="wap_sid2">
+              <UInput v-model="state.wap_sid2" placeholder="请填写wap_sid2"/>
+            </UFormGroup>
             <div class="flex justify-between">
               <UButton type="submit" color="black" class="w-20 justify-center disabled:bg-slate-10" :disabled="saveBtnDisabled">{{saveBtnText}}</UButton>
               <p class="text-sm font-mono space-x-2" v-if="invalidStr">
@@ -59,6 +62,7 @@ function parseURL() {
     state.uin = searchParams.get('uin')!
     state.key = searchParams.get('key')!
     state.pass_ticket = searchParams.get('pass_ticket')!
+    state.wap_sid2 = searchParams.get('wap_sid2')!
     state.updatedAt = new Date().toLocaleString()
   }
 }
@@ -68,6 +72,7 @@ const schema = z.object({
   uin: z.string(),
   key: z.string(),
   pass_ticket: z.string(),
+  wap_sid2: z.string(),
   updatedAt: z.string(),
 })
 
@@ -78,6 +83,7 @@ const state = reactive({
   uin: '',
   key: '',
   pass_ticket: '',
+  wap_sid2: '',
   updatedAt: '',
 })
 
@@ -105,6 +111,7 @@ onMounted(() => {
     state.uin = credentials.uin
     state.pass_ticket = credentials.pass_ticket
     state.key = credentials.key
+    state.wap_sid2 = credentials.wap_sid2
     state.updatedAt = credentials.updatedAt
 
     timer = window.setInterval(() => {
