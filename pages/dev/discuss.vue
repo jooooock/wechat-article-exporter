@@ -2,7 +2,7 @@
   <div style="max-width: 667px;margin: 0 auto;padding: 10px 10px 80px;">
     <p style="font-size: 15px;color: #949494;">留言 {{ totalCount }}</p>
     <div style="margin-top: -10px;">
-      <div style="margin-top: 25px;" v-for="comment in commentData.elected_comment">
+      <div style="margin-top: 25px;" v-for="comment in targetCommentData.elected_comment">
         <div style="display: flex;">
           <img v-if="[1, 2].includes(comment.identity_type)" :src="comment.logo_url"
                style="display: block;width: 30px;height: 30px;border-radius: 50%;margin-right: 8px;" alt="">
@@ -37,7 +37,7 @@
               <p style="display: flex;line-height: 16px;margin-bottom: 5px;">
                 <span style="margin-right: 5px;font-size: 15px;color: #949494;">{{ reply.nick_name }}</span>
                 <span
-                    style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">{{ reply.ip_wording.province_name }}</span>
+                    style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">{{ reply?.ip_wording?.province_name }}</span>
                 <span style="font-size: 12px;color: #b5b5b5;">{{ formatAlbumTime(reply.create_time) }}</span>
                 <span style="flex: 1;"></span>
                 <span style="display: inline-flex;align-items: center; font-size: 12px;color: #b5b5b5;">
@@ -1536,10 +1536,619 @@ const commentData = {
   "reply_flag": 2
 }
 
+const commentData2 = {
+  "base_resp": {
+    "exportkey_token": "",
+    "ret": 0
+  },
+  "buffer": "GA8wAA==",
+  "continue_flag": true,
+  "elected_comment": [
+    {
+      "author_like_status": 0,
+      "content": "四年过去了，你把这算法闹明白了吗[机智]",
+      "content_id": "5202285803069243886",
+      "create_time": 1730861270,
+      "id": 5,
+      "identity_name": "oHLtNwB2lBKmA5x-hs7JMy99nQ1E",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "四川"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 1,
+      "like_num": 16,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/ryGpckCTdr3U7Yqw8nPJ4jFfF2esmibPPlR9bfNMtZcwfY1S1FibVibXzowZ5drgftvtGzhlZkRSmcmCjUkHVuROOotEfdJqFc8/64",
+      "my_id": 494,
+      "nick_name": "轩辕之风",
+      "openid": "oHLtNwB2lBKmA5x-hs7JMy99nQ1E",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "让动态规划算法再次伟大",
+      "content_id": "1522936476210301210",
+      "create_time": 1730861225,
+      "id": 2,
+      "identity_name": "2",
+      "identity_type": 3,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "上海"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 22,
+      "like_status": 0,
+      "logo_url": "https://wx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7PpIFNNvE1lsyK5ETarw6waOd3YYiaJibc7OzBL3dwx52mG3HtVAw7uiaic8WZE4YXF6c70BjwmUfzFQ/64",
+      "my_id": 2330,
+      "nick_name": "momo",
+      "openid": "oHLtNwB4718oRilJzdGRXh3SyNzM",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "实际上&nbsp;all_states&nbsp;变量应该为&nbsp;all_swing_states，只需要考虑七个摇摆州就行，懂王实际行程也是在这几个州来回飞[呲牙]",
+      "content_id": "9475364262101647372",
+      "create_time": 1730863585,
+      "id": 12,
+      "identity_name": "oHLtNwF4F5y1ZksIJd7gAo6leVcQ",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "广东"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 5,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLAR3gKNgWANvNVzKoNAiacrYVVaic7iaOc3Dc3VIluUu7JjZIe0Nov5lnMze5J0VSmjVLiaH9lpvXKd1ATUibjIugakLe8HV30ibyNLE0ePVJWpzsdBckMy6PW9lY/64",
+      "my_id": 12,
+      "nick_name": "Fergie🛩",
+      "openid": "oHLtNwF4F5y1ZksIJd7gAo6leVcQ",
+      "reply_new": {
+        "max_reply_id": 2,
+        "reply_list": [
+          {
+            "author_like_status": 0,
+            "content": "是的",
+            "create_time": 1730863751,
+            "identity_name": "gh_fe02be2b2ff0",
+            "identity_type": 1,
+            "is_deleted": 0,
+            "is_from": 2,
+            "is_from_friend": 0,
+            "logo_url": "http://wx.qlogo.cn/mmhead/Q3auHgzwzM5iakZHNmMDuPl0azqlm8pPVtxhYTNqISsiat1OwT8f4I7Q/64",
+            "nick_name": "轩辕的编程宇宙",
+            "openid": "",
+            "reply_del_flag": 0,
+            "reply_id": 1,
+            "reply_is_elected": 1,
+            "reply_like_num": 1,
+            "reply_like_status": 0
+          }
+        ],
+        "reply_total_cnt": 1
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "加州不会去的必蓝",
+      "content_id": "6908521763961831452",
+      "create_time": 1730861597,
+      "id": 7,
+      "identity_name": "oHLtNwFG1XmgoY1-2xIV5tXiXj_E",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "山东"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 5,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/KydxAIB52xlW8xfaW2rFuAZNRSG1zUkzDkgO6rvAKeaNKuXT25m67lHIsYAEtnkV4jFFAW0XXhJJLIRGeLC3ra7WQoDV6vv96UgNz6mQrPbKjhD4ibDKjPBZAv1l5p98b/64",
+      "my_id": 28,
+      "nick_name": "Curiosity",
+      "openid": "oHLtNwFG1XmgoY1-2xIV5tXiXj_E",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "建国同志现在178&nbsp;哈牛逼99[Emm]",
+      "content_id": "3876171640626741729",
+      "create_time": 1730861313,
+      "id": 6,
+      "identity_name": "oHLtNwG6qh3K4HUTg-7tevOILchg",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "安徽"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 5,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/PiajxSqBRaELL3ERsAYkpGCAp5GbPox6gvMMdN8zFNFwkNtXic7hvPCZZOslX7vobVqgV6euKrCib6EVAB6nPrkGcahUGiavqL9tgyNFhga92aOr7Za0BNjyReR7aob4qukic/64",
+      "my_id": 481,
+      "nick_name": "遇见幸福",
+      "openid": "oHLtNwG6qh3K4HUTg-7tevOILchg",
+      "reply_new": {
+        "max_reply_id": 3,
+        "reply_list": [
+          {
+            "author_like_status": 0,
+            "content": "加州54深蓝还没开",
+            "create_time": 1730861536,
+            "identity_name": "4",
+            "identity_type": 3,
+            "ip_wording": {
+              "city_id": "",
+              "city_name": "",
+              "country_id": "156",
+              "country_name": "中国",
+              "province_id": "",
+              "province_name": "上海"
+            },
+            "is_deleted": 0,
+            "is_from": 3,
+            "is_from_friend": 0,
+            "logo_url": "https://wx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM5x3kibWsE7CicFTxAgCQKPHEIkZAygvzDxsqBkmFY8LcGLgG764cl7MibPIWay1n6Fs0icfCRURrQXAw/64",
+            "nick_name": "阿白",
+            "openid": "oHLtNwHt-uFQZ5DHFhxAtqe6-urg",
+            "reply_del_flag": 0,
+            "reply_id": 2,
+            "reply_is_elected": 1,
+            "reply_like_num": 5,
+            "reply_like_status": 0
+          }
+        ],
+        "reply_total_cnt": 1
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "懂王：没有人比我更懂动态规划",
+      "content_id": "2368798845996892199",
+      "create_time": 1730864105,
+      "id": 13,
+      "identity_name": "oHLtNwENH9kSeepAZfaQuwO0up7s",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "广东"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 4,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/DD6w1w6XNvhdCJlibbnpmh56LNlic8bgw9XjqPVJCnh0naHN8mxrVPpvKrzvXfyicOCmfZuhFggBHLrCvcFEMNmNDDgIk3XfbdR/64",
+      "my_id": 39,
+      "nick_name": "义勇",
+      "openid": "oHLtNwENH9kSeepAZfaQuwO0up7s",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "有汇编语言版本的么？[害羞]",
+      "content_id": "10252711080199455715",
+      "create_time": 1730866610,
+      "id": 17,
+      "identity_name": "oHLtNwNK3_xkakUsbE9gtESea_Tc",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "广东"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 2,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/ryGpckCTdr3U7Yqw8nPJ4kJprNcF74dS4Zp4ocK3LHyvAxanf5AbgRU6mjqkHJj8jUnibJsYvKt2hVTIPGrKIlGUzhJ10uEbL/64",
+      "my_id": 995,
+      "nick_name": "习习惠风",
+      "openid": "oHLtNwNK3_xkakUsbE9gtESea_Tc",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "要是再加上每个州花费时间和概率的关系[让我看看]",
+      "content_id": "10536588283658371263",
+      "create_time": 1730865447,
+      "id": 15,
+      "identity_name": "oHLtNwApO_H0XZAp4WcMKnzq_r58",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "四川"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 2,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/ryGpckCTdr2HhiaLl3SQjW4I3MjcQZxUYEkk5XbHsevl6sJZV4hfYSHbSynhz5rlEXt5ssSk6veJga6DMoG9vWBmfxPrw3thr/64",
+      "my_id": 191,
+      "nick_name": "JouLin",
+      "openid": "oHLtNwApO_H0XZAp4WcMKnzq_r58",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "最终还是懂王抗下了所有[捂脸]",
+      "content_id": "10503893068455871074",
+      "create_time": 1730861933,
+      "id": 8,
+      "identity_name": "oHLtNwLQCdKah98vcerErKMwDh5Q",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "安徽"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 2,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/DD6w1w6XNvjykQd62qu1HeibopgXcScJ9uIELeTW1niaKnbReI2mbZKQLONU3nW1icbBdMnt3wSmxfMLf7fFib596tARo0DdWJ5q/64",
+      "my_id": 610,
+      "nick_name": "Nick",
+      "openid": "oHLtNwLQCdKah98vcerErKMwDh5Q",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "不如让黏菌来找个路径比较好",
+      "content_id": "11964401765522079781",
+      "create_time": 1730863303,
+      "id": 11,
+      "identity_name": "oHLtNwAZB-vwax_zLdLoctVk3dk8",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "湖北"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 1,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/DD6w1w6XNvgFLrv6GvbGDQBSoUMiapRTxsXwPWqxFsTHBn37ChSDaoCibZVbCyOMwiaS8OoXicAkljlBJsw8VEYuDg3NU6nKsJic7/64",
+      "my_id": 37,
+      "nick_name": "kknd",
+      "openid": "oHLtNwAZB-vwax_zLdLoctVk3dk8",
+      "reply_new": {
+        "max_reply_id": 2,
+        "reply_list": [
+          {
+            "author_like_status": 0,
+            "content": "生物规划[呲牙]",
+            "create_time": 1730867771,
+            "identity_name": "oHLtNwBDNsB5Y7TsA2U4znSIjX1A",
+            "identity_type": 0,
+            "ip_wording": {
+              "city_id": "",
+              "city_name": "",
+              "country_id": "156",
+              "country_name": "中国",
+              "province_id": "",
+              "province_name": "天津"
+            },
+            "is_deleted": 0,
+            "is_from": 3,
+            "is_from_friend": 0,
+            "logo_url": "http://wx.qlogo.cn/mmopen/ryGpckCTdr01hNMsqoXm9PRhR6xibIQOg0eibSjgh0xCMBy2ewjib87CqPVnGmpYia7b9ZjWZubLOgM3ALAgGXaq8sOGNHc0ZiaalMlh6S3cANk1qbY6FSYPUXmtTDWaLLBUn/64",
+            "nick_name": "kali",
+            "openid": "oHLtNwBDNsB5Y7TsA2U4znSIjX1A",
+            "reply_del_flag": 0,
+            "reply_id": 1,
+            "reply_is_elected": 1,
+            "reply_like_num": 0,
+            "reply_like_status": 0
+          }
+        ],
+        "reply_total_cnt": 1
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "没有人比我更懂.jpg",
+      "content_id": "14470827903601869481",
+      "create_time": 1730861258,
+      "id": 4,
+      "identity_name": "gh_72941b4b34ec",
+      "identity_type": 1,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "广东"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 1,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmhead/Q3auHgzwzM4wT1LH2M1BK32eQJZcV1lqGfuruUTTa1ibqnfLBMe6QwA/64",
+      "my_id": 681,
+      "nick_name": "草木树心",
+      "openid": "oHLtNwOarRQVSQi9O1FlaqshriL0",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "真学以致用了",
+      "content_id": "10495743642889617566",
+      "create_time": 1730867796,
+      "id": 19,
+      "identity_name": "oHLtNwBDNsB5Y7TsA2U4znSIjX1A",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "天津"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 0,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/ryGpckCTdr01hNMsqoXm9PRhR6xibIQOg0eibSjgh0xCMBy2ewjib87CqPVnGmpYia7b9ZjWZubLOgM3ALAgGXaq8sOGNHc0ZiaalMlh6S3cANk1qbY6FSYPUXmtTDWaLLBUn/64",
+      "my_id": 158,
+      "nick_name": "kali",
+      "openid": "oHLtNwBDNsB5Y7TsA2U4znSIjX1A",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "赢了啊",
+      "content_id": "7904188783396914072",
+      "create_time": 1730867389,
+      "id": 18,
+      "identity_name": "2",
+      "identity_type": 3,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "上海"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 0,
+      "like_status": 0,
+      "logo_url": "https://wx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7PpIFNNvE1lsyK5ETarw6ws4DHGzw1h34UEHicWUfKe1GnoO2X1XS6IvaBVWibElMicibNfAnCRCsgPA/64",
+      "my_id": 920,
+      "nick_name": "momo",
+      "openid": "oHLtNwOJQ07DNttseEWWkvr6bpB8",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "MAKE&nbsp;🪿麦瑞咖&nbsp;GREAT&nbsp;AGAIN!",
+      "content_id": "358340138096394407",
+      "create_time": 1730862975,
+      "id": 10,
+      "identity_name": "oHLtNwKczpKQD25u4nAf94wAC33Q",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": "上海"
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 0,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/ryGpckCTdr0IzxDPHXwUJQfz30uvkngSJ7HZOhUbT2G6de8hto6d3AXmIWV4SRPRgz0zybribL4REwHzTAX4gqibYvJ5SAftlo6wXM5wITPJtJcPUpb2MpjPToXVpRUnHj/64",
+      "my_id": 167,
+      "nick_name": "ninja",
+      "openid": "oHLtNwKczpKQD25u4nAf94wAC33Q",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    },
+    {
+      "author_like_status": 0,
+      "content": "已阅",
+      "content_id": "5173123086798553492",
+      "create_time": 1730861230,
+      "id": 3,
+      "identity_name": "oHLtNwLZBnWVCszImOAjh9V2rdlI",
+      "identity_type": 0,
+      "ip_wording": {
+        "city_id": "",
+        "city_name": "",
+        "country_id": "156",
+        "country_name": "中国",
+        "province_id": "",
+        "province_name": ""
+      },
+      "is_can_delete": false,
+      "is_elected": 1,
+      "is_from": 0,
+      "is_from_friend": 0,
+      "is_from_me": 0,
+      "is_top": 0,
+      "like_num": 0,
+      "like_status": 0,
+      "logo_url": "http://wx.qlogo.cn/mmopen/I0Ptg1XcgGialibjKqQ254iczz4sPCoguBy2SmOGZ5nTrwW5HJEHicaeqmQlRVFPstib4MP07usoAlazVgJiaaKd8bbYQdYQIYwbbFVfgHK7W8oVCqdcic2DiayLojk2UdvZqvQN/64",
+      "my_id": 404,
+      "nick_name": "脑壳方",
+      "openid": "oHLtNwLZBnWVCszImOAjh9V2rdlI",
+      "reply_new": {
+        "max_reply_id": 1,
+        "reply_list": [],
+        "reply_total_cnt": 0
+      }
+    }
+  ],
+  "elected_comment_total_cnt": 15,
+  "enabled": 1,
+  "friend_comment": [],
+  "identity_name": "gh_ecb7803f8bb9",
+  "identity_type": 1,
+  "is_fans": 1,
+  "logo_url": "http://wx.qlogo.cn/mmhead/Q3auHgzwzM5PoG8G9gPdA6cQGuU2eG1aAymPuyRasDVyMPw6Fpq9Qg/132",
+  "my_comment": [],
+  "nick_name": "xkiller",
+  "not_pay_can_comment": 0,
+  "only_fans_can_comment": false,
+  "only_fans_days_can_comment": false,
+  "reply_flag": 2
+}
 
-const totalCount = commentData.elected_comment.length + commentData.elected_comment.reduce((total, item) => {
+const targetCommentData = commentData2
+
+const totalCount = targetCommentData.elected_comment.length + targetCommentData.elected_comment.reduce((total, item) => {
   return total + item.reply_new.reply_total_cnt
 }, 0)
+
 
 
 </script>

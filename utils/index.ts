@@ -490,7 +490,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 }
                 commentHTML += '<div style="flex: 1;"><p style="display: flex;line-height: 16px;margin-bottom: 5px;">'
                 commentHTML += `<span style="margin-right: 5px;font-size: 15px;color: #949494;">${comment.nick_name}</span>`
-                commentHTML += `<span style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">${comment.ip_wording.province_name}</span>`
+                commentHTML += `<span style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">${comment?.ip_wording?.province_name}</span>`
                 commentHTML += `<span style="font-size: 12px;color: #b5b5b5;">${formatAlbumTime(comment.create_time)}</span>`
                 commentHTML += '<span style="flex: 1;"></span><span style="display: inline-flex;align-items: center; font-size: 12px;color: #b5b5b5;">'
                 commentHTML += likeIcon
@@ -512,7 +512,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                         }
                         commentHTML += '<div style="flex: 1;"><p style="display: flex;line-height: 16px;margin-bottom: 5px;">'
                         commentHTML += `<span style="margin-right: 5px;font-size: 15px;color: #949494;">${reply.nick_name}</span>`
-                        commentHTML += `<span style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">${reply.ip_wording.province_name}</span>`
+                        commentHTML += `<span style="margin-right: 5px;font-size: 12px;color: #b5b5b5;">${reply?.ip_wording?.province_name}</span>`
                         commentHTML += `<span style="font-size: 12px;color: #b5b5b5;">${formatAlbumTime(reply.create_time)}</span>`
                         commentHTML += '<span style="flex: 1;"></span><span style="display: inline-flex;align-items: center; font-size: 12px;color: #b5b5b5;">'
                         commentHTML += likeIcon

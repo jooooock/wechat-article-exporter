@@ -16,16 +16,16 @@
           <textarea class="h-[400px] flex-1 p-2 border rounded resize-none" spellcheck="false" v-model="url" @input="parseURL" placeholder="请粘贴拦截到的公众号文章URL，将会自动解析出相关参数。" />
           <UForm :schema="schema" :state="state" class="space-y-4 flex-1 flex-shrink-0" @submit="onSubmit">
             <UFormGroup label="__biz" name="__biz">
-              <UInput v-model="state.__biz" placeholder="请输入 __biz" disabled />
+              <UInput v-model="state.__biz" placeholder="根据左边的URL自动解析 __biz" disabled />
             </UFormGroup>
             <UFormGroup label="uin" name="uin">
-              <UInput v-model="state.uin" placeholder="请输入 uin" disabled/>
+              <UInput v-model="state.uin" placeholder="根据左边的URL自动解析 uin" disabled/>
             </UFormGroup>
             <UFormGroup label="key" name="key">
-              <UInput v-model="state.key" placeholder="请输入 key" disabled/>
+              <UInput v-model="state.key" placeholder="根据左边的URL自动解析 key" disabled/>
             </UFormGroup>
             <UFormGroup label="pass_ticket" name="pass_ticket">
-              <UInput v-model="state.pass_ticket" placeholder="请输入 pass_ticket" disabled/>
+              <UInput v-model="state.pass_ticket" placeholder="根据左边的URL自动解析 pass_ticket" disabled/>
             </UFormGroup>
             <div class="flex justify-between">
               <UButton type="submit" color="black" class="w-20 justify-center disabled:bg-slate-10" :disabled="saveBtnDisabled">{{saveBtnText}}</UButton>
