@@ -23,7 +23,8 @@ useHead({
   meta: [
     {
       name: 'referrer',
-      content: 'no-referrer'
+      content: 'no-referrer',
+      tagPriority: -20,
     }
   ],
   script: [
