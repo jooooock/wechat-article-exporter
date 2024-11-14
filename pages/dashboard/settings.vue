@@ -6,7 +6,7 @@
     <div class="flex-1 overflow-scroll">
       <CredentialSetting />
       <ProxySetting />
-      <div class="h-[80vh]"></div>
+      <div class="h-[30vh]"></div>
     </div>
   </div>
 </template>
