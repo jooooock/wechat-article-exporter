@@ -3,11 +3,16 @@ import dayjs from "dayjs"
 import {AVAILABLE_PROXY_LIST} from '~/config'
 import type {DownloadableArticle} from "~/types/types"
 import type {AudioResource, VideoResource} from "~/types/video"
+import {v4 as uuid} from 'uuid'
+import PQueue from 'p-queue'
 
 /**
  * 代理实例
  */
 export interface ProxyInstance {
+    // 唯一标识
+    id: string
+
     // 代理地址
     address: string
 
@@ -30,7 +35,7 @@ export interface ProxyInstance {
     traffic: number
 }
 
-// 代理下载的资源
+// 使用代理下载的资源类型
 type DownloadResource =
     | string
     | HTMLLinkElement
@@ -83,6 +88,7 @@ class ProxyPool {
 
     constructor(proxyUrls: string[]) {
         this.proxies = proxyUrls.map(url => ({
+            id: uuid(),
             address: url,
             busy: false,
             cooldown: false,
@@ -96,11 +102,11 @@ class ProxyPool {
     /**
      * 初始化代理池
      * 可以传入新的代理地址列表（私有代理地址）
-     * @param proxyUrls
      */
     init(proxyUrls: string[] = []) {
         if (proxyUrls.length > 0) {
             this.proxies = proxyUrls.map(url => ({
+                id: uuid(),
                 address: url,
                 busy: false,
                 cooldown: false,
@@ -113,10 +119,16 @@ class ProxyPool {
             this.proxies.forEach(proxy => {
                 proxy.busy = false
                 proxy.cooldown = false
+                proxy.usageCount = 0
+                proxy.successCount = 0
+                proxy.failureCount = 0
             })
         }
     }
 
+    /**
+     * 获取可用代理
+     */
     async getAvailableProxy() {
         let time = 0
         while (true) {
@@ -137,6 +149,11 @@ class ProxyPool {
         }
     }
 
+    /**
+     * 释放代理
+     * @param proxy 代理对象
+     * @param success 使用当前代理的本次下载是否成功
+     */
     releaseProxy(proxy: ProxyInstance, success: boolean) {
         proxy.busy = false
 
@@ -146,12 +163,12 @@ class ProxyPool {
             proxy.failureCount++
             proxy.cooldown = true
 
-            // 5秒冷却时间
+            // 2秒冷却时间
             setTimeout(() => {
                 proxy.cooldown = false;
-            }, 5_000);
+            }, 2_000);
 
-            if (proxy.failureCount >= 5 && proxy.successCount === 0) {
+            if (proxy.failureCount >= 10 && proxy.successCount === 0) {
                 // 代理被识别为不可用，从代理池中移除
                 console.warn(`代理 ${proxy.address} 不可用，将被移除`)
                 this.removeProxy(proxy)
@@ -163,42 +180,7 @@ class ProxyPool {
      * 移除代理
      */
     removeProxy(proxy: ProxyInstance) {
-        this.proxies = this.proxies.filter(p => p.address !== proxy.address)
-    }
-
-    printProxyUsage() {
-        console.debug('代理使用情况:')
-        let traffic = 0
-        const usageData = this.proxies.map(proxy => {
-            traffic += proxy.traffic
-            return {
-                '代理': proxy.address,
-                '使用次数': proxy.usageCount,
-                '下载流量': formatTraffic(proxy.traffic),
-                '成功次数': proxy.successCount,
-                '失败次数': proxy.failureCount,
-                '成功率': proxy.usageCount === 0 ? '-' : ((proxy.successCount / proxy.usageCount) * 100).toFixed(2) + '%',
-            }
-        });
-        // 增加总计
-        usageData.push({
-            '代理': '总计',
-            '使用次数': usageData.reduce((total, item) => total + item['使用次数'], 0),
-            '下载流量': formatTraffic(traffic),
-            '成功次数': usageData.reduce((total, item) => total + item['成功次数'], 0),
-            '失败次数': usageData.reduce((total, item) => total + item['失败次数'], 0),
-            '成功率': '-',
-        })
-        console.table(usageData);
-    }
-
-    incrementTraffic(address: string, bytes: number) {
-        const proxy = this.proxies.find(proxy => proxy.address === address)
-        if (proxy) {
-            proxy.traffic += bytes
-        } else {
-            console.warn(`代理${address}未找到`)
-        }
+        this.proxies = this.proxies.filter(p => p.id !== proxy.id)
     }
 }
 
@@ -231,7 +213,7 @@ async function downloadResource<T extends DownloadResource>(proxy: ProxyInstance
  * @param useProxy
  * @param maxRetries
  */
-async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, resource: T, downloadFn: DownloadFn<T>, useProxy = true, maxRetries = 30): Promise<DownloadResult> {
+async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, resource: T, downloadFn: DownloadFn<T>, useProxy = true, maxRetries = 10): Promise<DownloadResult> {
     let attempts = 0;
     let isSuccess = false;
     let size: number = 0;
@@ -322,34 +304,8 @@ export async function downloads<T extends DownloadResource>(resources: T[], down
     // 初始化 pool
     pool.init(privateProxy)
 
-    console.debug('本次下载使用代理为: ', pool.proxies)
+    const queue = new PQueue({concurrency: pool.proxies.length})
 
-    const tasks = resources.map(resource => download<T>(resource, downloadFn, useProxy));
-    return await Promise.all(tasks)
-}
-
-/**
- * 打印代理使用次数
- */
-export function usage() {
-    pool.printProxyUsage();
-}
-
-export function formatDownloadResult(label: string, results: DownloadResult | DownloadResult[], total: number) {
-    if (!Array.isArray(results)) {
-        results = [results]
-    }
-
-    console.debug(label)
-    console.debug(`总耗时: ${total.toFixed(2)}s`);
-
-    // 打印下载耗时明细
-    const downloadResults = results.map(result => ({
-        URL: result.url,
-        size: result.size,
-        '耗时': result.totalTime,
-        '重试次数': result.attempts,
-        '是否下载成功': result.success,
-    }))
-    console.table(downloadResults)
+    const tasks = resources.map(resource => queue.add(() => download<T>(resource, downloadFn, useProxy)))
+    await Promise.all(tasks)
 }

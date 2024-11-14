@@ -52,30 +52,18 @@ async function downloadAssetWithProxy<T extends Blob | string>(url: string, prox
     }
     let targetURL = proxy ? `${proxy}?url=${encodeURIComponent(url)}&headers=${encodeURIComponent(JSON.stringify(headers))}` : url
     targetURL = targetURL.replace(/^http:\/\//, 'https://')
-    const result = await $fetch<T>(targetURL, {
+
+    return await $fetch<T>(targetURL, {
         retry: 0,
         timeout: timeout * 1000,
     })
-
-    // 统计代理下载资源流量
-    if (proxy) {
-        if (result instanceof Blob) {
-            pool.pool.incrementTraffic(proxy, result.size)
-        } else {
-            pool.pool.incrementTraffic(proxy, new Blob([result]).size)
-        }
-    }
-
-    return result
 }
 
-async function measureExecutionTime(label: string, taskFn: () => Promise<DownloadResult | DownloadResult[]>) {
+async function measureExecutionTime(label: string, taskFn: () => Promise<undefined>) {
     const start = Date.now()
     const result = await taskFn()
     const end = Date.now()
     const total = (end - start) / 1000;
-
-    pool.formatDownloadResult(label, result, total)
 
     return result
 }
@@ -110,9 +98,7 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
         return new Blob([html]).size
     }
 
-    await measureExecutionTime('html下载结果:', async () => {
-        return await pool.downloads([articleURL], htmlDownloadFn)
-    })
+    await pool.downloads([articleURL], htmlDownloadFn)
 
     if (!html) {
         throw new Error('下载html失败，请稍后重试')
@@ -155,9 +141,7 @@ export async function downloadArticleHTMLs(articles: DownloadableArticle[], call
         return new Blob([fullHTML]).size
     }
 
-    await measureExecutionTime('html下载结果:', async () => {
-        return  await pool.downloads(articles, htmlDownloadFn)
-    })
+    await pool.downloads(articles, htmlDownloadFn)
 
     return results
 }
@@ -433,14 +417,13 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                     videoURLMap.set(url, `./assets/${uuid}.${ext}`)
                     return videoData.size
                 }
-                await measureExecutionTime('视频资源下载结果:', async () => {
-                    const urls: string[] = []
-                    if (poster) {
-                        urls.push(poster)
-                    }
-                    urls.push(videoUrl)
-                    return await pool.downloads<string>(urls, resourceDownloadFn, false)
-                })
+
+                const urls: string[] = []
+                if (poster) {
+                    urls.push(poster)
+                }
+                urls.push(videoUrl)
+                await pool.downloads<string>(urls, resourceDownloadFn, false)
 
                 const div = document.createElement('div')
                 div.style.cssText = 'height: 381px;background: #000;border-radius: 4px; overflow: hidden;margin-bottom: 12px;'
@@ -478,27 +461,26 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
             return audioData.size
         }
-        await measureExecutionTime('音频资源下载结果:', async () => {
-            const assets: AudioResource[] = []
-            mpAudioEls.forEach(mpAudioEl => {
-                const uuid = new Date().getTime() + Math.random().toString()
-                mpAudioEl.setAttribute('data-uuid', uuid)
-                const cover = mpAudioEl.getAttribute('cover')!
-                const voice_encode_fileid = mpAudioEl.getAttribute('voice_encode_fileid')!
-                assets.push({
-                    uuid: uuid,
-                    type: 'cover',
-                    url: cover,
-                })
-                assets.push({
-                    uuid: uuid,
-                    type: 'audio',
-                    url: 'https://res.wx.qq.com/voice/getvoice?mediaid=' + voice_encode_fileid,
-                })
-            })
 
-            return await pool.downloads<AudioResource>(assets, audioResourceDownloadFn, false)
+        const assets: AudioResource[] = []
+        mpAudioEls.forEach(mpAudioEl => {
+            const uuid = new Date().getTime() + Math.random().toString()
+            mpAudioEl.setAttribute('data-uuid', uuid)
+            const cover = mpAudioEl.getAttribute('cover')!
+            const voice_encode_fileid = mpAudioEl.getAttribute('voice_encode_fileid')!
+            assets.push({
+                uuid: uuid,
+                type: 'cover',
+                url: cover,
+            })
+            assets.push({
+                uuid: uuid,
+                type: 'audio',
+                url: 'https://res.wx.qq.com/voice/getvoice?mediaid=' + voice_encode_fileid,
+            })
         })
+
+        await pool.downloads<AudioResource>(assets, audioResourceDownloadFn, false)
     }
 
     // 下载内嵌视频
@@ -524,16 +506,15 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             videoURLMap.set(url, `./assets/${uuid}.${ext}`)
             return videoData.size
         }
-        await measureExecutionTime('视频资源下载结果:', async () => {
-            const urls: string[] = []
-            videoPageInfos.forEach(videoPageInfo => {
-                urls.push(videoPageInfo.cover_url)
-                if (videoPageInfo.is_mp_video === 1 && videoPageInfo.mp_video_trans_info.length > 0) {
-                    urls.push(videoPageInfo.mp_video_trans_info[0].url)
-                }
-            })
-            return await pool.downloads<string>(urls, resourceDownloadFn, false)
+
+        const urls: string[] = []
+        videoPageInfos.forEach(videoPageInfo => {
+            urls.push(videoPageInfo.cover_url)
+            if (videoPageInfo.is_mp_video === 1 && videoPageInfo.mp_video_trans_info.length > 0) {
+                urls.push(videoPageInfo.mp_video_trans_info[0].url)
+            }
         })
+        await pool.downloads<string>(urls, resourceDownloadFn, false)
 
         const videoIframes = $jsArticleContent.querySelectorAll('iframe.video_iframe')
         videoIframes.forEach(videoIframe => {
@@ -578,9 +559,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     }
     const imgs = $jsArticleContent.querySelectorAll<HTMLImageElement>('img')
     if (imgs.length > 0) {
-        await measureExecutionTime('图片下载结果:', async () => {
-            return await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
-        })
+        await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
     }
 
 
@@ -607,9 +586,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
         }
         const url2pathMap = new Map<string, string>()
 
-        await measureExecutionTime('背景图片下载结果:', async () => {
-            return await pool.downloads<string>([...bgImageURLs], bgImgDownloadFn)
-        })
+        await pool.downloads<string>([...bgImageURLs], bgImgDownloadFn)
 
         // 替换背景图片路径
         pageContentHTML = pageContentHTML.replaceAll(/((?:background|background-image): url\((?:&quot;)?)((?:https?|\/\/)[^)]+?)((?:&quot;)?\))/gs, (_, p1, url, p3) => {
@@ -648,9 +625,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     let localLinks: string = ''
     const links = document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')
     if (links.length > 0) {
-        await measureExecutionTime('样式下载结果:', async () => {
-            return await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn, false)
-        })
+        await pool.downloads<HTMLLinkElement>([...links], linkDownloadFn, false)
     }
 
     // 处理自定义组件
