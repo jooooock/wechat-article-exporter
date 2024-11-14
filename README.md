@@ -16,7 +16,7 @@
 
 ## 注意
 
-由于免费的代理资源有限，因此推荐 **私有部署 + 搭建私有代理节点** 服用，部署教程在下方。
+由于免费的代理资源有限，因此推荐 **搭建私有代理节点** 服用，私有代理节点代码在下方。
 
 
 ## :dart: 特性
@@ -55,11 +55,15 @@
 ## :rocket: 私有部署
 
 > [!WARNING]
-> 由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。
+> ~~由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。~~
 > 
-> 或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。
+> ~~或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。~~
 > 
-> 另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。
+> ~~另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。~~
+> 
+> 2024.11.14 更新
+> 
+> 推荐使用 **[公共网站](https://wechat-article-exporter.deno.dev/)** + **私有代理节点** 的形式使用。
 
 <details>
 <summary><span style="font-size: 16px;font-weight: 500;">部署到 Deno Deploy</span></summary>
@@ -161,95 +165,226 @@
 
 数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
 
-目前有以下代理节点:
+目前公共代理有以下节点:
 ```
-https://vproxy-01.deno.dev
-https://vproxy-02.deno.dev
-https://vproxy-03.deno.dev (本月额度已用完，刷新时间: 2024-11-02 at 19:59:12)
-https://vproxy-04.deno.dev (本月额度已用完，刷新时间: 2024-11-02 at 19:59:12)
-https://vproxy-05.deno.dev (本月额度已用完，刷新时间: 2024-11-08 at 12:22:38)
-https://vproxy-06.deno.dev (本月额度已用完，刷新时间: 2024-11-08 at 12:22:38)
-https://vproxy-07.deno.dev
-https://vproxy-08.deno.dev
-https://vproxy-09.deno.dev
-https://vproxy-10.deno.dev
-https://vproxy-11.deno.dev
-https://vproxy-12.deno.dev
-https://vproxy-13.deno.dev
-https://vproxy-14.deno.dev
-https://vproxy-15.deno.dev
-https://vproxy-16.deno.dev
-https://vproxy-01.jooooock.workers.dev
-https://vproxy-02.jooooock.workers.dev
+https://wproxy-01.deno.dev
+https://wproxy-02.deno.dev
+https://wproxy-03.deno.dev
+https://wproxy-04.deno.dev
+https://wproxy-05.deno.dev
+https://wproxy-06.deno.dev
+https://wproxy-07.deno.dev
+https://wproxy-08.deno.dev
+https://wproxy-09.deno.dev
+https://wproxy-10.deno.dev
 ```
 
-> 以上节点都是部署在 Deno Deploy / Cloudflare Workers 上面的免费账户中，算是白嫖了这些托管平台的流量。
+> 以上节点都是部署在 Deno Deploy 上面的免费账户中，每个月有100G的免费额度，超过额度之后需要等到下个周期刷新。
 >
-> 目前这些节点都是公开的，后续打算加入签名验证机制，防止被恶意盗刷。
+> 推荐搭建自己的节点使用。
 
-代理节点代码 (未进行签名验证，请酌情使用):
+代理节点代码:
 
 <details>
-<summary>Deno Deploy</summary>
+<summary>Deno Deploy (v2)</summary>
 
 ```ts
-function error(msg: Error | string) {
-    return new Response(msg instanceof Error ? msg.message : msg, {
-        status: 403,
+// deno-lint-ignore-file no-explicit-any
+// @ts-nocheck
+
+
+const UA =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36";
+const PRESETS: Record<string, Record<string, string>> = {
+    mp: {
+        Referer: "https://mp.weixin.qq.com",
+    },
+};
+
+
+function error(msg: string, status = 400) {
+    return new Response(msg, {
+        status: status,
     });
 }
 
-async function wfetch(url: string, opt: Record<string, string> = {}) {
-    if (!opt) {
-        opt = {};
-    }
-    const options: Record<string, any> = {
-        method: "GET",
-        headers: {
-            "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
-        },
-    };
-    if (opt.referer) {
-        options.headers["Referer"] = opt.referer;
-    }
+interface ParsedRequest {
+    targetURL: string;
+    targetMethod: string;
+    targetBody?: string;
+    targetHeaders: Record<string, string>;
 
-    return await fetch(url, options);
+    /**
+     * 发起请求所在的域
+     */
+    origin: string;
+
+    /**
+     * 用户id，用于判断是否为付费用户
+     */
+    uuid: string;
 }
 
-Deno.serve(async (req: Request) => {
-    if (req.method.toLowerCase() !== "get") {
-        return error("Method not allowed");
-    }
-
+/**
+ * 解析请求
+ */
+async function parseRequest(req: Request): Promise<ParsedRequest> {
     const origin = req.headers.get("origin")!;
-    const { searchParams } = new URL(req.url);
-    let url = searchParams.get("url");
-    if (!url) {
-        return error("url cannot empty");
+
+    // 代理目标的请求参数
+    let targetURL: string = '';
+    let targetMethod = "GET";
+    let targetBody: string = '';
+    let targetHeaders: Record<string, string> = {};
+    let uuid: string = '';
+    let preset: string = '';
+
+    const method = req.method.toLowerCase();
+    if (method === "get") {
+        // GET
+        // ?url=${encodeURIComponent(https://example.com?a=b)}&method=GET&headers=${encodeURIComponent(JSON.stringify(headers))}
+        const { searchParams } = new URL(req.url);
+        if (searchParams.has("url")) {
+            targetURL = decodeURIComponent(searchParams.get("url")!);
+        }
+        if (searchParams.has("method")) {
+            targetMethod = searchParams.get("method")!;
+        }
+        if (searchParams.has("body")) {
+            targetBody = decodeURIComponent(searchParams.get("body")!);
+        }
+        if (searchParams.has("headers")) {
+            try {
+                targetHeaders = JSON.parse(
+                    decodeURIComponent(searchParams.get("headers")!),
+                );
+            } catch (_: unknown) {
+                throw new Error("headers not valid");
+            }
+        }
+        if (searchParams.has("uuid")) {
+            uuid = decodeURIComponent(searchParams.get("uuid")!);
+        }
+        if (searchParams.has("preset")) {
+            preset = decodeURIComponent(searchParams.get("preset")!);
+        }
+    } else if (method === "post") {
+        // POST
+        /**
+         * payload(json):
+         * {
+         *   url: 'https://example.com',
+         *   method: 'PUT',
+         *   body: 'a=1&b=2',
+         *   headers: {
+         *     Cookie: 'name=root'
+         *   },
+         *   uuid: '',
+         *   preset: '',
+         * }
+         */
+        const payload = await req.json();
+        if (payload.url) {
+            targetURL = payload.url;
+        }
+        if (payload.method) {
+            targetMethod = payload.method;
+        }
+        if (payload.body) {
+            targetBody = payload.body;
+        }
+        if (payload.headers) {
+            targetHeaders = payload.headers;
+        }
+        if (payload.uuid) {
+            uuid = payload.uuid;
+        }
+        if (payload.preset) {
+            preset = payload.preset;
+        }
+    } else {
+        throw new Error("Method not implemented");
     }
 
-    url = decodeURIComponent(url);
-    console.log("proxy url:", url);
-
-    if (!/^https?:\/\//.test(url)) {
-        return error("url not valid");
+    if (!targetURL) {
+        throw new Error("URL not found");
+    }
+    if (!/^https?:\/\//.test(targetURL)) {
+        throw new Error("URL not valid");
+    }
+    if (targetMethod === "GET" && targetBody) {
+        throw new Error("GET method can't has body");
+    }
+    if (Object.prototype.toString.call(targetHeaders) !== "[object Object]") {
+        throw new Error("Headers not valid");
+    }
+    if (!targetHeaders["User-Agent"]) {
+        targetHeaders["User-Agent"] = UA;
     }
 
-    const response = await wfetch(url);
+    // 增加预设
+    if (preset in PRESETS) {
+        Object.assign(targetHeaders, PRESETS[preset]);
+    }
 
-    return new Response(response.body, {
+    return {
+        origin,
+        targetURL,
+        targetMethod,
+        targetBody,
+        targetHeaders,
+        uuid,
+    };
+}
+
+/**
+ * 代理请求
+ */
+function wfetch(url: string, method: string, body?: string, headers: Record<string, string> = {}) {
+    return fetch(url, {
+        method: method,
+        body: body || undefined,
         headers: {
-            "Access-Control-Allow-Origin": origin,
-            "Content-Type": response.headers.get("Content-Type")!,
+            ...headers,
         },
     });
+}
+
+
+Deno.serve(async (req: Request, info: Deno.ServeHandlerInfo) => {
+    try {
+        const {
+            origin,
+            targetURL,
+            targetMethod,
+            targetBody,
+            targetHeaders,
+            uuid,
+        } = await parseRequest(req);
+
+        // 代理请求
+        const response = await wfetch(
+            targetURL,
+            targetMethod,
+            targetBody,
+            targetHeaders,
+        );
+
+        return new Response(response.body, {
+            headers: {
+                "Access-Control-Allow-Origin": origin,
+                "Content-Type": response.headers.get("Content-Type")!,
+            },
+        });
+    } catch (err: any) {
+        return error(err.message);
+    }
 });
 ```
 </details>
 
 <details>
-<summary>Cloudflare Worker</summary>
+<summary>Cloudflare Worker (v1)</summary>
 
 ```js
 function error(msg) {
@@ -312,7 +447,7 @@ export default {
 
 
 ## 关于导出其他格式
-本项目暂不支持除`html`格式之外的其他格式，很大一部分原因是样式很难保真。如果需要其他格式，可以寻找其他格式转换工具。
+本项目暂不支持除`html`格式之外的其他格式，很大一部分原因是样式很难保真。如果需要其他格式，可以自行寻找其他格式转换工具。
 
 > PDF格式可参考: https://github.com/colin4k/wechat-article-dl
 
@@ -329,6 +464,8 @@ export default {
 ## :coffee: 支持
 
 如果你觉得本项目帮助到了你，请给作者一个免费的 Star，感谢你的支持！
+
+若有任何技术或部署问题，本人也提供付费咨询服务，详情可添加本人微信(champkeh)，备注: 公众号文章下载
 
 
 ## 关于后续更新计划

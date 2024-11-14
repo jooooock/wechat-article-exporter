@@ -9,6 +9,7 @@
         <p class="login__type__container__scan__info__desc">微信扫一扫，选择该微信下的</p>
         <p class="login__type__container__scan__info__desc">公众平台账号登录</p>
       </div>
+
       <!-- 扫码成功，可登录账号=1 -->
       <div class="login__type__container__scan__info__inner" v-else-if="scanLoginType === 1">
         <div class="login__type__container__scan_mask">
@@ -20,6 +21,7 @@
         <p class="login__type__container__scan__info__desc">请在微信中确认账号登录</p>
         <a href="javascript:;" @click="refreshQrcode">重新扫码</a>
       </div>
+
       <!-- 扫码成功，可登录账号>1 -->
       <div class="login__type__container__scan__info__inner" v-else-if="scanLoginType === 2">
         <div class="login__type__container__scan_mask">
@@ -31,6 +33,7 @@
         <p class="login__type__container__scan__info__desc">请在微信中选择账号登录</p>
         <a href="javascript:;" @click="refreshQrcode">重新扫码</a>
       </div>
+
       <!-- 没有可登录账号 -->
       <div class="login__type__container__scan__info__inner login__type__container__scan__noaccount" v-else-if="scanLoginType === 3">
         <div class="login__type__container__scan_mask">
@@ -44,6 +47,7 @@
         </p>
         <a href="javascript:;" @click="refreshQrcode">重新扫码</a>
       </div>
+
       <!-- 登录失败 -->
       <div class="login__type__container__scan__info__inner" v-else-if="scanLoginType === 4">
         <div class="login__type__container__scan_mask">
@@ -58,6 +62,7 @@
         </p>
         <p class="login__type__container__scan__info__desc">或使用账号密码登录</p>
       </div>
+
       <!-- 二维码已过期 -->
       <div class="login__type__container__scan__info__inner" v-else-if="scanLoginType === 5">
         <div class="login__type__container__scan_mask">
@@ -71,6 +76,7 @@
         <p class="login__type__container__scan__info__desc">微信扫一扫，选择该微信下的</p>
         <p class="login__type__container__scan__info__desc">公众平台账号登录</p>
       </div>
+
       <!-- 二维码加载失败 -->
       <div class="login__type__container__scan__info__inner" v-else-if="scanLoginType === 6">
         <div class="login__type__container__scan_mask">
@@ -84,6 +90,7 @@
         <p class="login__type__container__scan__info__desc">微信扫一扫，选择该微信下的</p>
         <p class="login__type__container__scan__info__desc">公众平台账号登录</p>
       </div>
+
       <!-- qq号需要绑定邮箱 -->
       <div class="login__type__container__scan__info__inner" v-else-if="scanLoginType === 7">
         <div class="login__type__container__scan_mask">

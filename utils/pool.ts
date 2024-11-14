@@ -93,11 +93,28 @@ class ProxyPool {
         }));
     }
 
-    init() {
-        this.proxies.forEach(proxy => {
-            proxy.busy = false
-            proxy.cooldown = false
-        })
+    /**
+     * 初始化代理池
+     * 可以传入新的代理地址列表（私有代理地址）
+     * @param proxyUrls
+     */
+    init(proxyUrls: string[] = []) {
+        if (proxyUrls.length > 0) {
+            this.proxies = proxyUrls.map(url => ({
+                address: url,
+                busy: false,
+                cooldown: false,
+                usageCount: 0,
+                successCount: 0,
+                failureCount: 0,
+                traffic: 0,
+            }));
+        } else {
+            this.proxies.forEach(proxy => {
+                proxy.busy = false
+                proxy.cooldown = false
+            })
+        }
     }
 
     async getAvailableProxy() {
@@ -291,8 +308,21 @@ async function download<T extends DownloadResource>(resource: T, downloadFn: Dow
  * @param useProxy
  */
 export async function downloads<T extends DownloadResource>(resources: T[], downloadFn: DownloadFn<T>, useProxy = true) {
+    // 检查是否设置了私有代理地址
+    const privateProxy: string[] = []
+    try {
+        const proxy = JSON.parse(window.localStorage.getItem('wechat-proxy')!)
+        if (Array.isArray(proxy) && proxy.length > 0) {
+            privateProxy.push(...proxy)
+        }
+    } catch (e) {
+        console.log(e)
+    }
+
     // 初始化 pool
-    pool.init()
+    pool.init(privateProxy)
+
+    console.debug('本次下载使用代理为: ', pool.proxies)
 
     const tasks = resources.map(resource => download<T>(resource, downloadFn, useProxy));
     return await Promise.all(tasks)
