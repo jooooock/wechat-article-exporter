@@ -231,7 +231,7 @@ async function downloadResource<T extends DownloadResource>(proxy: ProxyInstance
  * @param useProxy
  * @param maxRetries
  */
-async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, resource: T, downloadFn: DownloadFn<T>, useProxy = true, maxRetries = 100): Promise<DownloadResult> {
+async function downloadWithRetry<T extends DownloadResource>(pool: ProxyPool, resource: T, downloadFn: DownloadFn<T>, useProxy = true, maxRetries = 30): Promise<DownloadResult> {
     let attempts = 0;
     let isSuccess = false;
     let size: number = 0;

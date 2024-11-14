@@ -95,10 +95,14 @@ export async function downloadArticleHTML(articleURL: string, title?: string) {
         // 验证是否下载完整
         const document = parser.parseFromString(fullHTML, 'text/html')
         const $jsContent = document.querySelector('#js_content')
+        const $layout = document.querySelector('#js_fullscreen_layout_padding')
         if (!$jsContent) {
-            if (title) {
-                console.info(title)
+            if ($layout) {
+                console.log(`文章(${title})已被删除，跳过下载`)
+                return 0
             }
+
+            console.log(`文章(${title})下载失败`)
             throw new Error('下载失败，请重试')
         }
         html = fullHTML
@@ -132,10 +136,14 @@ export async function downloadArticleHTMLs(articles: DownloadableArticle[], call
         // 验证是否下载完整
         const document = parser.parseFromString(fullHTML, 'text/html')
         const $jsContent = document.querySelector('#js_content')
+        const $layout = document.querySelector('#js_fullscreen_layout_padding')
         if (!$jsContent) {
-            if (article.title) {
-                console.info(article.title)
+            if ($layout) {
+                console.log(`文章(${article.title})已被删除，跳过下载`)
+                return 0
             }
+
+            console.log(`文章(${article.title})下载失败`)
             throw new Error('下载失败，请重试')
         }
 
