@@ -16,7 +16,12 @@
 
 ## 注意
 
-由于免费的代理资源有限，因此推荐 **搭建私有代理节点** 服用，私有代理节点代码在下方。
+由于免费的代理资源有限，因此推荐 **搭建私有代理节点** 服用，私有代理可部署在以下平台：
+
+- [Deno Deploy][Deno Deploy]
+- [Cloudflare Workers][Cloudflare Workers]
+
+查看 [搭建私有代理节点](docs/private-proxy.md) 教程。
 
 
 ## :dart: 特性
@@ -43,69 +48,51 @@
 
 2. 二维码扫码登录
 
-进入 [登录页面]，用微信扫描页面上的二维码，然后选择自己的公众号进行登录。
+进入 [登录页面]，用微信扫描页面上的二维码，然后选择自己的 **公众号** 进行登录。
 
-3. 搜索目标公众号，开始下载文章
+> 注意，必须选择公众号登录，用小程序登录无法使用。
+
+3. 配置私有代理(推荐)
+
+在设置页面配置私有代理地址，如下所示：
+
+![配置私有代理](assets/config-private-proxy.png)
+
+4. 搜索目标公众号，开始下载文章
 
 通过左上角的公众号切换按钮，搜索自己感兴趣的公众号，如下图所示：
 
 ![切换账号]
 
 
-## :rocket: 私有部署
+## :earth_americas: 关于代理节点
 
-> [!WARNING]
-> ~~由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。~~
-> 
-> ~~或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。~~
-> 
-> ~~另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。~~
-> 
-> 2024.11.14 更新
-> 
-> 推荐使用 **[公共网站](https://wechat-article-exporter.deno.dev/)** + **私有代理节点** 的形式使用。
+数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
 
-<details>
-<summary><span style="font-size: 16px;font-weight: 500;">部署到 Deno Deploy</span></summary>
+目前公共代理有以下节点:
+```
+https://wproxy-01.deno.dev
+https://wproxy-02.deno.dev
+https://wproxy-03.deno.dev
+https://wproxy-04.deno.dev
+https://wproxy-05.deno.dev
+https://wproxy-06.deno.dev
+https://wproxy-07.deno.dev
+https://wproxy-08.deno.dev
+https://wproxy-09.deno.dev
+https://wproxy-10.deno.dev
+```
 
-1. Fork 该项目
-
-![create a fork][create-a-fork]
-
-2. 点击 [New Project][new-deno-deploy-project] 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
-
-![create deno deploy project][create-deno-deploy-project]
-
-创建之后如下所示:
-
-![deno deploy project result][deno-deploy-project-create-result]
-
-3. 修改github仓库发布配置
-
-启用仓库的 workflows (默认fork的仓库是禁用的):
-
-![enable github workflows][enable-github-workflows]
-
-修改`.github/workflows/deno_deploy.yml`:
-
-![update workflows project][update-workflows-project]
-
-提交:
-
-![commit changes][commit-changes]
-
-4. 等待发布结果
-
-![deploy success][deploy-success]
-
-![finally website][finally-website]
-</details>
+> 这些节点全部部署在 Deno Deploy 的免费账户中，每个月有100G的免费额度，超过额度之后需要等到下个周期刷新。
+>
+> 这些节点仅供测试使用，正式使用请搭建自己的节点。
 
 
-## 内嵌音视频下载
+## 关于内嵌音视频下载
 从 2024-10-21 开始，下载机制进行了调整，文章内嵌的 **音视频下载** 需要配合浏览器插件才能下载。
 
 这里推荐用 [ModHeader插件](https://modheader.com/)，插件的配置如下:
+
 ![modheader插件设置](assets/modheader-plugin-config.png)
 
 <details>
@@ -156,296 +143,6 @@
 </details>
 
 
-## :bulb: 原理
-
-在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的。
-
-
-## :earth_americas: 关于代理池
-
-数据的下载采用代理池的思路，以便解决跨域、防盗链、加速等一系列问题。
-
-目前公共代理有以下节点:
-```
-https://wproxy-01.deno.dev
-https://wproxy-02.deno.dev
-https://wproxy-03.deno.dev
-https://wproxy-04.deno.dev
-https://wproxy-05.deno.dev
-https://wproxy-06.deno.dev
-https://wproxy-07.deno.dev
-https://wproxy-08.deno.dev
-https://wproxy-09.deno.dev
-https://wproxy-10.deno.dev
-```
-
-> 以上节点都是部署在 Deno Deploy 上面的免费账户中，每个月有100G的免费额度，超过额度之后需要等到下个周期刷新。
->
-> 推荐搭建自己的节点使用。
-
-代理节点代码:
-
-<details>
-<summary>Deno Deploy (v2)</summary>
-
-```ts
-// deno-lint-ignore-file no-explicit-any
-// @ts-nocheck
-
-
-const UA =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36";
-const PRESETS: Record<string, Record<string, string>> = {
-    mp: {
-        Referer: "https://mp.weixin.qq.com",
-    },
-};
-
-
-function error(msg: string, status = 400) {
-    return new Response(msg, {
-        status: status,
-    });
-}
-
-interface ParsedRequest {
-    targetURL: string;
-    targetMethod: string;
-    targetBody?: string;
-    targetHeaders: Record<string, string>;
-
-    /**
-     * 发起请求所在的域
-     */
-    origin: string;
-
-    /**
-     * 用户id，用于判断是否为付费用户
-     */
-    uuid: string;
-}
-
-/**
- * 解析请求
- */
-async function parseRequest(req: Request): Promise<ParsedRequest> {
-    const origin = req.headers.get("origin")!;
-
-    // 代理目标的请求参数
-    let targetURL: string = '';
-    let targetMethod = "GET";
-    let targetBody: string = '';
-    let targetHeaders: Record<string, string> = {};
-    let uuid: string = '';
-    let preset: string = '';
-
-    const method = req.method.toLowerCase();
-    if (method === "get") {
-        // GET
-        // ?url=${encodeURIComponent(https://example.com?a=b)}&method=GET&headers=${encodeURIComponent(JSON.stringify(headers))}
-        const { searchParams } = new URL(req.url);
-        if (searchParams.has("url")) {
-            targetURL = decodeURIComponent(searchParams.get("url")!);
-        }
-        if (searchParams.has("method")) {
-            targetMethod = searchParams.get("method")!;
-        }
-        if (searchParams.has("body")) {
-            targetBody = decodeURIComponent(searchParams.get("body")!);
-        }
-        if (searchParams.has("headers")) {
-            try {
-                targetHeaders = JSON.parse(
-                    decodeURIComponent(searchParams.get("headers")!),
-                );
-            } catch (_: unknown) {
-                throw new Error("headers not valid");
-            }
-        }
-        if (searchParams.has("uuid")) {
-            uuid = decodeURIComponent(searchParams.get("uuid")!);
-        }
-        if (searchParams.has("preset")) {
-            preset = decodeURIComponent(searchParams.get("preset")!);
-        }
-    } else if (method === "post") {
-        // POST
-        /**
-         * payload(json):
-         * {
-         *   url: 'https://example.com',
-         *   method: 'PUT',
-         *   body: 'a=1&b=2',
-         *   headers: {
-         *     Cookie: 'name=root'
-         *   },
-         *   uuid: '',
-         *   preset: '',
-         * }
-         */
-        const payload = await req.json();
-        if (payload.url) {
-            targetURL = payload.url;
-        }
-        if (payload.method) {
-            targetMethod = payload.method;
-        }
-        if (payload.body) {
-            targetBody = payload.body;
-        }
-        if (payload.headers) {
-            targetHeaders = payload.headers;
-        }
-        if (payload.uuid) {
-            uuid = payload.uuid;
-        }
-        if (payload.preset) {
-            preset = payload.preset;
-        }
-    } else {
-        throw new Error("Method not implemented");
-    }
-
-    if (!targetURL) {
-        throw new Error("URL not found");
-    }
-    if (!/^https?:\/\//.test(targetURL)) {
-        throw new Error("URL not valid");
-    }
-    if (targetMethod === "GET" && targetBody) {
-        throw new Error("GET method can't has body");
-    }
-    if (Object.prototype.toString.call(targetHeaders) !== "[object Object]") {
-        throw new Error("Headers not valid");
-    }
-    if (!targetHeaders["User-Agent"]) {
-        targetHeaders["User-Agent"] = UA;
-    }
-
-    // 增加预设
-    if (preset in PRESETS) {
-        Object.assign(targetHeaders, PRESETS[preset]);
-    }
-
-    return {
-        origin,
-        targetURL,
-        targetMethod,
-        targetBody,
-        targetHeaders,
-        uuid,
-    };
-}
-
-/**
- * 代理请求
- */
-function wfetch(url: string, method: string, body?: string, headers: Record<string, string> = {}) {
-    return fetch(url, {
-        method: method,
-        body: body || undefined,
-        headers: {
-            ...headers,
-        },
-    });
-}
-
-
-Deno.serve(async (req: Request, info: Deno.ServeHandlerInfo) => {
-    try {
-        const {
-            origin,
-            targetURL,
-            targetMethod,
-            targetBody,
-            targetHeaders,
-            uuid,
-        } = await parseRequest(req);
-
-        // 代理请求
-        const response = await wfetch(
-            targetURL,
-            targetMethod,
-            targetBody,
-            targetHeaders,
-        );
-
-        return new Response(response.body, {
-            headers: {
-                "Access-Control-Allow-Origin": origin,
-                "Content-Type": response.headers.get("Content-Type")!,
-            },
-        });
-    } catch (err: any) {
-        return error(err.message);
-    }
-});
-```
-</details>
-
-<details>
-<summary>Cloudflare Worker (v1)</summary>
-
-```js
-function error(msg) {
-    return new Response(msg instanceof Error ? msg.message : msg, {
-        status: 403,
-    });
-}
-
-async function wfetch(url, opt = {}) {
-    if (!opt) {
-        opt = {};
-    }
-    const options = {
-        method: "GET",
-        headers: {
-            "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
-        },
-    };
-    if (opt.referer) {
-        options.headers["Referer"] = opt.referer;
-    }
-
-    return await fetch(url, options);
-}
-
-
-export default {
-  async fetch(req, env, ctx) {
-    if (req.method.toLowerCase() !== "get") {
-        return error("Method not allowed");
-    }
-
-    const origin = req.headers.get("origin");
-    const { searchParams } = new URL(req.url);
-    let url = searchParams.get("url");
-    if (!url) {
-        return error("url cannot empty");
-    }
-
-    url = decodeURIComponent(url);
-    console.log("proxy url:", url);
-
-    if (!/^https?:\/\//.test(url)) {
-        return error("url not valid");
-    }
-
-    const response = await wfetch(url);
-
-    return new Response(response.body, {
-        headers: {
-            "Access-Control-Allow-Origin": origin,
-            "Content-Type": response.headers.get("Content-Type"),
-        },
-    });
-  },
-};
-```
-</details>
-
-
 ## 关于导出其他格式
 本项目暂不支持除`html`格式之外的其他格式，很大一部分原因是样式很难保真。如果需要其他格式，可以自行寻找其他格式转换工具。
 
@@ -465,7 +162,60 @@ export default {
 
 如果你觉得本项目帮助到了你，请给作者一个免费的 Star，感谢你的支持！
 
-若有任何技术或部署问题，本人也提供付费咨询服务，详情可添加本人微信(champkeh)，备注: 公众号文章下载
+若有任何技术上或部署上的问题，本人也提供付费咨询服务，详情可添加本人微信(champkeh)，备注: 公众号文章下载。
+
+
+
+## :rocket: 私有部署 (网站)
+
+> [!WARNING]
+> ~~由于项目目前还没有进入稳定状态，所以如果进行了私有部署，请随时关注该项目的最新更新，特别是代理部分的变化，后续将会修改使用策略。~~
+>
+> ~~或者你可以修改`config/index.ts`中的`AVAILABLE_PROXY_LIST`变量，完全使用自己搭建的节点。~~
+>
+> ~~另外，目前只有部署到 Deno Deploy 的文档，如果需要部署到其他平台，请在 Issue 中说明。~~
+>
+> 2024.11.14 更新
+>
+> 推荐使用 **[公共网站](https://wechat-article-exporter.deno.dev/)** + **私有代理节点** 的形式使用。
+> 
+> 如果你确实需要部署私有网站，可查看下面的部署教程。
+
+<details>
+<summary><span style="font-size: 16px;font-weight: 500;">部署到 Deno Deploy</span></summary>
+
+1. Fork 该项目
+
+![create a fork][create-a-fork]
+
+2. 点击 [New Project][new-deno-deploy-project] 在 Deno Deploy 上面创建一个项目，选择你刚fork的仓库，如下图所示:
+
+![create deno deploy project][create-deno-deploy-project]
+
+创建之后如下所示:
+
+![deno deploy project result][deno-deploy-project-create-result]
+
+3. 修改github仓库发布配置
+
+启用仓库的 workflows (默认fork的仓库是禁用的):
+
+![enable github workflows][enable-github-workflows]
+
+修改`.github/workflows/deno_deploy.yml`:
+
+![update workflows project][update-workflows-project]
+
+提交:
+
+![commit changes][commit-changes]
+
+4. 等待发布结果
+
+![deploy success][deploy-success]
+
+![finally website][finally-website]
+</details>
 
 
 ## 关于后续更新计划
@@ -483,14 +233,22 @@ export default {
 
 > 目前只是有这个计划，并没有开始实施。对于之前有赞赏行为的用户，可提供优惠政策。
 
-## :star: Star 历史
 
-[![Star History Chart]][Star History Chart Link]
+## :bulb: 原理
+
+在公众号后台写文章时支持搜索其他公众号的文章功能，以此来实现抓取指定公众号所有文章的目的。
 
 
 ## :memo: 许可
 
 MIT
+
+
+## :star: Star 历史
+
+[![Star History Chart]][Star History Chart Link]
+
+
 
 <!-- Definitions -->
 

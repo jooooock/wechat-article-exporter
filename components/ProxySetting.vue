@@ -2,18 +2,26 @@
   <UCard class="mx-4 mt-4">
     <template #header>
       <h3 class="text-2xl font-semibold">私有代理</h3>
-      <p class="text-sm text-slate-10 font-serif">私有代理仅您本人使用</p>
-      <p><a href="https://github.com/jooooock/wechat-article-exporter/blob/master/docs/credentials.md" target="_blank" class="underline text-blue-600 text-sm">查看搭建教程</a></p>
+      <p class="text-sm text-slate-10 font-serif">配置的私有代理地址仅供您本人使用</p>
+      <p><a href="https://github.com/jooooock/wechat-article-exporter/blob/master/docs/private-proxy.md" target="_blank" class="underline text-blue-600 text-sm">查看搭建私有代理节点教程</a></p>
     </template>
 
     <div class="flex space-x-10">
       <textarea class="h-[400px] flex-1 p-2 border rounded resize-none" v-model="textareaValue" spellcheck="false" placeholder="请填写私有部署的代理地址，一行一个"></textarea>
       <div class="flex-1 flex-shrink-0">
         <div class="mb-3">
-          <h4 class="">说明：</h4>
           <p>代理地址要求：</p>
+          <ol>
+            <li>
+              <p>1. 以 <code class="text-rose-500 font-mono">http/https</code> 开头的绝对路径地址。</p>
+              <p>2. 该地址在使用时后面会自动拼接 <code class="text-rose-500 font-mono">?url=</code> 等参数，请确保格式正确。</p>
+            </li>
+          </ol>
+          <p class="mt-3">代理示例：</p>
+          <p><code class="text-rose-500 font-mono">https://wproxy-01.deno.dev</code></p>
+          <p><code class="text-rose-500 font-mono">https://wproxy-01.deno.dev/</code></p>
         </div>
-        <UButton type="submit" @click="save" color="black" class="w-20 justify-center disabled:bg-slate-10" :disabled="proxyList.length === 0">{{saveBtnText}}</UButton>
+        <UButton type="submit" @click="save" color="black" class="w-20 mt-5 justify-center disabled:bg-slate-10" :disabled="proxyList.length === 0">{{saveBtnText}}</UButton>
       </div>
     </div>
   </UCard>
