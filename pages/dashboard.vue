@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import {Album, ChartNoAxesCombined, Download, Globe, Settings} from 'lucide-vue-next';
+import {Album, ChartNoAxesCombined, Download, Globe, Settings, HeartHandshake} from 'lucide-vue-next';
 import {formatDistance} from "date-fns";
 import type {LogoutResponse} from "~/types/types";
 import {IMAGE_REFERER_PROXY} from '~/config'
@@ -103,6 +103,7 @@ const items = ref([
   {name: '缓存分析', icon: ChartNoAxesCombined, href: '/dashboard/analytics'},
   {name: '资源额度', icon: Globe, href: '/dashboard/usage'},
   {name: '设置', icon: Settings, href: '/dashboard/settings'},
+  {name: '技术支持', icon: HeartHandshake, href: '/dashboard/support'},
 ])
 
 const expire = loginAccount.value.expires
