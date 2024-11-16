@@ -3,7 +3,7 @@
     <img v-if="isDeleted" src="~/assets/deleted.png" alt="" class="absolute z-10 size-[100px] right-0 top-64 translate-x-full drop-shadow-[-116px_0_red]">
     <div v-if="cover" class="h-60 overflow-hidden" :style="{backgroundColor: themeColor(coverTheme!)}">
       <img
-          :src="cover"
+          :src="IMAGE_REFERER_PROXY + '?url=' + cover"
           loading="lazy"
           alt=""
           class="object-contain size-full group-hover:scale-110 ease-in-out transition duration-300">
@@ -46,6 +46,7 @@ import {saveAs} from 'file-saver'
 import {Loader} from 'lucide-vue-next';
 import {formatTimeStamp, downloadArticleHTML, packHTMLAssets, formatItemShowType} from "~/utils";
 import type {AppMsgAlbumInfo, RGB} from "~/types/types";
+import {IMAGE_REFERER_PROXY} from '~/config'
 
 
 interface Props {

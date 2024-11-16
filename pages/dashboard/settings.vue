@@ -6,12 +6,14 @@
     <div class="flex-1 overflow-scroll">
       <CredentialSetting />
       <ProxySetting />
+      <DownloadSetting />
       <div class="h-[30vh]"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+
 useHead({
   title: '设置 | 微信公众号文章导出'
 });

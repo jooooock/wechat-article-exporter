@@ -1,5 +1,5 @@
 <template>
-  <UCard class="mx-4 mt-4">
+  <UCard class="mx-4 mt-10">
     <template #header>
       <h3 class="text-2xl font-semibold">私有代理</h3>
       <p class="text-sm text-slate-10 font-serif">配置的私有代理地址仅供您本人使用</p>

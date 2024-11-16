@@ -26,7 +26,7 @@
       </a>
     </div>
     <div v-if="loginAccount" class="flex flex-col sm:flex-row items-center sm:space-x-2 ml-5">
-      <img v-if="loginAccount.avatar" :src="loginAccount.avatar" alt="" class="rounded-full size-10">
+      <img v-if="loginAccount.avatar" :src="IMAGE_REFERER_PROXY + '?url=' + loginAccount.avatar" alt="" class="rounded-full size-10">
       <span v-if="loginAccount.nickname">{{loginAccount.nickname}}</span>
     </div>
   </header>
@@ -45,7 +45,7 @@
               :class="{active: account.fakeid === activeAccount?.fakeid}"
               @click="selectAccount(account)"
           >
-            <img v-if="account.type !== 'author'" class="size-20 mr-2" :src="account.round_head_img" alt="">
+            <img v-if="account.type !== 'author'" class="size-20 mr-2" :src="IMAGE_REFERER_PROXY + '?url=' + account.round_head_img" alt="">
             <div class="flex-1">
               <div class="flex justify-between">
                 <p class="font-semibold">{{ account.nickname }}</p>
@@ -80,6 +80,7 @@ import {Loader, ArrowRightLeft} from "lucide-vue-next";
 import {packHTMLAssets} from "~/utils";
 import {ACCOUNT_LIST_PAGE_SIZE, ACCOUNT_TYPE} from "~/config";
 import {getAccountList} from "~/apis";
+import {IMAGE_REFERER_PROXY} from '~/config'
 
 
 const loginAccount = useLoginAccount()

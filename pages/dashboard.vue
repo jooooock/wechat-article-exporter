@@ -31,7 +31,7 @@
         <!-- footer -->
         <footer v-if="loginAccount" class="flex flex-col space-y-2 pt-3 border-t">
           <div class="flex items-center space-x-2">
-            <img v-if="loginAccount.avatar" :src="loginAccount.avatar" alt="" class="rounded-full size-10">
+            <img v-if="loginAccount.avatar" :src="IMAGE_REFERER_PROXY + '?url=' + loginAccount.avatar" alt="" class="rounded-full size-10">
             <UTooltip v-if="loginAccount.nickname" class="flex-1 overflow-hidden"
                       :popper="{ placement: 'top-start', offsetDistance: 16 }">
               <template #text>
@@ -86,6 +86,7 @@
 import {Album, ChartNoAxesCombined, Download, Globe, Settings} from 'lucide-vue-next';
 import {formatDistance} from "date-fns";
 import type {LogoutResponse} from "~/types/types";
+import {IMAGE_REFERER_PROXY} from '~/config'
 
 
 const route = useRoute()

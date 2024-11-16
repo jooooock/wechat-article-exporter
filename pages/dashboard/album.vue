@@ -107,7 +107,7 @@
                   </h3>
                   <time class="text-sm text-slate-10">{{ formatAlbumTime(+article.create_time) }}</time>
                 </div>
-                <img class="size-16 ml-4 flex-shrink-0" :src="article.cover_img_1_1" alt="">
+                <img class="size-16 ml-4 flex-shrink-0" :src="IMAGE_REFERER_PROXY + '?url=' + article.cover_img_1_1" alt="">
               </li>
             </ul>
             <div v-element-visibility="onElementVisibility"></div>
@@ -131,6 +131,7 @@ import type {AppMsgAlbumResult, ArticleItem, BaseInfo} from "~/types/album";
 import {vElementVisibility} from "@vueuse/components"
 import {useDownloadAlbum} from '~/composables/useBatchDownload'
 import {formatAlbumTime} from "~/utils/album";
+import {IMAGE_REFERER_PROXY} from '~/config'
 
 
 useHead({
