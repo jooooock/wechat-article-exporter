@@ -18,7 +18,7 @@
 
       <img class="w-96" src="~/assets/wechat-support.png" alt="">
 
-      <p>付费后可添加私人微信号(<code>champkeh</code>)，一对一帮您解决问题。</p>
+      <p>付费后可添加私人微信号(<code>champkeh</code>，备注: 公众号文章下载)，一对一帮您解决问题。</p>
     </div>
   </div>
 </template>
