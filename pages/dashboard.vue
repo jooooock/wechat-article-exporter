@@ -4,7 +4,7 @@
       <aside
           class="hidden md:flex flex-col h-screen w-[250px] flex-shrink-0 justify-between border-r border-slate-4 bg-slate-1 px-4 pb-6">
         <div class="flex items-center h-[60px]">
-          <NuxtLink to="/dashboard" class="px-2 font-bold text-xl">微信公众号文章导出</NuxtLink>
+          <NuxtLink to="/" class="px-2 font-bold text-xl">微信公众号文章导出</NuxtLink>
         </div>
 
         <!-- 导航菜单 -->
