@@ -4,7 +4,6 @@
 
 # wechat-article-exporter
 
-[![Deploy][deploy-badge]][deploy]
 ![GitHub stars]
 ![GitHub forks]
 ![GitHub License]
