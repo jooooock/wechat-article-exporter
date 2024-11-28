@@ -28,6 +28,8 @@ export function formatItemShowType(type: number) {
             return '图片分享'
         case 10:
             return '文本分享'
+        case 11:
+            return '文章分享'
         case 17:
             return '短文'
         default:
@@ -172,7 +174,6 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     $jsArticleContent.querySelector('#js_top_ad_area')?.remove()
     $jsArticleContent.querySelector('#js_tags_preview_toast')?.remove()
     $jsArticleContent.querySelector('#content_bottom_area')?.remove()
-    $jsArticleContent.querySelector('#js_temp_bottom_area')?.remove()
     $jsArticleContent.querySelectorAll('script').forEach(el => {
         el.remove()
     })
@@ -219,7 +220,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     const ipWrp = document.getElementById('js_ip_wording_wrp')!
     const ipWording = document.getElementById('js_ip_wording')!
     const ipWordingMatchResult = html.match(/window\.ip_wording = (?<data>{\s+countryName: '[^']+',[^}]+})/s)
-    if (ipWordingMatchResult && ipWordingMatchResult.groups && ipWordingMatchResult.groups.data) {
+    if (ipWrp && ipWording && ipWordingMatchResult && ipWordingMatchResult.groups && ipWordingMatchResult.groups.data) {
         const json = ipWordingMatchResult.groups.data
         eval('window.ip_wording = ' + json)
         const ipWordingDisplay = getIpWoridng((window as any).ip_wording)
@@ -423,7 +424,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                     urls.push(poster)
                 }
                 urls.push(videoUrl)
-                await pool.downloads<string>(urls, resourceDownloadFn, false)
+                await pool.downloads<string>(urls, resourceDownloadFn)
 
                 const div = document.createElement('div')
                 div.style.cssText = 'height: 381px;background: #000;border-radius: 4px; overflow: hidden;margin-bottom: 12px;'
@@ -480,7 +481,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
             })
         })
 
-        await pool.downloads<AudioResource>(assets, audioResourceDownloadFn, false)
+        await pool.downloads<AudioResource>(assets, audioResourceDownloadFn)
     }
 
     // 下载内嵌视频
@@ -514,7 +515,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 urls.push(videoPageInfo.mp_video_trans_info[0].url)
             }
         })
-        await pool.downloads<string>(urls, resourceDownloadFn, false)
+        await pool.downloads<string>(urls, resourceDownloadFn)
 
         const videoIframes = $jsArticleContent.querySelectorAll('iframe.video_iframe')
         videoIframes.forEach(videoIframe => {
@@ -557,7 +558,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
         return imgData.size
     }
-    const imgs = $jsArticleContent.querySelectorAll<HTMLImageElement>('img')
+    const imgs = Array.from($jsArticleContent.querySelectorAll<HTMLImageElement>('img')).filter(img => img.getAttribute('src')?.trim())
     if (imgs.length > 0) {
         await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
     }
