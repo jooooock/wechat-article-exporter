@@ -1,6 +1,15 @@
 {
   "name": "wechat-article-exporter",
   "version": "0.0.3",
+  "description": "微信公众号批量下载工具",
+  "keywords": [
+    "公众号",
+    "公众号文章",
+    "批量下载",
+    "在线下载",
+    "wechat",
+    "download"
+  ],
   "type": "module",
   "scripts": {
     "dev": "node -e \"const version = process.version.slice(1);if (parseInt(version.split('.')[0]) < 20) throw new Error('Expected node version >= 20, Got ' + version)\" && nuxt dev",
