@@ -33,7 +33,7 @@ export const AVAILABLE_PROXY_LIST: string[] = [
     'https://wproxy-10.deno.dev/',
 ]
 
-export const IMAGE_REFERER_PROXY = 'https://clear-alligator-17.deno.dev'
+export const IMAGE_REFERER_PROXY = 'https://lingering-haze-9880.sonaliyadav.workers.dev/'
 
 /**
  * 扫码状态
