@@ -543,7 +543,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
     // 下载所有的图片
     const imgDownloadFn = async (img: HTMLImageElement, proxy: string) => {
-        const url = img.src || img.dataset.src!
+        const url = img.getAttribute('src') || img.getAttribute('data-src')
         if (!url) {
             return 0
         }
@@ -558,7 +558,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
         return imgData.size
     }
-    const imgs = Array.from($jsArticleContent.querySelectorAll<HTMLImageElement>('img')).filter(img => img.getAttribute('src')?.trim())
+    const imgs = $jsArticleContent.querySelectorAll<HTMLImageElement>('img')
     if (imgs.length > 0) {
         await pool.downloads<HTMLImageElement>([...imgs], imgDownloadFn)
     }
