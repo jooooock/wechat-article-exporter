@@ -31,6 +31,6 @@ jobs:
       - name: Deploy to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: wedown
+          project: wedown12345691232323123-23
           entrypoint: server/index.ts
           root: .output
