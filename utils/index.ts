@@ -3,11 +3,10 @@ import JSZip from "jszip";
 import mime from "mime";
 import {sleep} from "@antfu/utils";
 import {getAssetCache, updateAssetCache} from "~/store/assetes";
-import type {DownloadResult} from "~/utils/pool";
 import * as pool from '~/utils/pool';
 import type {DownloadableArticle} from "~/types/types";
 import type {AudioResource, VideoPageInfo} from "~/types/video";
-import {getComment} from "~/apis/index";
+import {getComment} from "~/apis";
 
 
 export function formatTimeStamp(timestamp: number) {
@@ -61,14 +60,6 @@ async function downloadAssetWithProxy<T extends Blob | string>(url: string, prox
     })
 }
 
-async function measureExecutionTime(label: string, taskFn: () => Promise<undefined>) {
-    const start = Date.now()
-    const result = await taskFn()
-    const end = Date.now()
-    const total = (end - start) / 1000;
-
-    return result
-}
 
 /**
  * 下载文章的 html
@@ -245,6 +236,46 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
     const titleModifiedMatchResult = html.match(/window\.isTitleModified = "(?<data>\d*)" \* 1;/)
     if (titleModifiedMatchResult && titleModifiedMatchResult.groups && titleModifiedMatchResult.groups.data) {
         __setTitleModify(titleModifiedMatchResult.groups.data === '1')
+    }
+
+    // 文章引用
+    const js_share_source = document.getElementById('js_share_source')
+    const contentTpl = document.getElementById('content_tpl')
+    if (js_share_source && contentTpl) {
+        const html = contentTpl.innerHTML
+            .replace(/<img[^>]*>/g, '<p>[图片]</p>')
+            .replace(/<iframe [^>]*?class=\"res_iframe card_iframe js_editor_card\"[^>]*?data-cardid=[\'\"][^\'\"]*[^>]*?><\/iframe>/ig, '<p>[卡券]</p>')
+            .replace(/<mpvoice([^>]*?)js_editor_audio([^>]*?)><\/mpvoice>/g, '<p>[语音]</p>')
+            .replace(/<mpgongyi([^>]*?)js_editor_gy([^>]*?)><\/mpgongyi>/g, '<p>[公益]</p>')
+            .replace(/<qqmusic([^>]*?)js_editor_qqmusic([^>]*?)><\/qqmusic>/g, '<p>[音乐]</p>')
+            .replace(/<mpshop([^>]*?)js_editor_shop([^>]*?)><\/mpshop>/g, '<p>[小店]</p>')
+            .replace(/<iframe([^>]*?)class=[\'\"][^\'\"]*video_iframe([^>]*?)><\/iframe>/g, '<p>[视频]</p>')
+            .replace(/(<iframe[^>]*?js_editor_vote_card[^<]*?<\/iframe>)/gi, '<p>[投票]</p>')
+            .replace(/<mp-weapp([^>]*?)weapp_element([^>]*?)><\/mp-weapp>/g, '<p>[小程序]</p>')
+            .replace(/<mp-miniprogram([^>]*?)><\/mp-miniprogram>/g, '<p>[小程序]</p>')
+            .replace(/<mpproduct([^>]*?)><\/mpproduct>/g, '<p>[商品]</p>')
+            .replace(/<mpcps([^>]*?)><\/mpcps>/g, '<p>[商品]</p>');
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        let content = div.innerText;
+        content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;').trim();
+        if (content.length > 140) {
+            content = content.substr(0, 140) + '...';
+        }
+        const digest = content.split('\n').map(function(line) {
+            return '<p>' + line + '</p>';
+        })
+        document.getElementById('js_content')!.innerHTML = digest.join('');
+
+        // 替换url
+        const sourceURL = js_share_source.getAttribute('data-url')
+        if (sourceURL) {
+            const link = document.createElement('a')
+            link.href = sourceURL
+            link.className = js_share_source.className
+            link.innerHTML = js_share_source.innerHTML
+            js_share_source.replaceWith(link)
+        }
     }
 
     // 下载留言数据
@@ -510,7 +541,9 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
 
         const urls: string[] = []
         videoPageInfos.forEach(videoPageInfo => {
-            urls.push(videoPageInfo.cover_url)
+            if (videoPageInfo.cover_url) {
+                urls.push(videoPageInfo.cover_url)
+            }
             if (videoPageInfo.is_mp_video === 1 && videoPageInfo.mp_video_trans_info.length > 0) {
                 urls.push(videoPageInfo.mp_video_trans_info[0].url)
             }
@@ -525,7 +558,7 @@ export async function packHTMLAssets(html: string, title: string, zip?: JSZip) {
                 if (videoInfo) {
                     const div = document.createElement('div')
                     div.style.cssText = 'height: 508px;background: #000;border-radius: 4px; overflow: hidden;margin-bottom: 12px;'
-                    div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0].url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%;height: 100%;"></video>`
+                    div.innerHTML = `<video src="${videoURLMap.get(videoInfo.mp_video_trans_info[0]?.url)}" poster="${videoURLMap.get(videoInfo.cover_url)}" controls style="width: 100%;height: 100%;"></video>`
                     videoIframe.replaceWith(div)
                 }
             } else {
