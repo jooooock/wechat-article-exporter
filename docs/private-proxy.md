@@ -3,6 +3,18 @@
 
 ## 部署到 Deno Deploy
 
+在 Deno Deploy 控制台点击`New Playground`，创建一个项目，如下：
+![img.png](../assets/private-proxy/img.png)
+![img_1.png](../assets/private-proxy/img_1.png)
+
+将下面的代码拷贝到左侧代码编辑区，并点击`Save & Deploy`按钮：
+
+![img_2.png](../assets/private-proxy/img_2.png)
+
+保存成功后，后侧会出现`URL not found`提示，表示代理搭建完成。
+
+复制右侧地址栏中的地址(https://deep-boa-76.deno.dev)，配置进页面中即可使用。
+
 > 代码版本: v2
 
 ```ts
@@ -197,6 +209,18 @@ Deno.serve(async (req: Request, info: Deno.ServeHandlerInfo) => {
 ```
 
 ## 部署到 Cloudflare Workers
+
+在控制台的左侧`Workers & Pages`菜单中点击创建 Worker，创建一个新的 worker，如下所示：
+
+![img_3.png](../assets/private-proxy/img_3.png)
+![img_4.png](../assets/private-proxy/img_4.png)
+
+部署之后，点击【编辑代码】，将下面的代码粘贴到左侧编辑区：
+
+![img_5.png](../assets/private-proxy/img_5.png)
+![img_6.png](../assets/private-proxy/img_6.png)
+
+发布成功之后，同样地址栏中的地址即为代理地址。
 
 > 代码版本: v1
 
