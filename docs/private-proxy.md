@@ -3,6 +3,8 @@
 
 ## 部署到 Deno Deploy
 
+![搭建代理教程-deno-deploy版](../assets/private-proxy/搭建代理教程-deno-deploy版.mp4)
+
 在 Deno Deploy 控制台点击`New Playground`，创建一个项目，如下：
 ![img.png](../assets/private-proxy/img.png)
 ![img_1.png](../assets/private-proxy/img_1.png)
