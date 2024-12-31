@@ -87,63 +87,8 @@ https://wproxy-10.deno.dev
 > **这些节点仅供测试使用，正式使用请搭建自己的私有节点。**
 
 
-## 关于内嵌音视频下载
-从 2024-10-21 开始，下载机制进行了调整，文章内嵌的 **音视频下载** 需要配合浏览器插件才能下载。
-
-这里推荐用 [ModHeader插件](https://modheader.com/)，插件的配置如下:
-
-![modheader插件设置](assets/modheader-plugin-config.png)
-
-<details>
-<summary>配置说明</summary>
-
-请求头中添加`Referer`，值为`https://mp.weixin.qq.com/`, 解决页面上图片显示及视频资源下载问题。
-
-响应头中添加`Access-Control-Allow-Origin`，值为`*`, 解决下载资源接口跨域问题。
-
-过滤器添加2个域名：`wechat-article-exporter.deno.dev`和`localhost`，表示只有这些域名发起的请求才会应用这些配置。`localhost`用于本地开发调试。
-
-可复制以下配置直接导入到 ModHeader 插件中:
-```json
-[
-  {
-    "headers": [
-      {
-        "appendMode": false,
-        "enabled": true,
-        "name": "Referer",
-        "value": "https://mp.weixin.qq.com/"
-      }
-    ],
-    "initiatorDomainFilters": [
-      {
-        "domain": "wechat-article-exporter.deno.dev",
-        "enabled": true
-      },
-      {
-        "domain": "localhost",
-        "enabled": true
-      }
-    ],
-    "respHeaders": [
-      {
-        "appendMode": false,
-        "enabled": true,
-        "name": "Access-Control-Allow-Origin",
-        "value": "*"
-      }
-    ],
-    "shortTitle": "1",
-    "title": "公众号文章导出",
-    "version": 2
-  }
-]
-```
-</details>
-
-
 ## 关于导出其他格式
-本项目暂不支持除`html`格式之外的其他格式，很大一部分原因是样式很难保真。如果需要其他格式，可以自行寻找其他格式转换工具。
+本项目暂不支持导出除`html`格式之外的其他格式，很大一部分原因是样式很难保真。如果需要其他格式，可以自行寻找其他格式转换工具。
 
 > PDF格式可参考: https://github.com/colin4k/wechat-article-dl
 
@@ -177,6 +122,8 @@ https://wproxy-10.deno.dev
 > 推荐使用 **[公共网站](https://wechat-article-exporter.deno.dev/)** + **私有代理节点** 的形式使用。
 > 
 > 如果你确实需要部署私有网站，可查看下面的部署教程。
+> 
+> 注意：公众网站(也就是 https://wechat-article-exporter.deno.dev/ )的功能是最全的，后续某些 Pro 版功能只会出现在公共网站中，私有部署不支持。
 
 <details>
 <summary><span style="font-size: 16px;font-weight: 500;">部署到 Deno Deploy</span></summary>
